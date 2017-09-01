@@ -1,6 +1,6 @@
 input_args <- commandArgs(trailingOnly=T)
 fname <- input_args[1] 
-d = read.table(fname)
+d <- readChar(fname, file.info(fname)$size)
 # fileConn<-file("output.txt")
 # writeLines(c("Hello","World"), fileConn)
 # close(fileConn)
