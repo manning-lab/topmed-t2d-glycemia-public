@@ -15,7 +15,7 @@ task getScript {
 	}
 }
 
-task runScript {
+task vcfToGds {
 	File in
 	File indat
 	Int disksize
@@ -34,13 +34,42 @@ task runScript {
 	}
 }
 
-workflow w {
-	File infile
+task vcfToBgvcf {
+	File vcf_in
+	Int diskSize
+	Float Memory
+	File bgfile = vcf_in + ".gz"
 
-	call getScript
-	call runScript {input: in=getScript.outscript, indat=infile}
+	command {
+		bgzip -c ${vcf_in} > ${bgfile}
+		tabix -p vcf ${bgfile}
+	}
+
+	runtime {
+		docker: "biowardrobe2/samtools@sha256:e4dad5f38c1b782d3f1608410c07e8dc47fb7b92bc427175a160dfa0813c48d8"
+		disks: "local-disk ${diskSize} SSD"
+		memory: "${Memory}G"
+	}
 
 	output {
-		File outfile = runScript.out
+		File zip = "${vcf_in}.gz"
+		File ind = "${vcf_in}.gz.tbi"
+	}
+}
+
+workflow w {
+	File infile
+	Int thisDisksize
+	Float thisMemory
+	Boolean gzip
+	Boolean gds
+
+	if(gds) {
+		call getScript
+		call vcfToGds {input: in=getScript.outscript, indat=infile, disksize=thisDisksize, memory=thisMemory}
+	}
+
+	if(gzip) {
+		call vcfToBgvcf {input: vcf_in=infile, diskSize=thisDisksize, Memory=thisMemory}
 	}
 }
