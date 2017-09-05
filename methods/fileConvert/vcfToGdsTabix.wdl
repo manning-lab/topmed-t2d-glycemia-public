@@ -53,28 +53,33 @@ task vcfToBgvcf {
 	output {
 		String zip = "${vcf_in}" + ".gz"
 		String ind = "${vcf_in}" + ".gz.tbi"
+		# File zip = "${vcf_in}.gz"
+		# File ind = "${vcf_in}.gz.tbi"
 	}
 }
 
 workflow w {
-	File infile
+	Array[File] infiles
 	Int thisDisksize
 	Float thisMemory
 	Boolean gzip
 	Boolean gds
 
-	if(gds) {
-		call getScript
-		call vcfToGds {input: in=getScript.outscript, indat=infile, disksize=thisDisksize, memory=thisMemory}
-	}
+	scatter(this_file in infiles) {
 
-	if(gzip) {
-		call vcfToBgvcf {input: vcf_in=infile, diskSize=thisDisksize, Memory=thisMemory}
+		if(gds) {
+			call getScript
+			call vcfToGds {input: in=getScript.outscript, indat=this_file, disksize=thisDisksize, memory=thisMemory}
+		}
+
+		if(gzip) {
+			call vcfToBgvcf {input: vcf_in=this_file, diskSize=thisDisksize, Memory=thisMemory}
+		}
 	}
 
 	output {
-		File? gdsOut = vcfToGds.out
-		File? vcfzip = vcfToBgvcf.zip
-		File? vcfind = vcfToBgvcf.ind
+		Array[File]? gdsOut = select_all(vcfToGds.out)
+		Array[File]? vcfzip = select_all(vcfToBgvcf.zip)
+		Array[File]? vcfind = select_all(vcfToBgvcf.ind)
 	}
 }
