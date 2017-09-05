@@ -7,7 +7,7 @@ task getScript {
 	}
 
 	runtime {
-		docker: "tmajarian/wget@sha256:2808366a79e76c01fdfa007413f400c811918060f0c25d1c7b28d5e19c504215"
+		docker: "tmajarian/alpine_wget@sha256:2534252c3acc4b4c4a11ee9fc369de8065d5b35d0f6d6b66bea78f82a2a95495"
 	}
 
 	output {
