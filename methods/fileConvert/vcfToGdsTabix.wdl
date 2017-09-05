@@ -7,7 +7,7 @@ task getScript {
 	}
 
 	runtime {
-		docker: "tmajarian/alpine_wget@sha256:2534252c3acc4b4c4a11ee9fc369de8065d5b35d0f6d6b66bea78f82a2a95495"
+		docker: "tmajarian/alpine_wget@sha256:f3402d7cb7c5ea864044b91cfbdea20ebe98fc1536292be657e05056dbe5e3a4"
 	}
 
 	output {
@@ -38,11 +38,10 @@ task vcfToBgvcf {
 	File vcf_in
 	Int diskSize
 	Float Memory
-	File bgfile = vcf_in + ".gz"
 
 	command {
-		bgzip -c ${vcf_in} > ${bgfile}
-		tabix -p vcf ${bgfile}
+		bgzip -c ${vcf_in} > ${vcf_in}.gz
+		tabix -p vcf ${vcf_in}.gz
 	}
 
 	runtime {
@@ -52,8 +51,8 @@ task vcfToBgvcf {
 	}
 
 	output {
-		File zip = "${vcf_in}.gz"
-		File ind = "${vcf_in}.gz.tbi"
+		String zip = "${vcf_in}" + ".gz"
+		String ind = "${vcf_in}" + ".gz.tbi"
 	}
 }
 
@@ -71,5 +70,11 @@ workflow w {
 
 	if(gzip) {
 		call vcfToBgvcf {input: vcf_in=infile, diskSize=thisDisksize, Memory=thisMemory}
+	}
+
+	output {
+		File? gdsOut = vcfToGds.out
+		File? vcfzip = vcfToBgvcf.zip
+		File? vcfind = vcfToBgvcf.ind
 	}
 }
