@@ -44,7 +44,7 @@ print(vcf_out)
 print(vcf_out_tbi)
 
 fileConn<-file("output_gds.txt")
-writeLines(paste(gds_out, fileConn)
+writeLines(gds_out, fileConn)
 close(fileConn)
 
 fileConn<-file("output_vcf.txt")
