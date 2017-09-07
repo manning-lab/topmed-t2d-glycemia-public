@@ -10,10 +10,11 @@ input_args <- commandArgs(trailingOnly=T)
 infile <- input_args[1]
 gds_flag <- input_args[2]
 vcf_flag <- input_args[3]
-
 filetype <- file_ext(infile)
 
-#outfiles <- c()
+gds_out <- ""
+vcf_out <- ""
+vcf_out_tbi <- ""
 
 if (vcf_flag == "true"){
 	vcf_out <- gsub(filetype,'vcf.gz',infile)
