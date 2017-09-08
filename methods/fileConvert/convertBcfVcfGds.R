@@ -11,14 +11,15 @@ infile <- input_args[1]
 gds_flag <- input_args[2]
 vcf_flag <- input_args[3]
 filetype <- file_ext(infile)
+filebase <- basename(infile)
 
 gds_out <- ""
 vcf_out <- ""
 vcf_out_tbi <- ""
 
 if (vcf_flag == "true"){
-	vcf_out <- gsub(filetype,'vcf.gz',infile)
-	vcf_out_tbi <- gsub(filetype,'vcf.gz.tbi',infile)
+	vcf_out <- gsub(filetype,'vcf.gz',filebase)
+	vcf_out_tbi <- gsub(filetype,'vcf.gz.tbi',filebase)
 	#outfiles <- c(outfiles,vcf_out,vcf_out_tbi)
 	vcf_gz_com <- paste("bcftools convert ", infile, " --output-type z --output ",vcf_out,sep="")
 	vcf_tbi_com <- paste("tabix -p vcf ", vcf_out, sep="")
@@ -28,7 +29,7 @@ if (vcf_flag == "true"){
 }
 
 if (gds_flag == "true"){
-	gds_out <- gsub(filetype,'gds',infile)
+	gds_out <- gsub(filetype,'gds',filebase)
 	#outfiles <- c(outfiles,gds_out)
 	if (filetype == "bcf") {
 		infile <- pipe(paste("bcftools view", infile), "rt")
