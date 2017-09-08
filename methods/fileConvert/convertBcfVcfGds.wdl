@@ -24,7 +24,7 @@ task runScript {
 		R --vanilla --args ${indat} ${gds_flag} ${vcf_flag} < ${script}
 	}
 	runtime {
-		docker: "robbyjo/r-mkl-bioconductor@sha256:96d6b7b1ab1ec89d6413c09f7fef3fdaac5e9d4293b259492ddda4cf5883d354"
+		docker: "akmanning/r-mkl-bioconductor-bcftools@sha256:432300b876907590fc0778dd214f35718477a670acc0501427dcb5a30486ae4a"
 		disks: "local-disk ${disksize} SSD"
 		memory: "${memory}G"
 	}
