@@ -50,7 +50,7 @@ task flattenArray {
     }
 
     output{
-        Array[File] filenames = read_lines("./file_of_filenames")
+        Array[String] filenames = read_lines("./file_of_filenames")
     }
 }
 
@@ -70,7 +70,7 @@ workflow w {
 
 	call flattenArray { input: arr=chunk.out }
 
-	# output { Array[File] chunks = flattenArray.filenames }
+	output { Array[File] chunks = flattenArray.filenames }
 	# output { chunk.out }
 
 }
