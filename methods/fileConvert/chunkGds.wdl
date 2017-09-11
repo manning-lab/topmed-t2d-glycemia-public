@@ -50,7 +50,7 @@ task flattenArray {
     }
 
     output{
-        Array[String] filenames = read_lines("./file_of_filenames")
+        Array[String] filenames = read_lines("file_of_filenames")
     }
 }
 
