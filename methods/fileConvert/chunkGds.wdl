@@ -70,7 +70,7 @@ workflow w {
 
 	call flattenArray { input: arr=chunk.out }
 
-	output { Array[String] chunks = flattenArray.filenames }
+	output { Array[File] chunks = flattenArray.filenames }
 	# output { chunk.out }
 
 }
