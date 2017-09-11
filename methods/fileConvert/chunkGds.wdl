@@ -42,7 +42,7 @@ task flattenArray {
 
     command{
     	echo "${sep='\n' arr}" > raw_array
-    	sed -e 's/\n//g' -e 's/\[//g' -e $'s/\]//g' -e $'s/,/\\\n/g' raw_array > file_of_filenames
+    	sed -e 's/\n//g' -e 's/\[//g' -e $'s/\]//g' -e $'s/ /\\\n/g' raw_array > file_of_filenames
     }
 
     runtime {
@@ -66,11 +66,8 @@ workflow w {
 		call chunk {input: script=getScript.outscript, gds_in=this_file, disksize=thisDisksize, memory=thisMemory}
 	}
 
-	# call chunk {input: script=getScript.outscript, gds_in=infile, disksize=thisDisksize, memory=thisMemory}
-
 	call flattenArray { input: arr=chunk.out }
 
 	output { Array[File] chunks = flattenArray.filenames }
-	# output { chunk.out }
 
 }
