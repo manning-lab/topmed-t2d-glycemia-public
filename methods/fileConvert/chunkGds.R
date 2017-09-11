@@ -5,7 +5,7 @@ input_args <- commandArgs(trailingOnly=T)
 gds.file <- input_args[1]
 outbase <- basename(gds.file)
 outbase <- substr(outbase, 0, nchar(outbase)-4)
-outbase <- paste(getwd(),"/",outbase,sep="")
+#outbase <- paste(getwd(),"/",outbase,sep="")
 
 # https://stackoverflow.com/questions/3318333/split-a-vector-into-chunks-in-r
 chunk <- function(x,n) {
