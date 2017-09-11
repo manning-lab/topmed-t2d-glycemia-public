@@ -55,22 +55,22 @@ task flattenArray {
 }
 
 workflow w {
-	# Array[File] infiles
-	File infile
+	Array[File] infiles
+	# File infile
 	Int thisDisksize
 	Float thisMemory
 
 	call getScript
 
-	# scatter(this_file in infiles) {
-	# 	call chunk {input: script=getScript.outscript, gds_in=this_file, disksize=thisDisksize, memory=thisMemory}
-	# }
+	scatter(this_file in infiles) {
+		call chunk {input: script=getScript.outscript, gds_in=this_file, disksize=thisDisksize, memory=thisMemory}
+	}
 
-	call chunk {input: script=getScript.outscript, gds_in=infile, disksize=thisDisksize, memory=thisMemory}
+	# call chunk {input: script=getScript.outscript, gds_in=infile, disksize=thisDisksize, memory=thisMemory}
 
 	# call flattenArray { input: arr=chunk.out }
 
 	# output { Array[File] chunks = flattenArray.filenames }
-	output { Array[File] chunks = chunk.out }
+	output { chunk.out }
 
 }
