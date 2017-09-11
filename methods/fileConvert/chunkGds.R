@@ -2,7 +2,7 @@
 
 library(SeqArray)
 input_args <- commandArgs(trailingOnly=T)
-gds.file <- inputs_args[1]
+gds.file <- input_args[1]
 outbase <- basename(gds.file)
 outbase <- substr(outbase, 0, nchar(outbase)-4)
 outbase <- paste(getwd(),"/",outbase,sep="")
@@ -15,7 +15,7 @@ chunk <- function(x,n) {
 
 gds <- seqOpen(gds.file)
 variant.id <- seqGetData(gds, "variant.id")
-variant.id.chunks <- chunk(variant.id,100)
+variant.id.chunks <- chunk(variant.id,400000)
 
 # loop through the chunks
 for(j in 1:length(variant.id.chunks)) {
