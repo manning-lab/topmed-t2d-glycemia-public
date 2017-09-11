@@ -42,7 +42,7 @@ task flattenArray {
 
     command{
     	echo "${sep='\n' arr}" > raw_array
-    	sed -e 's/\n//g' -e 's/\[//g' -e $'s/\]/\\\n/g' -e $'s/, /\\\n/g' raw_array > file_of_filenames   
+    	sed -e 's/\n//g' -e 's/\[//g' -e $'s/\]//g' -e $'s/,/\\\n/g' raw_array > file_of_filenames
     }
 
     runtime {
