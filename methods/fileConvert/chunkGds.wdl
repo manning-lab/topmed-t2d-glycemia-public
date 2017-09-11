@@ -68,9 +68,9 @@ workflow w {
 
 	# call chunk {input: script=getScript.outscript, gds_in=infile, disksize=thisDisksize, memory=thisMemory}
 
-	# call flattenArray { input: arr=chunk.out }
+	call flattenArray { input: arr=chunk.out }
 
 	# output { Array[File] chunks = flattenArray.filenames }
-	output { chunk.out }
+	# output { chunk.out }
 
 }
