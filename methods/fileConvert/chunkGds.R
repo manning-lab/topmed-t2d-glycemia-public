@@ -5,6 +5,7 @@ input_args <- commandArgs(trailingOnly=T)
 gds.file <- inputs_args[1]
 outbase <- basename(gds.file)
 outbase <- substr(outbase, 0, nchar(outbase)-4)
+outbase <- paste(getwd(),"/",outbase,sep="")
 
 # https://stackoverflow.com/questions/3318333/split-a-vector-into-chunks-in-r
 chunk <- function(x,n) {
@@ -18,8 +19,8 @@ variant.id.chunks <- chunk(variant.id,100)
 
 # loop through the chunks
 for(j in 1:length(variant.id.chunks)) {
+  print(paste("Chunk ",j," / ",length(variant.id.chunks),sep=""))
   seqSetFilter(gds, variant.id=variant.id.chunks[[j]])
-  
   seqExport(gds, paste(outbase,".chunk",j,".gds",sep=""))
   # reset filter
   seqResetFilter(gds)
