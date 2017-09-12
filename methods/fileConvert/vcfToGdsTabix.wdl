@@ -18,11 +18,12 @@ task getScript {
 task vcfToGds {
 	File in
 	File indat
+	String in_base = basename(indat,".vcf")
 	Int disksize
 	Float memory
 	
 	command {
-		R --vanilla --args ${indat} < ${in}
+		R --vanilla --args ${indat} ${in_base} < ${in}
 	}
 	runtime {
 		docker: "robbyjo/r-mkl-bioconductor@sha256:96d6b7b1ab1ec89d6413c09f7fef3fdaac5e9d4293b259492ddda4cf5883d354"
@@ -30,7 +31,8 @@ task vcfToGds {
 		memory: "${memory}G"
 	}
 	output { 
-		File out = read_string("output.txt")
+		#File out = read_string("output.txt")
+		String out = "${in_base}" + ".gds"
 	}
 }
 

@@ -56,9 +56,13 @@ print(paste("outcomeType:",outcomeType))
 
 
 if(length(input_args)>8) {
-covariates <- strsplit(input_args[9],split=",")[[1]]
-print(paste("covariates:",paste(covariates,collapse=" ")))
+	if (input_args[9] != "None"){
+		covariates <- strsplit(input_args[9],split=",")[[1]]
+		print(paste("covariates:",paste(covariates,collapse=" ")))
+	}
 }
+
+
 
 # load ped_file and re-order columns
 ped_file <- read.table(ped, header = TRUE, as.is = FALSE)
