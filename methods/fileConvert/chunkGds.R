@@ -15,7 +15,7 @@ chunk <- function(x,n) {
 
 gds <- seqOpen(gds.file)
 variant.id <- seqGetData(gds, "variant.id")
-variant.id.chunks <- chunk(variant.id,400000)
+variant.id.chunks <- chunk(variant.id,1000)
 
 # loop through the chunks
 for(j in 1:length(variant.id.chunks)) {
