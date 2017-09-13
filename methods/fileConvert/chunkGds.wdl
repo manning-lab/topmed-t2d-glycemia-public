@@ -38,11 +38,11 @@ task chunk {
 }
 
 task flattenArray {
-    Array[Array[File]] arr
+    Array[Array[String]] arr
 
     command{
     	echo "${sep='\n' arr}" > raw_array
-    	sed -e 's/\n//g' -e 's/\[//g' -e $'s/\]//g' -e $'s/ /\\\n/g' raw_array > file_of_filenames
+    	sed -e 's/\n//g' -e 's/\[//g' -e $'s/\]//g' -e $'s/ /\\\n/g' -e 's/,//g' raw_array > file_of_filenames
     }
 
     runtime {
@@ -50,7 +50,7 @@ task flattenArray {
     }
 
     output{
-        Array[File] filenames = read_lines("file_of_filenames")
+        Array[String] filenames = read_lines("file_of_filenames")
     }
 }
 
