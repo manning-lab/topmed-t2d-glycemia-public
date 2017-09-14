@@ -1,8 +1,8 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/association.R"
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/commonID.R"
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/summary.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/association.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/commonID.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/summary.R"
 	}
 
 	runtime {
@@ -10,7 +10,7 @@ task getScript {
 	}
 
 	output {
-		File assoc_script = "association.R"
+		File assoc_script = "association_opt.R"
 		File commonID_script = "commonID.R"
 		File summary_script = "summary.R"
 	}
@@ -59,7 +59,7 @@ task assocTest {
 	String colname
 	String outcome
 	String outcomeType
-	String covariates
+	String? covariates
 	File assocTestScript
 
 	command {
@@ -118,7 +118,7 @@ workflow w_assocTest {
 	String this_colname
 	String this_outcome
 	String this_outcomeType
-	String this_covariates
+	String? this_covariates
 	Array[File] gdsFiles
 	String this_pval 
 	String this_title

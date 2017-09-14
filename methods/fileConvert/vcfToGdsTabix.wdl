@@ -3,7 +3,7 @@
 
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/methods/fileConvert/vcfToGds.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/methods/fileConvert/vcfToGds.R"
 	}
 
 	runtime {

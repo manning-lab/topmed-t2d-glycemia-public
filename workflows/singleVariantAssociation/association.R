@@ -56,10 +56,10 @@ print(paste("outcomeType:",outcomeType))
 
 
 if(length(input_args)>8) {
-	if (input_args[9] != "None"){
-		covariates <- strsplit(input_args[9],split=",")[[1]]
-		print(paste("covariates:",paste(covariates,collapse=" ")))
-	}
+	
+	covariates <- strsplit(input_args[9],split=",")[[1]]
+	print(paste("covariates:",paste(covariates,collapse=" ")))
+
 }
 
 
