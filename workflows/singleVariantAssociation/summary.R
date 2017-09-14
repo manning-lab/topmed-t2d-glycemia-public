@@ -43,20 +43,23 @@ for (i in 1:numAssocFiles) {
 #	assoc <-  transform(assoc, BP = as.numeric(BP))
 	
 	#remove rows with null values
-	print(dim(assoc))
-	assoc <- assoc[!is.na(assoc[,pval]),]
-	print(dim(assoc))
+
+	if (!is.na(assoc)[1]){
+		print(dim(assoc))
+		assoc <- assoc[!is.na(assoc[,pval]),]
+		print(dim(assoc))
 
 	#add to assoc.compilation
 #	assoc.compilation <- rbind(assoc.compilation, assoc)
 
-	if (i == 1) {
-		write.table(assoc,paste(label, ".assoc.csv", sep=""),sep=",",row.names=F)
-	} else {
-		write.table(assoc,paste(label, ".assoc.csv", sep=""),col.names=FALSE,sep=",",row.names=F, append=TRUE)
+		if (i == 1) {
+			write.table(assoc,paste(label, ".assoc.csv", sep=""),sep=",",row.names=F)
+		} else {
+			write.table(assoc,paste(label, ".assoc.csv", sep=""),col.names=FALSE,sep=",",row.names=F, append=TRUE)
+		}	
 	}
-		
 }
+
 print(date())
 print(list.files())
 install.packages("data.table",repos='http://cran.us.r-project.org')
