@@ -1,0 +1,8 @@
+*.gds
+*.vcf
+*.vcf*
+*.bcf
+*.png
+*.pdf
+*.jpg
+*.DS_Store

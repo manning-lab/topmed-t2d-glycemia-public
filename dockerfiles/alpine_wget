@@ -1,0 +1,8 @@
+FROM alpine
+RUN apk add --update bash && rm -rf /var/cache/apk/*
+RUN apk --no-cache add wget
+RUN   apk update \                                                                                                                                                                                                                        
+  &&   apk add ca-certificates wget \                                                                                                                                                                                                      
+  &&   update-ca-certificates    
+
+CMD ["/bin/bash"]
