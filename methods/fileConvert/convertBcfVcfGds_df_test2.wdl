@@ -1,3 +1,17 @@
+task getScript {
+	command {
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/methods/fileConvert/convertBcfVcfGds_df2.R"
+	}
+
+	runtime {
+		docker: "tmajarian/alpine_wget@sha256:f3402d7cb7c5ea864044b91cfbdea20ebe98fc1536292be657e05056dbe5e3a4"
+	}
+
+	output {
+		File outscript = "convertBcfVcfGds_df2.R"
+	}
+}
+
 task runGds {
 	File script
 	File indat
@@ -59,20 +73,21 @@ task runVcf {
 
 
 workflow w {
-	File in_script
 	Array[File] infiles
 	Boolean this_gds_flag
 	Boolean this_vcf_flag
 	Int thisDisksize
 	Float thisMemory
 
+	call getScript
+
 	scatter(this_file in infiles) {
 		if (this_gds_flag) {
-			call runGds { input: script=in_script, indat=this_file, disksize=thisDisksize, memory=thisMemory}
+			call runGds { input: script=getScript.outscript, indat=this_file, disksize=thisDisksize, memory=thisMemory}
 		}
 
 		if (this_vcf_flag) {
-			call runVcf { input: script=in_script, indat=this_file, disksize=thisDisksize, memory=thisMemory}
+			call runVcf { input: script=getScript.outscript, indat=this_file, disksize=thisDisksize, memory=thisMemory}
 		}
 	}
 
