@@ -37,16 +37,18 @@ task runScript {
 }
 
 workflow w {
-	File this_gds_in
+	Array[File] this_gds_in_arr
 	Array[String] this_subset_ids
 	Float this_memory
 	Int this_disksize
 	
 	call getScript
 
-	call runScript{ input: gds_in=this_gds_in, subset_ids=this_subset_ids, script=getScript.outscript, memory=this_memory, disksize=this_disksize}
+	scatter(this_gds_in in this_gds_in_arr) {
+		call runScript{ input: gds_in=this_gds_in, subset_ids=this_subset_ids, script=getScript.outscript, memory=this_memory, disksize=this_disksize}
+	}
 
 	output {
-		File this_gds_out = runScript.out_file
+		Array[File] this_gds_out = runScript.out_file
 	}
 }
