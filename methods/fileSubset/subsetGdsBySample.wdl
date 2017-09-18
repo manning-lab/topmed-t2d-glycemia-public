@@ -24,7 +24,7 @@ task runScript {
 	Int disksize
 	
 	command {
-		R --vanilla --args ${gds_in} ${subset_ids} ${outfile} < ${script}
+		R --vanilla --args ${gds_in} ${sep= "," subset_ids} ${outfile} < ${script}
 	}
 	runtime {
 		docker: "robbyjo/r-mkl-bioconductor@sha256:96d6b7b1ab1ec89d6413c09f7fef3fdaac5e9d4293b259492ddda4cf5883d354"

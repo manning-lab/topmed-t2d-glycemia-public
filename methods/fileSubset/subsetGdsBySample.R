@@ -7,7 +7,6 @@ library(SeqArray)
 ## real inputs
 args <- commandArgs(trailingOnly=T)
 gds.file <- args[1]
-gds.subset.ids <- gsub("]","",gsub("[","",args[2]))
 gds.subset.ids <- unlist(strsplit(args[2],","))
 gds.subset.file <- args[3]
 
