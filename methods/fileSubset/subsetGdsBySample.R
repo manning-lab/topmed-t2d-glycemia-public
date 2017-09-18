@@ -1,14 +1,15 @@
 library(SeqArray)
 
 ## testing inputs:
-gds.file <- "/Users/tmajaria/Documents/projects/topmed/code/testing_inputs/singleVariantFull/freeze4.chr21.pass.gtonly.minDP10.genotypes.gds"
-gds.subset.ids <- c("NWD146248","NWD146267","NWD146274","NWD146380")
-gds.subset.label <- "test"
+# gds.file <- "/Users/tmajaria/Documents/projects/topmed/code/testing_inputs/singleVariantFull/freeze4.chr21.pass.gtonly.minDP10.genotypes.gds"
+# gds.subset.ids <- c("NWD146248","NWD146267","NWD146274","NWD146380")
+# gds.subset.label <- "test"
 ## real inputs
-# args <- commandArgs(trailingOnly=T)
-# gds.file <- args[1]
-# gds.subset.ids <- unlist(strsplit(args[2],","))
-# gds.subset.file <- args[3]
+args <- commandArgs(trailingOnly=T)
+gds.file <- args[1]
+gds.subset.ids <- gsub("]","",gsub("[","",args[2]))
+gds.subset.ids <- unlist(strsplit(args[2],","))
+gds.subset.file <- args[3]
 
 # load the gds file
 gds.data <- seqOpen(gds.file)
