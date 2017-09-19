@@ -15,9 +15,10 @@ task getScript {
 task runScript {
 	File gds_in
 	Array[String] subset_ids
+	String? label = "subset"
 
 	String outbase = basename(gds_in,".gds")
-	String outfile = outbase + "_subset.gds"
+	String outfile = outbase + label + ".gds"
 
 	File script
 	Float memory
@@ -39,13 +40,14 @@ task runScript {
 workflow w {
 	Array[File] this_gds_in_arr
 	Array[String] this_subset_ids
+	String? this_label
 	Float this_memory
 	Int this_disksize
 	
 	call getScript
 
 	scatter(this_gds_in in this_gds_in_arr) {
-		call runScript{ input: gds_in=this_gds_in, subset_ids=this_subset_ids, script=getScript.outscript, memory=this_memory, disksize=this_disksize}
+		call runScript{ input: gds_in=this_gds_in, subset_ids=this_subset_ids, label=this_label, script=getScript.outscript, memory=this_memory, disksize=this_disksize}
 	}
 
 	output {
