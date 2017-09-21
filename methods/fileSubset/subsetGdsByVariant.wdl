@@ -36,17 +36,45 @@ task runScript {
 	}
 }
 
+task combine {
+	Array[File] in_files 
+	String? label = "subset"
+	String outfile = label + ".gds"
+	Int disksize
+	Float memory
+
+	command {
+	awk '
+    	FNR==1 && NR!=1 { while (/^<header>/) getline; }
+    	1 {print}
+	' *.gds >${outfile}
+	}
+
+	runtime {
+		docker: "alpine@sha256:1072e499f3f655a032e88542330cf75b02e7bdf673278f701d7ba61629ee3ebe"
+		disks: "local-disk ${disksize} SSD"
+		memory: "${memory}G"
+	}
+
+	output {
+		File out = outfile
+	}
+}
+
 workflow w {
-	File this_gds_in
+	Array[File] this_gds_in_arr
 	Array[String] this_subset_ids
 	Float this_memory
 	Int this_disksize
 	
 	call getScript
+	scatter(this_gds in this_gds_in_arr){
+		call runScript{ input: gds_in=this_gds, subset_ids=this_subset_ids, script=getScript.outscript, memory=this_memory, disksize=this_disksize}
+	}
 
-	call runScript{ input: gds_in=this_gds_in, subset_ids=this_subset_ids, script=getScript.outscript, memory=this_memory, disksize=this_disksize}
+	call combine {input: runScript.out_file}
 
 	output {
-		File this_gds_out = runScript.out_file
+		File this_gds_out = combines.out
 	}
 }
