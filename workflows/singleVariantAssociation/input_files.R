@@ -15,7 +15,7 @@ get.markerID.column <- function(study) {
   if(study == "GENESIS-FIRECLOUD" | study == "GENESIS-QT-WALD") return("snpID")
 }
 
-get.input <- function(in.file.name, study) {
+get.input <- function(in.file.name, study,in.file.path=NA,min.maf=NA) {
 
     if(study=="meta") {
     in.file <- read.table(in.file.name,as.is=T,header=T,sep="\t")
@@ -30,10 +30,29 @@ get.input <- function(in.file.name, study) {
     return(in.file)
     
   } else if (study == "GENESIS_T2D") {
+    library(readr)
     in.file <- c()
-    for(in.file.name in list.files(pattern="^T2D_Adj_chr")) {
-      tmp <- read.csv(in.file.name,header=T,as.is=T)
-      in.file <- rbind(in.file,tmp)
+    print(getwd())
+    print(list.files(path=in.file.path,pattern=in.file.name))
+    for(in.file.name in list.files(path=in.file.path,pattern=in.file.name)) {
+      print(in.file.name)
+      tmp <- read_csv(paste(in.file.path,"/",in.file.name,sep=""),col_names=T,
+                      col_types=list(
+        snpID = col_character(),
+        chr = col_integer(),
+        n = col_integer(),
+        MAF = col_double(),
+        minor.allele = col_character(),
+        Score = col_double(),
+        Var = col_double(),
+        Score.Stat = col_double(),
+        Score.pval = col_double(),
+        pos = col_integer(),
+        ref = col_character(),
+        alt = col_character()
+      ))
+      in.file <- rbind(in.file,tmp[which(tmp[,"MAF"]>min.maf),])
+      tail(in.file)
       print(dim(in.file))
     }    
     

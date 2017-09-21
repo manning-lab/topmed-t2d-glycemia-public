@@ -10,7 +10,7 @@ task getScript {
 	}
 
 	output {
-		File assoc_script = "association_opt.R"
+		File assoc_script = "association.R"
 		File commonID_script = "commonID.R"
 		File summary_script = "summary.R"
 	}
