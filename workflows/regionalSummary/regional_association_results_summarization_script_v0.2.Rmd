@@ -1,0 +1,147 @@
+---
+title: "Genome-wide, chromosome and regional Summaries"
+output:
+  html_notebook: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r include=FALSE}
+## title: regional association results summary script
+## version: 0.1
+### required input: input file name, type, maf.threshold
+
+## type: type of file; defines how file will be read into script
+## options: epacts, meta, study, label
+
+# Command line
+#$ sudo docker run -v /mnt/data:/mnt/data -ti bioconductor/release_core2 Rscript -e 'rmarkdown::render("/mnt/data/regional_association_results_summarization_script_v0.1.Rmd")' /mnt/data/METAANALYSIS1.tbl meta
+# args <- c("/home/rstudio/test-regional-summary/FG_raw_cohort_adj10PC.assoc.csv", "GENESIS-FIRECLOUD","FG-test", "/home/rstudio/amanning/topmed-t2d-glycemia-dev/tasks/regional_summaries/input_files.R","/home/rstudio/amanning/topmed-t2d-glycemia-dev/tasks/regional_summaries/visualization_gviz.R","/home/rstudio/test-regional-summary/gtex.v6p.adipose_subcutaneous.expression.min.rpkm.0.1.txt","/home/rstudio/test-regional-summary/gtex.v6p.adipose_visceral.expression.min.rpkm.0.1.txt","/home/rstudio/test-regional-summary/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt","/home/rstudio/test-regional-summary/gtex.v6p.muscle_skeletal.expression.min.rpkm.0.1.txt","/home/rstudio/test-regional-summary/gtex.v6p.liver.expression.min.rpkm.0.1.txt","5e-4","0.01")
+knitr::opts_chunk$set(echo = TRUE,cache=TRUE,cache.path="cache/",cache.lazy=F)
+install.packages(c("qqman","codetools","data.table"))
+library(data.table)
+
+args <- commandArgs(trailingOnly=T)
+print(args)
+in.file.name <- args[1]
+study <- args[2]
+label <- args[3]
+input.file.script <- args[4]
+functions.file <- args[5]
+gtex.adipose.sub.file <- args[6]
+gtex.adipose.vis.file <- args[7]
+gtex.pancreas.file <- args[8]
+gtex.muscle.file <- args[9]
+gtex.liver.file <- args[10]
+pvalue.threshold <- as.numeric(args[11])
+maf.threshold <- as.numeric(args[12])
+
+today <- paste(strsplit(date()," +")[[1]][c(3,2,5)],collapse=" ")
+
+
+```
+
+# Regional summary `r label`
+## Date `r today`
+
+```{r input, fig.height=10,fig.width=6,include=FALSE}
+
+
+# testing
+#in.file.name <- "METAANALYSIS1.tbl"
+#study <- "meta"
+#maf.threshold <- 0.05
+#print(getwd())
+source(input.file.script)
+P.value.column <- get.pvalue.column(study)
+MarkerID.column <- get.markerID.column(study)
+
+#in.file <- get.input(in.file.name,study)
+in.file <- fread(in.file.name, data.table=FALSE, header=TRUE)
+in.file$pos <- as.numeric(in.file$pos)
+in.file$chr <- as.numeric(in.file$chr)
+in.file <- in.file[which(!is.na(in.file[,P.value.column])),]
+output.labels <- paste(label,"_regional.",sep="")
+
+library(qqman)
+source(functions.file)
+```
+## Manhattan plots, with allele frequency split at MAF = `r maf.threshold`
+
+```{r manhattanplots,fig.height=11,fig.width=8,echo=FALSE}
+layout(matrix(c(1,2,3,4,4,4,5,5,5,6,6,6),nrow=4,ncol=3,byrow=T))
+
+qq(in.file[,P.value.column],main="All variants")
+qq(in.file[which(in.file$MAF>=maf.threshold),P.value.column],main=paste("Variants with MAF>=",maf.threshold,sep=""))
+qq(in.file[which(in.file$MAF<maf.threshold),P.value.column],main=paste("Variants with MAF<",maf.threshold,sep=""))
+
+manhattan(in.file[which(in.file[,P.value.column]<0.1),],chr="chr",bp="pos",p=P.value.column,snp=MarkerID.column,main=label)
+manhattan(in.file[which(in.file[,P.value.column]<0.1 & in.file$MAF>=0.01 ),],chr="chr",bp="pos",p=P.value.column,snp=MarkerID.column,main=paste(label,"Variants with MAF>=0.01",sep="\n"))
+manhattan(in.file[which(in.file[,P.value.column]<0.1 & in.file$MAF<0.01 ),],chr="chr",bp="pos",p=P.value.column,snp=MarkerID.column,main=paste(label,"Variants with MAF<0.01",sep="\n"))
+
+print(head(in.file[order(in.file[,P.value.column]),]))
+
+```
+
+## Chromosome Plots
+
+```{r chromosomeplots,fig.height=8,fig.width=6,echo=FALSE}
+#chr <- "1"
+print(summary(in.file))
+print(pvalue.threshold)
+print(table(in.file[,P.value.column]<pvalue.threshold))
+
+all.top.snps <- c()
+for(chr in names(table(in.file[which(in.file[,P.value.column]<pvalue.threshold),"chr"]))) {
+  snps.in.chr <- in.file[which(in.file[,"chr"]==chr),]
+  
+  layout(matrix(c(1,2),ncol=1,nrow=2))
+
+  manhattan(snps.in.chr[which(snps.in.chr[,P.value.column]<0.01),],
+            chr="chr",bp="pos",p=P.value.column,main=paste("Chromosome",chr),
+            snp=MarkerID.column)
+  
+  qq(snps.in.chr[,P.value.column],main=paste("Chromosome",chr),pch=19)
+
+  top.snps <- snps.in.chr[which(snps.in.chr[,P.value.column]<pvalue.threshold),]
+  top.snps <- top.snps[order(top.snps[,P.value.column]),]
+  
+  while(nrow(top.snps)>0) {
+    # take top snp
+   # print(nrow(top.snps))
+    all.top.snps <- rbind(all.top.snps,top.snps[1,])
+    top.snp.pos <- top.snps$pos[1]
+    snps.region <- snps.in.chr[which(snps.in.chr$pos>top.snp.pos-1000000 &
+                                           snps.in.chr$pos<top.snp.pos+1000000),]
+   # do.Qings.Gviz(snps.region,paste("chr",chr,sep=""),chr,top.snps[1,"MARKER_ID"],plot=T)
+    
+    top.snps <- top.snps[setdiff(seq(1,nrow(top.snps)),
+                                     which(top.snps[,MarkerID.column] %in% snps.region[,MarkerID.column])),]
+  }
+  
+  
+}
+
+print(all.top.snps)
+#write.table(all.top.snps,paste(output.labels,".csv",sep=""),sep=",",row.names=F)
+
+```
+
+## Regional Plots
+
+```{r regionalplots,fig.height=10,fig.width=6,echo=FALSE}
+
+for(i in  which(all.top.snps[,P.value.column] < pvalue.threshold)) {
+  #print(all.top.snps[i,])
+  
+  snps.region <- in.file[which(in.file$pos > all.top.snps[i,"pos"]-1000000 &
+                                  in.file$pos < all.top.snps[i,"pos"]+1000000 &
+                                  in.file[,"chr"]==all.top.snps[i,"chr"]),]
+  
+   do.Qings.Gviz(snps.region,paste("chr",all.top.snps[i,"chr"],sep=""),all.top.snps[i,"chr"],all.top.snps[i,MarkerID.column],P.value.column=P.value.column,MarkerID.column=MarkerID.column,plot=F)
+}
+
+```
+
+
+
