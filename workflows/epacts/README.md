@@ -11,7 +11,7 @@ First, you'll need to login to DNAnexus and create a new folder for your EPACTS 
 Docker image available on docker hub: [tmajarian/epacts_rmkl:1.1](https://hub.docker.com/r/tmajarian/epacts_rmkl/)
 
 
-Tutorial scripts available on GitHub: <link to scripts>
+Tutorial scripts available on [GitHub](https://github.com/manning-lab/topmed-t2d-glycemia-public/tree/dev/workflows/epacts)
 
 You do not need to download the docker image to your local machine, although it can be useful for reproducing the compute environment in DNAnexus while testing. Download the tutorial scripts and upload to your EPACTS scripts folder.
 
