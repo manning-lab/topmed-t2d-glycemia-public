@@ -1,6 +1,6 @@
 # Running EPACTS in DNAnexus with the *Swiss Army Knife* app
 
-Here is a quick tuturial on running EPACTS in DNAnexus. We use custom shell scripts, called from the *Swiss Army Knife* command line to run EPACTS commands (just like you would locally) together with a docker image containing all of the EPACTS code.
+Here is a quick tuturial on running EPACTS in DNAnexus. We use custom shell scripts, called from the *Swiss Army Knife* command line to run EPACTS commands (just like you would locally) together with a docker image containing all of the EPACTS code. This is entirely based on the examples provided with the [EPACTS documentation](https://genome.sph.umich.edu/wiki/EPACTS#Getting_Started_With_Examples).
 
 ## Getting Started
 
