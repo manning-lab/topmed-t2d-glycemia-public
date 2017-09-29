@@ -200,7 +200,7 @@ if(sum(maf.filt)==0) {
   # get the groups
   source_file <- ""
   source(source.file)
-  variant.groups <- getAggUnits(state.file , anno.file , geno , state.names )
+  variant.groups <- getAggUnits(state.file , anno.file , geno , state.names , anno.type , anno.value)
  
   ## dichotomous 
   if(outcomeType=="dichotomous" ) {
