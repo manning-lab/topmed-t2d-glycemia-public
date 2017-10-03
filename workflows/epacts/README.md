@@ -1,8 +1,10 @@
-# Running EPACTS in DNAnexus with the *Swiss Army Knife* app
+# Running EPACTS in DNAnexus
 
 Here is a quick tuturial on running EPACTS in DNAnexus. We use custom shell scripts, called from the *Swiss Army Knife* command line to run EPACTS commands (just like you would locally) together with a docker image containing all of the EPACTS code. This is entirely based on the examples provided with the [EPACTS documentation](https://genome.sph.umich.edu/wiki/EPACTS#Getting_Started_With_Examples).
 
-## Getting Started
+We can also use the *cloud-workstation app* to run EPACTS from the command line within DNAnexus.
+
+## Getting Started -- Swiss Army Knife
 
 First, you'll need to login to DNAnexus and create a new folder for your EPACTS scripts. 
 
@@ -14,7 +16,7 @@ Tutorial scripts available on [GitHub](https://github.com/manning-lab/topmed-t2d
 
 You do not need to download the docker image to your local machine, although it can be useful for reproducing the compute environment in DNAnexus while testing. Download the tutorial scripts and upload to your EPACTS scripts folder.
 
-## Writing scripts for DNAnexus
+### Writing scripts for DNAnexus
 
 Running EPACTS on DNAnexus boils down to copying your normal command line input to a shell script. The script is then interpreted within a docker image, and the EPACTS commands executed. For more information on running EPACTS from the commend line, see their [documentation](https://genome.sph.umich.edu/wiki/EPACTS). From here, we'll assume that you know the basics of using EPACTS. 
 
@@ -203,3 +205,234 @@ Confirm running the executable with this input [Y/n]:
 ```
 
 Confirm and that job will be submitted. Now we just wait to gather our results.
+
+
+## Running EPACTS with the Cloud Workstation App
+
+**_Note that most of this information is adapted from the dnanexus [documentation](https://wiki.dnanexus.com/developer-tutorials/cloud-workstations)._**
+
+### Motivation
+
+Most EPACTS jobs can easily be run from the command line. To avoid downloading and uploading many large files, a user may want to run EPACTS from within the DNAnexus infrustructure directly. The cloud-workstation app allows us access to this infrustructure from a familiar command line interface without running anything locally -- so no downloading files or hogging all of your local computer's memory or storage. As long as the files that we want to work on exist within a DNAnexus project, we can run EPACTS commands.
+
+### Prerequisites
+
+#### Install the app
+
+First, install the cloud workstation app
+
+```base
+dx install cloud_workstation
+```
+
+#### Configure SSH
+
+First, configure SSH for your account. 
+
+```bash
+dx ssh_config
+```
+
+Follow the prompts and look [here](https://wiki.dnanexus.com/Command-Line-Client/Index-of-dx-Commands#ssh_config) for more info.
+
+### Running the app
+
+#### Checkout what inputs we might need to run the app
+
+```bash
+dx run cloud_workstation -h
+```
+
+```bash
+usage: dx run cloud_workstation [-iINPUT_NAME=VALUE ...]
+
+App: Cloud Workstation
+
+This app sets up a cloud workstation which you can access by running the applet with the --ssh or
+--allow-ssh flags
+
+See the app page for more information:
+  https://platform.dnanexus.com/app/cloud_workstation
+
+Inputs:
+  Maximum Session Length (suffixes allowed: s, m, h, d, w, M, y): [-imax_session_length=(string, default="1h")]
+        The maximum length of time to keep the workstation running.  Value should include units of
+        either s, m, h, d, w, M, y for seconds, minutes, hours, days, weeks, months, or years
+        respectively.
+
+  Files: [-ifids=(file) [-ifids=... [...]]]
+        An optional list of files to download to the cloud workstation on startup.
+
+  Snapshot: [-isnapshot=(file)]
+        An optional list of snapshots to restore to the workshop.
+
+Outputs: <none>
+```
+
+Since we would like this to be an interactive session (where we can directly access the command line from within the DNAnexus framework), use the *-ssh* flag
+
+```bash
+dx run cloud_workstation --ssh
+```
+
+```bash
+Select an optional parameter to set by its # (^D or <ENTER> to finish):
+
+ [0] Maximum Session Length (suffixes allowed: s, m, h, d, w, M, y) (max_session_length) [default="1h"]
+ [1] Files (fids)
+ [2] Snapshot (snapshot)
+
+ ```
+
+ Here is where you would set the job time limit.
+
+```bash
+Select an optional parameter to set by its # (^D or <ENTER> to finish):
+
+ [0] Maximum Session Length (suffixes allowed: s, m, h, d, w, M, y) (max_session_length) [default="1h"]
+ [1] Files (fids)
+ [2] Snapshot (snapshot)
+
+Optional param #: 0
+
+Input:   Maximum Session Length (suffixes allowed: s, m, h, d, w, M, y) (max_session_length)
+Class:   string
+
+Enter string value ('?' for more options)
+max_session_length: 1h
+
+Select an optional parameter to set by its # (^D or <ENTER> to finish):
+
+ [0] Maximum Session Length (suffixes allowed: s, m, h, d, w, M, y) (max_session_length) [="1h"]
+ [1] Files (fids)
+ [2] Snapshot (snapshot)
+
+Optional param #:
+
+Using input JSON:
+{
+    "max_session_length": "1h"
+}
+
+Confirm running the executable with this input [Y/n]:
+```
+
+After conformation, we'll be connected to a virtual machine within DNAnexus 
+
+```bash
+Welcome to DNAnexus!
+
+This is the DNAnexus Execution Environment, running job-F79kYj801JK9fKP4KF3B2vB0.
+Job: Cloud Workstation
+App: cloud_workstation:main
+Instance type: mem1_ssd1_x4
+Project: cdbg_t2d (project-F292q6001JK51p1PJ64F8fb0)
+Workspace: container-F79kYjQ034ybKvpb61q9yVJb
+Running since: Tue Oct  3 14:13:27 UTC 2017
+Running for: 0:00:43
+The public address of this instance is ec2-34-228-254-97.compute-1.amazonaws.com.
+You are running byobu, a terminal session manager.
+If you get disconnected from this instance, you can log in again; your work will be saved as long as the job is running.
+For more information on byobu, press F1.
+The job is running in terminal 1. To switch to it, use the F4 key (fn+F4 on Macs; press F4 again to switch back to this terminal).
+Use sudo to run administrative commands.
+From this window, you can:
+ - Use the DNAnexus API with dx
+ - Monitor processes on the worker with htop
+ - Install packages with apt-get install
+ - Use this instance as a general-purpose Linux workstation
+OS version: Ubuntu 14.04.5 LTS (GNU/Linux 3.13.0-117-generic x86_64)
+dnanexus@job-F79kYj801JK9fKP4KF3B2vB0:~⟫
+```
+
+#### Setting up EPACTS environment
+
+We can use docker to setup our compute environment. This will import all of the EPACTS code and allow us to run some commands. First pull the image from the [remote repository](https://hub.docker.com/r/tmajarian/epacts_rmkl/).
+
+```bash
+dx-docker pull tmajairan/epacts_rmkl:1.1
+```
+
+Next, we'll want to import any files from our DNAnexus project that we might want to use. The first two commands ensure that our environment is setup correctly to access files. If we don't know the exact path to a file, we can view the file structure of our project
+
+```bash
+unset DX_WORKSPACE_ID
+dx cd $DX_PROJECT_CONTEXT_ID:
+dx ls $DX_PROJECT_CONTEXT_ID
+```
+
+```bash
+Annotation/
+Chr10_Pilot_Rare/
+freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz
+freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz.tbi
+```
+
+Now we can import the files we need
+
+```bash
+dx download $DX_PROJECT_CONTEXT_ID:/freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz
+dx download $DX_PROJECT_CONTEXT_ID:/freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz.tbi
+dx download $DX_PROJECT_CONTEXT_ID:/AFEU.Firth.24AUG2017.ped
+```
+
+Now that we have the correct input files downloaded, we'll want to run our docker image. Be sure to include all input files that you might need when running the *dx-docker run* command. We are essentially creating a self contained virtual machine (within our current virtual machine) that has no outside access. Any files not imported will not be visible from within the docker container. More information on this can be found [here](https://docs.docker.com/engine/admin/volumes/volumes/)
+
+```bash
+# first create and move the downloaded files to their own folder
+mkdir data
+mv freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz ./data/
+mv freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz.tbi ./data/
+mv AFEU.Firth.24AUG2017.ped ./data/
+dx-docker run -v data:/data tmajarian/epacts_rmkl:1.1
+```
+
+Once we're within the docker container, we can *ls* and see our local file system
+
+```bash
+EPACTS_install  bin  boot  data  dev  etc  gs_install  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+```
+
+#### Running an epacts command
+
+Just like our single variant workflow script (above), we can run the command directly from the command line in the docker container.
+
+```bash
+cd data/
+touch freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz.tbi
+/EPACTS_install/EPACTS-3.2.6/bin/epacts single --vcf freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz --ped AFEU.Firth.24AUG2017.ped --pheno t2d_ctrl --cov age --cov sex --cov PC1 --test b.score --out testsmallminmaf001 --chr 10 -run 4 --min-maf 0.001
+```
+
+#### Pushing result files back to the DNAnexus project
+
+To finish our workflow, we still need to make sure our generated results end up back in our project in DNAnexus. We'll need to upload them back to the project directory.
+
+```bash
+dx upload --path "$DX_PROJECT_CONTEXT_ID:" /data/out/*.png
+```
+
+Check that the files were actuall uploaded.
+
+```bash
+dx ls
+```
+
+### Ending the job
+
+Make sure to end your session when everything is finished.
+
+```bash
+dx terminate $DX_JOB_ID
+```
+
+## Other resources
+
+For more information on the cloud-workstation app, see [this page](https://wiki.dnanexus.com/developer-tutorials/cloud-workstations).
+
+For information on running docker commands, see [this page](https://docs.docker.com/)
+
+
+
+
+
+
