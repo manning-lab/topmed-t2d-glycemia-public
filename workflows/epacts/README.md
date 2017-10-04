@@ -108,21 +108,15 @@ First, we need to upload our shell script to our DNAnexus project. See this [doc
 
 Once the script is uploaded, cd to the correct directory using the *dx cd* command. Next, we want to see if the Swiss Army Knife app is installed.
 
-```bash
-dx find apps --installed
-```
+`dx find apps --installed`
 
 If the Swiss Army Knife app is not within the list printed to the console:
 
-```bash
-dx install swiss-army-knife
-```
+`dx install swiss-army-knife`
 
 Now lets check out the app:
 
-```bash
-dx run swiss-army-knife -h
-```
+`dx run swiss-army-knife -h`
 
 ```
 usage: dx run swiss-army-knife [-iINPUT_NAME=VALUE ...]
@@ -162,9 +156,7 @@ For the job that we want to run we have:
 
 Then our call to DNAnexus is (assuming that all of our inputs are in our current working directory, otherwise use full paths relative to the DNAnexus project):
 
-```bash
-dx run swiss-army-knife -iin=run_firth_chr10small.sh -iin=freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz -iin=freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz.tbi -iin=AFEU.Firth.24AUG2017.ped -icmd=sh\ run_firth_chr10small.sh -iimage=tmajarian/epacts_rmkl:1.1
-```
+`dx run swiss-army-knife -iin=run_firth_chr10small.sh -iin=freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz -iin=freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz.tbi -iin=AFEU.Firth.24AUG2017.ped -icmd=sh\ run_firth_chr10small.sh -iimage=tmajarian/epacts_rmkl:1.1`
 
 ```
 dx run swiss-army-knife -iin=run_firth_chr10small.sh -iin=freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz -iin=freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz.tbi -iin=AFEU.Firth.24AUG2017.ped -icmd=sh\ run_firth_chr10small.sh -iimage=tmajarian/epacts_rmkl:1.1
@@ -221,17 +213,13 @@ Most EPACTS jobs can easily be run from the command line. To avoid downloading a
 
 First, install the cloud workstation app
 
-```base
-dx install cloud_workstation
-```
+`dx install cloud_workstation`
 
 #### Configure SSH
 
 First, configure SSH for your account. 
 
-```bash
-dx ssh_config
-```
+`dx ssh_config`
 
 Follow the prompts and look [here](https://wiki.dnanexus.com/Command-Line-Client/Index-of-dx-Commands#ssh_config) for more info.
 
@@ -239,9 +227,7 @@ Follow the prompts and look [here](https://wiki.dnanexus.com/Command-Line-Client
 
 #### Checkout what inputs we might need to run the app
 
-```bash
-dx run cloud_workstation -h
-```
+`dx run cloud_workstation -h`
 
 ```bash
 usage: dx run cloud_workstation [-iINPUT_NAME=VALUE ...]
@@ -271,9 +257,7 @@ Outputs: <none>
 
 Since we would like this to be an interactive session (where we can directly access the command line from within the DNAnexus framework), use the *-ssh* flag
 
-```bash
-dx run cloud_workstation --ssh
-```
+`dx run cloud_workstation --ssh`
 
 ```bash
 Select an optional parameter to set by its # (^D or <ENTER> to finish):
@@ -349,17 +333,11 @@ dnanexus@job-F79kYj801JK9fKP4KF3B2vB0:~⟫
 
 We can use docker to setup our compute environment. This will import all of the EPACTS code and allow us to run some commands. First pull the image from the [remote repository](https://hub.docker.com/r/tmajarian/epacts_rmkl/).
 
-```bash
-dx-docker pull tmajairan/epacts_rmkl:1.1
-```
+`dx-docker pull tmajairan/epacts_rmkl:1.1`
 
-Next, we'll want to import any files from our DNAnexus project that we might want to use. The first two commands ensure that our environment is setup correctly to access files. If we don't know the exact path to a file, we can view the file structure of our project
+Next, we'll want to import any files from our DNAnexus project that we might want to use. If we don't know the exact path to a file, we can view the file structure of our project
 
-```bash
-unset DX_WORKSPACE_ID
-dx cd $DX_PROJECT_CONTEXT_ID:
-dx ls $DX_PROJECT_CONTEXT_ID
-```
+`dx ls $DX_PROJECT_CONTEXT_ID`
 
 ```bash
 Annotation/
@@ -387,10 +365,18 @@ mv AFEU.Firth.24AUG2017.ped ./data/
 dx-docker run -v data:/data tmajarian/epacts_rmkl:1.1
 ```
 
-Once we're within the docker container, we can *ls* and see our local file system
-
+Once we're within the docker container, we can *ls* and see our local file system. 
+(highlight data)
 ```bash
 EPACTS_install  bin  boot  data  dev  etc  gs_install  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+```
+
+Notice that the folder `data` is exactly what we imported using the `-v` command above.
+
+`ls ./data`
+
+```bash
+freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz.tbi AFEU.Firth.24AUG2017.ped
 ```
 
 #### Running an epacts command
@@ -407,23 +393,17 @@ touch freeze4.chr10.pass.gtonly.minDP10.genotypes.small.vcf.gz.tbi
 
 To finish our workflow, we still need to make sure our generated results end up back in our project in DNAnexus. We'll need to upload them back to the project directory.
 
-```bash
-dx upload --path "$DX_PROJECT_CONTEXT_ID:" /data/out/*.png
-```
+`dx upload --path "$DX_PROJECT_CONTEXT_ID:" /data/out/*.png`
 
 Check that the files were actuall uploaded.
 
-```bash
-dx ls
-```
+`dx ls`
 
 ### Ending the job
 
 Make sure to end your session when everything is finished.
 
-```bash
-dx terminate $DX_JOB_ID
-```
+`dx terminate $DX_JOB_ID`
 
 ## Other resources
 
