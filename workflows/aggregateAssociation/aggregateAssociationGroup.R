@@ -43,37 +43,17 @@ gds <- input_args[1] #"GoT2D.chr22.biallelic.gds"
 ped <- input_args[2] #"GoT2D.phenotype.ped"
 kinship_file <- input_args[3] # GoT2DSampleID
 commonID_file <- input_args[4]
-chr_st.file <- inputs_args[5]
-anno.file <- input_args[6]
-anno.type <- input_args[7]
-anno.value <- input_args[8]
-id.column.name <- input_args[9]
-label <- input_args[10]
-outcome <- input_args[11]
-outcomeType <- input_args[12]
-minMAC <- 30 # hard coded
-chr_st.names <- unlist(strsplit(input_args[13],split=","))
-source.file <- input_args[14]
-test <- input_args[15]
-pval <- input_args[16]
-gene.file <- input_args[17]
+group_file <- input_args[5]
+id.column.name <- input_args[6]
+label <- input_args[7]
+outcome <- input_args[8]
+outcomeType <- input_args[9]
+test <- input_args[10]
+pval <- input_args[11]
 covariates <- NULL
 
-print(paste("GDS file:",gds))
-print(paste("Ped file:",ped))
-print(paste("Kinship file:",kinship_file))
-print(paste("Common IDs file:",commonID_file))
-print(paste("ID column name:",id.column.name))
-print(paste("label:",label))
-print(paste("outcome:",outcome))
-print(paste("outcomeType:",outcomeType))
-
-
-if(length(input_args)>17) {
-  
-  covariates <- strsplit(input_args[17],split=",")[[1]]
-  print(paste("covariates:",paste(covariates,collapse=" ")))
-  
+if(length(input_args)>11) {
+  covariates <- strsplit(input_args[12],split=",")[[1]]
 }
 
 
@@ -172,70 +152,42 @@ if(outcomeType=="continuous" & is.null(covariates)) {
 #### run association test
 geno <- seqOpen(gds)
 
-# filter by MAF
-# seqSetFilter(geno,sample.id=nullmod$scanID, action="intersect", verbose=TRUE)
+genoData <- SeqVarData(geno)
+load(group_file)
 
-# ref.freq <- seqAlleleFreq(geno, .progress=TRUE)
-# maf <- pmin(ref.freq, 1-ref.freq)
-# maf.filt <- 2 * maf * (1-maf) * length(nullmod$scanID) >= minMAC
-# print(table(maf.filt))
+# groups <- groups[!sapply(groups, is.null)]
 
-# if(sum(maf.filt)==0) {
-#   print("No SNPs pass MAC filter. Finished Association Step")
-#   assoc <- NA
-#   
-# } else {
-  # seqSetFilter(geno, variant.sel=maf.filt, action="intersect", verbose=TRUE)
-  
-  ## add position and rsID
-  # pos <- seqGetData(geno,"position")
-  #chr.pos <- seqGetData(geno, "$chrom_pos") This line didn't seem to work after filtering geno
-  # allele <- seqGetData(geno, "allele")
-  # snps.pos <- cbind(pos,allele)
-  # print("Filtered SNPs")
-  # print(dim(snps.pos))
-  
-  genoData <- SeqVarData(geno)
-  
-  # get the groups
-  
-  source(source.file)
-  # variant.groups <- groupByGene(geno.gds,chr_st.file,anno.file,gene.file,chr_st.names,anno.value,minmaf)
-  load("/Users/tmajaria/Documents/projects/topmed/code/varshney/results/groups_v1.RData")
-  
-  groups <- groups[!sapply(groups, is.null)]
- 
-  ## dichotomous 
-  if(outcomeType=="dichotomous" ) {
-    if (test=="burden"){
-      assoc <- assocTestSeq(genoData, nullmod, groups, test=test, burden.test=pval)
-    } else if (test == "skat"){
-      assoc <- assocTestSeq(genoData, nullmod, groups, test=test, pval.method=pval)
-    } else {
-      assoc <- c()
-      print("sorry, that didnt work")
-    }
-    # assoc  <- assocTestMM(genoData = genoData, nullMMobj = nullmod, test = "Score")
+## dichotomous 
+if(outcomeType=="dichotomous" ) {
+  if (test=="burden"){
+    assoc <- assocTestSeq(genoData, nullmod, groups, test=test, burden.test=pval)
+  } else if (test == "skat"){
+    assoc <- assocTestSeq(genoData, nullmod, groups, test=test, pval.method=pval)
+  } else {
+    assoc <- c()
+    print("sorry, that didnt work")
   }
-  
-  ## continuous 
-  if(outcomeType=="continuous" ) {
-    if (test=="burden"){
-      assoc <- assocTestSeq(genoData, nullmod, groups, test=test, burden.test=pval)
-    } else if (test == "skat"){
-      assoc <- assocTestSeq(genoData, nullmod, groups, test=test, pval.method=pval)
-    } else {
-      assoc <- c()
-      print("sorry, that didnt work")
-    }
+  # assoc  <- assocTestMM(genoData = genoData, nullMMobj = nullmod, test = "Score")
+}
+
+## continuous 
+if(outcomeType=="continuous" ) {
+  if (test=="burden"){
+    assoc <- assocTestSeq(genoData, nullmod, groups, test=test, burden.test=pval)
+  } else if (test == "skat"){
+    assoc <- assocTestSeq(genoData, nullmod, groups, test=test, pval.method=pval)
+  } else {
+    assoc <- c()
+    print("sorry, that didnt work")
   }
-  print("Finished Association Step")
-  print(dim(assoc))
-  # assoc <- cbind(snps.pos, assoc)
-  
+}
+print("Finished Association Step")
+print(dim(assoc))
+# assoc <- cbind(snps.pos, assoc)
+
 # }
 ## save assoc object
-  seqClose(gds)
+seqClose(gds)
 save(assoc, file=paste(label, ".assoc.RData", sep=""))
 
 

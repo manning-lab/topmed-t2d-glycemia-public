@@ -65,7 +65,7 @@ getAggUnits <- function( state.file , peak.file , anno.file , gene.file , geno.g
   anno.file <- "/Users/tmajaria/Documents/projects/topmed/code/varshney/data/freezes_2a_3a_4.chr10.snp.annotated.general20170422.gz"
   gene.file <- "/Users/tmajaria/Documents/projects/topmed/code/varshney/data/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
   geno.file <- "/Users/tmajaria/Documents/projects/topmed/code/varshney/data/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
-  state.names <- c("active_tss","active_enhancer_1","active_enhancer_2")
+  state.names <- c("active_tss","active_enhancer_1")
   anno.value <- c("splice_acceptor_variant","splice_donor_variant","stop_gained","splice_region_variant")
   minmaf <- 0.01
   # anno.value <- c("stopgain", "splicing")
@@ -82,10 +82,11 @@ getAggUnits <- function( state.file , peak.file , anno.file , gene.file , geno.g
 
   geno.gds <- seqOpen(geno.file)
   
-  ref.freq <- seqAlleleFreq(geno.gds, .progress=TRUE)
+  ref.freq <- seqAlleleFreq(geno.gds, .progress=TRUE, parallel = TRUE)
   maf <- pmin(ref.freq, 1-ref.freq)
-  maf.filt <- maf <= minmaf
-  seqSetFilter(geno.gds, variant.sel=maf.filt, action="intersect", verbose=TRUE)
+  vid.id <- seqGetData(geno.gds,"variant.id")
+  vid.filt <- vid.id[which(maf <= minmaf)]
+  seqSetFilter(geno.gds, variant.id=vid.filt, action="intersect", verbose=TRUE)
   
   
   chr_num <- seqGetData(geno.gds,"chromosome")[1]
@@ -130,71 +131,175 @@ getAggUnits <- function( state.file , peak.file , anno.file , gene.file , geno.g
   #granges
   peak.gr <- GRanges(seqnames=peak.raw$chr,ranges=IRanges(start=peak.raw$start,end=peak.raw$stop))
   states.gr <- GRanges(seqnames=state.raw$chr,ranges=IRanges(start=state.raw$start,end=state.raw$stop))
-  gene.gr <- GRanges(seqnames=gene.prep$chromosome_name, ranges=IRanges(start=gene.prep$start_position-20000,end=gene.prep$end_position+20000),gene_id=gene.prep$ensembl_gene_id)
+  gene.gr <- GRanges(seqnames=gene.prep$chromosome_name, ranges=IRanges(start=gene.prep$start_position-5000,end=gene.prep$end_position+5000),gene_id=gene.prep$ensembl_gene_id)
+  gene.gr <- reduce(gene.gr)
+  
+  seqSetFilter(geno.gds,gene.gr)
   
   # filter snps for gene regions
   #seqSetFilter(geno.gds, gene.gr, verbose=FALSE)
   
   # define our groups by genes first
-  groups <- data.frame(group_id=seq(length(gene.prep[,1])), chromosome=gene.prep[,3], start=gene.prep[,4], end=gene.prep[,5])
+  # groups <- data.frame(group_id=seq(length(gene.prep[,1])), chromosome=gene.prep[,3], start=gene.prep[,4], end=gene.prep[,5])
+  groups <- data.frame(group_id=seq(length(gene.gr)), chromosome=seqnames(gene.gr), start=start(gene.gr), end=end(gene.gr))
   
-  # get list of variants with protein changing function
-  anno.sub <- anno.raw$pos[which(anno.raw$VEP_ensembl_Consequence %in% anno.value)]
-  anno.sub <- anno.raw$pos[apply(sapply(anno.raw$VEP_ensembl_Consequence, function(x) str_detect(x,anno.value)), 2, any)]
-  sapply(1:3, function(x, y) mean(y[,x]), y=m)
+  # get list of variants with at least one of our tags
+  
+  anno.sub <- anno.raw[which(anno.raw$VEP_ensembl_Gene_ID != "."),]
+  
+  ininds <- c()
+  for (i in seq(1,length(anno.sub[,1]))){
+    if (any(str_detect(anno.value,anno.sub$VEP_ensembl_Consequence[i]))) {
+      ininds <- c(ininds,i)
+    }
+  }
+  
+  # anno.sub <- anno.sub[apply(sapply(anno.raw$VEP_ensembl_Consequence, function(x) str_detect(x,anno.value)), 2, any),]
+  anno.sub <- anno.sub[ininds,]
+  
+  # anno.sub <- anno.raw$pos[apply(sapply(anno.raw$VEP_ensembl_Consequence, function(x) str_detect(x,anno.value)), 2, any)]
   snp.prot <- data.frame(names=seqGetData(geno.gds,"variant.id"), pos=seqGetData(geno.gds,"position"))
-  snp.prot <- snp.prot[which(snp.prot$pos %in% anno.sub),]$names
+  snp.prot <- snp.prot[which(snp.prot$pos %in% anno.sub$pos),]$names
+  filtOrig <- seqGetFilter(geno.gds)
+  filt_pregene <- filtOrig
+  seqSetFilter(geno.gds,gene.gr) # 2261861 variants
+  
   
   # get snps in open peaks
   filtOrig <- seqGetFilter(geno.gds)
-  seqSetFilter(geno.gds, variant.sel=peak.gr)
+  # seqSetFilter(geno.gds, variant.sel=peak.gr,action="intersect")
+  seqSetFilter(geno.gds, peak.gr)
+  
   snp.peaks <- seqGetData(geno.gds,"variant.id")
   seqResetFilter(geno.gds)
-  seqSetFilter(geno.gds, sample.sel=filtOrig$sample.sel,variant.sel=filtOrig$variant.sel, verbose=FALSE)
+  seqSetFilter(geno.gds, sample.sel=filtOrig$sample.sel,variant.sel=filtOrig$variant.sel)
   
-  # get snps in islet regions
-  seqSetFilter(geno.gds, states.gr, verbose=FALSE)
+  # get snps in islet regions (chromatin states)
+  seqSetFilter(geno.gds, states.gr)
   snp.states <- seqGetData(geno.gds,"variant.id")
   seqResetFilter(geno.gds)
-  seqSetFilter(geno.gds, sample.sel=filtOrig$sample.sel,variant.sel=filtOrig$variant.sel, verbose=TRUE)
+  seqSetFilter(geno.gds, sample.sel=filtOrig$sample.sel,variant.sel=filtOrig$variant.sel)
   
   # get our variants lists for each mask
   
-  # regulatory (tss or enhancer) and ptv/splice (stopgain, splicing) variants
-  seqSetFilter(geno.gds, variant.sel=c(snp.prot,snp.states))
+  # regulatory or stopgain/splice
+  seqSetFilter(geno.gds, variant.id=c(snp.prot,snp.states),action="intersect")
   variants.reg_ptv <- seqGetData(geno.gds,"variant.id")
+  print(length(variants.reg_ptv)) # 115762
   mask.reg_ptv <- aggregateListByPosition(geno.gds, groups)
   seqResetFilter(geno.gds)
   seqSetFilter(geno.gds, sample.sel=filtOrig$sample.sel,variant.sel=filtOrig$variant.sel)
   
-  # regulatory (tss or enhancer), ptv/splice (stopgain, splicing) and peaks
-  seqSetFilter(geno.gds, variant.sel=c(snp.prot,snp.states, snp.peaks))
+  # regulatory or broad peak or stopgain/splice
+  seqSetFilter(geno.gds, variant.id=c(snp.prot,snp.states, snp.peaks),action="intersect")
   variants.pks_reg_ptv <- seqGetData(geno.gds,"variant.id")
+  print(length(variants.pks_reg_ptv)) # 261110
   mask.pks_reg_ptv <- aggregateListByPosition(geno.gds, groups)
   seqResetFilter(geno.gds)
-  seqSetFilter(geno.gds, sample.sel=filtOrig$sample.sel,variant.sel=filtOrig$variant.sel, verbose=FALSE)
+  seqSetFilter(geno.gds, sample.sel=filtOrig$sample.sel,variant.sel=filtOrig$variant.sel)
   
-  # write mask files
-  # mask.file.split <- unlist(strsplit(geno.file,"\\."))
-  # mask.file.base <- paste(paste(mask.file.split,collapse = "."),"minmaf",minmaf,sep=".")
-  # fwrite(mask.reg_ptv, file=paste(mask.file.base,paste(state.names,collapse="."),paste(anno.value,collapse="."),"groups","csv",sep="."))
-  # fwrite(mask.pks_reg_ptv, file=paste(mask.file.base,paste(state.names,collapse="."),paste(anno.value,collapse="."),"peaks","groups","csv",sep="."))
-  # fwrite(list(variants.reg_ptv), file=paste(mask.file.base,paste(state.names,collapse="."),paste(anno.value,collapse="."),"variantlist","csv",sep="."))
-  # fwrite(list(variants.pks_reg_ptv), file=paste(mask.file.base,paste(state.names,collapse="."),paste(anno.value,collapse="."),"peaks","variantlist","csv",sep="."))
-  # 
+  # write mask files as r data objects
+  mask.file.split <- unlist(strsplit(geno.file,"\\."))
+  mask.file.base <- paste(paste(mask.file.split,collapse = "."),"minmaf",minmaf,sep=".")
+  save(mask.reg_ptv, "mask.reg_ptv", file=paste(mask.file.base,paste(state.names,collapse="."),paste(anno.value,collapse="."),"groups","RData",sep="."))
+  save(mask.pks_reg_ptv, "mask.pks_reg_ptv", file=paste(mask.file.base,paste(state.names,collapse="."),paste(anno.value,collapse="."),"peaks","groups","RData",sep="."))
+  write(variants.reg_ptv, file=paste(mask.file.base,paste(state.names,collapse="."),paste(anno.value,collapse="."),"variantlist","txt",sep="."),ncolumns=1)
+  write(variants.pks_reg_ptv, file=paste(mask.file.base,paste(state.names,collapse="."),paste(anno.value,collapse="."),"peaks","variantlist","txt",sep="."),ncolumns=1)
+  
   # close gds file
   #seqClose(geno.gds)
   
   return(mask)
 }
 
-plotAggUnit <- function( geno.gds , groups ){
+plotAggUnit <- function( geno.gds , groups , pancrease ){
+  
+  library(Gviz)
+  library(biomaRt)
+  ##
+  groups <- mask.reg_ptv
+  gene_pancreas <- gene.prep
+  pancreas <- gene.raw
+  ##
+  
+  cur_group <- as.matrix(groups[1])[1][[1]]
+  buff <- 20000
+  from <- min(cur_group$position) - buff
+  to <- max(cur_group$position) + buff
+  chr <- cur_group$chromosome[1]
+  gen <- "hg19"
+  
+  plot.name = "test.pdf"
+  axTrack <- GenomeAxisTrack(genome = gen , chromosome = chr)
+  
+  ## idxTrack
+  idxTrack <- IdeogramTrack(genome = gen, chromosome = chr)
+  
+  ## cpgIslands track
+  # cpgIslands <- UcscTrack(genome = gen, chromosome = chr,
+  #                         track = "cpgIslandExt", from = from, to = to,
+  #                         trackType = "AnnotationTrack", start = "chromStart",
+  #                         end = "chromEnd", id = "name", shape = "box",
+  #                         fill = "#006400", name = "CpG")
+  
+  ## dtrack
+  coords <- cur_group$position
+  filtOrig <- seqGetFilter(geno.gds)
+  # seqResetFilter(geno.gds)
+  v.gr <- GRanges(seqnames=c(chr),ranges=IRanges(start=min(cur_group$position),en=max(cur_group$position)))
+  seqSetFilter(geno.gds,v.gr)
+  seqSetFilter(geno.gds,variant.id=cur_group$variant.id, action="intersect")
+  ref.freq <- seqAlleleFreq(geno.gds)
+  maf <- pmin(ref.freq, 1-ref.freq)
+  vid.id <- seqGetData(geno.gds,"variant.id")
+  wm <- which(maf <= minmaf)
+  wm <- unique(wm)
+  maf <- maf[wm]
+  vid.filt <- vid.id[wm]
+  seqSetFilter(geno.gds, variant.id=vid.filt, action="intersect", verbose=TRUE)
+  # ref.freq <- seqAlleleFreq(geno.gds)
+  # maf <- pmin(ref.freq, 1-ref.freq)
+  coords <- seqGetData(geno.gds,"position")
+  lm <- -log10(maf)
+  keep <- !is.infinite(lm)
+  lm <- lm[keep]
+  coords <- coords[keep]
+  # maf <- seqAlleleFreq(geno.gds)
+  seqResetFilter(geno.gds)
+  seqSetFilter(geno.gds, sample.sel=filtOrig$sample.sel,variant.sel=filtOrig$variant.sel)
+  
+  dtrack <- DataTrack(data = lm, start = coords,
+                      end = coords+1, chromosome = chr, genome = gen,
+                      ylim=c(floor(min(lm)),ceiling(max(lm))), name = "MAF")
   
   
+  ######################## here ############################
+  ## ENSEMBL gene track 
+  mart <- useMart("ensembl")
+  mart <- useDataset("hsapiens_gene_ensembl",mart)
+  mart=useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
   
   
+  ensembl <- select(mart,keys = chr_num,keytype = "chromosome_name",
+                    columns =  c( "ensembl_transcript_id","hgnc_symbol", "chromosome_name","transcript_start", "transcript_end", "ensembl_gene_id"))
+  ensembl <- ensembl[order(ensembl$hgnc_symbol),]
+  ensembl_transcript <- ensembl[!duplicated(ensembl$hgnc_symbol),][-1,"ensembl_transcript_id"]
   
+  biomTrack <- BiomartGeneRegionTrack(genome = gen, chromosome = chr, start = from, end = to, 
+                                      name = "ENSEMBL", filter = list(ensembl_transcript_id = ensembl_transcript))
   
+  # gene_pancreas_chr <- gene_pancreas[!duplicated(gene_pancreas$ensembl_gene_id),"ensembl_gene_id"] # 960 genes
+  # biomTrack.pancreas <- BiomartGeneRegionTrack(genome = gen, name = "Pancreas", showId=TRUE, geneSymbol=FALSE, filters = list(ensembl_gene_id=gene_pancreas_chr))
+  # 
+  gene_pancreas <- ensembl[ensembl$ensembl_gene_id %in%  pancreas[pancreas$RPKM>=2 & pancreas$Gene_Type=="protein_coding",1],]
+  transcript_pancreas_chr <- gene_pancreas[!duplicated(gene_pancreas$ensembl_gene_id),"ensembl_transcript_id"] # 960 genes
+  biomTrack.pancreas <- BiomartGeneRegionTrack(genome = gen, name = "Pancreas", showId=FALSE, geneSymbol=FALSE, filters = list(ensembl_transcript_id=transcript_pancreas_chr))
   
-  }
+  pdf(plot.name) 
+  
+  # plotTracks(list(axTrack,idxTrack,dtrack,cpgIslands,biomTrack, biomTrack.pancreas),from = from, to = to,transcriptAnnotation = "symbol",  showTitle = TRUE)
+  # plotTracks(list(axTrack,idxTrack,dtrack,biomTrack, biomTrack.pancreas),from = from, to = to,transcriptAnnotation = "symbol",  showTitle = TRUE)
+  plotTracks(list(axTrack,idxTrack,dtrack),from = from, to = to,transcriptAnnotation = "symbol",  showTitle = TRUE)
+  dev.off()
+}
   
