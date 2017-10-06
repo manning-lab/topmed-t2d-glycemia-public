@@ -87,8 +87,8 @@ head(ped_file)
 # load common ID and kinship files
 load(commonID_file)
 
-library(gdsfmt)
-geno.pcrelate <- openfn.gds(kinship_file)
+# library(gdsfmt)
+# geno.pcrelate <- openfn.gds(kinship_file)
 # load(paste(kinship_file)) #ped_file.trimmed, PCRgrm, filteredSNPs, both
 
 ## trim phenotype file 
@@ -132,13 +132,14 @@ str(scanAnnot)
 #### Null model - Future Versions of this script can be extended to input null models
 
 # get GRM in correct format
-PCRgrm <- pcrelateMakeGRM(geno.pcrelate, scan.include = both, scaleKin = 2)
+# PCRgrm <- pcrelateMakeGRM(geno.pcrelate, scan.include = both, scaleKin = 2)
+load(kinship_file)
 
 if(outcomeType=="dichotomous" & is.null(covariates)) {
   nullmod <- fitNullMM(scanData = scanAnnot, outcome = outcome, family = binomial, covMatList = PCRgrm)
 }
 if(outcomeType=="dichotomous" & !is.null(covariates)) {
-  nullmod <- fitNullMM(scanData = scanAnnot, outcome = outcome, family = binomial, covMatList = PCRgrm, covars = covariates)
+  nullmod <- fitNullMM(scanData = scanAnnot, outcome = outcome, family = binomial, covMatList = kmatr, covars = covariates)
 }
 if(outcomeType=="continuous" & !is.null(covariates)) {
   nullmod <- fitNullMM(scanData = scanAnnot, outcome = outcome, family = gaussian, covMatList = PCRgrm, covars = covariates)
@@ -159,10 +160,10 @@ load(group_file)
 
 ## dichotomous 
 if(outcomeType=="dichotomous" ) {
-  if (test=="burden"){
+  if (test=="Burden"){
     assoc <- assocTestSeq(genoData, nullmod, groups, test=test, burden.test=pval)
-  } else if (test == "skat"){
-    assoc <- assocTestSeq(genoData, nullmod, groups, test=test, pval.method=pval)
+  } else if (test == "SKAT"){
+    assoc <- assocTestSeq(genoData, nullmod, groups, test=test, pval.method=pval,weight.beta = c(1,25))
   } else {
     assoc <- c()
     print("sorry, that didnt work")

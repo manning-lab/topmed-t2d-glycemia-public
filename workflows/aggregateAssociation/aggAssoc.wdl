@@ -1,8 +1,8 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/aggregateAssociationGroup.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/aggregateAssociationGroup.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/commonID.R"
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/aggregateSummary.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/aggregateSummary.R"
 	}
 
 	runtime {
@@ -10,7 +10,7 @@ task getScript {
 	}
 
 	output {
-		File assoc_script = "aggregateAssociation.R"
+		File assoc_script = "aggregateAssociationGroup.R"
 		File commonID_script = "commonID.R"
 		File summary_script = "aggregateSummary.R"
 	}
@@ -126,7 +126,7 @@ workflow w_assocTest {
 	}
 		
 	call aggAssocTest {
-		input: gds = oneFile, ped = this_ped, GRM = this_GRM, commonIDs = common_ID.commonIDsRData, groups = this_groups, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval, covariates = this_covariates, assocTestScript = getScript.assoc_script
+		input: gds = this_gds, ped = this_ped, GRM = this_GRM, commonIDs = common_ID.commonIDsRData, groups = this_groups, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval, covariates = this_covariates, assocTestScript = getScript.assoc_script
 	}
 
 

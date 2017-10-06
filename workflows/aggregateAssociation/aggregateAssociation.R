@@ -70,10 +70,8 @@ print(paste("outcomeType:",outcomeType))
 
 
 if(length(input_args)>17) {
-  
   covariates <- strsplit(input_args[17],split=",")[[1]]
   print(paste("covariates:",paste(covariates,collapse=" ")))
-  
 }
 
 
@@ -199,7 +197,6 @@ geno <- seqOpen(gds)
   
   # get the groups
   
-  source(source.file)
   # variant.groups <- groupByGene(geno.gds,chr_st.file,anno.file,gene.file,chr_st.names,anno.value,minmaf)
   load("/Users/tmajaria/Documents/projects/topmed/code/varshney/results/groups_v1.RData")
   
@@ -220,10 +217,10 @@ geno <- seqOpen(gds)
   
   ## continuous 
   if(outcomeType=="continuous" ) {
-    if (test=="burden"){
+    if (test=="Burden"){
       assoc <- assocTestSeq(genoData, nullmod, groups, test=test, burden.test=pval)
-    } else if (test == "skat"){
-      assoc <- assocTestSeq(genoData, nullmod, groups, test=test, pval.method=pval)
+    } else if (test == "SKAT"){
+      assoc <- assocTestSeq(genoData, nullmod, groups, test=test, pval.method=pval,weight.beta <- c(1,25))
     } else {
       assoc <- c()
       print("sorry, that didnt work")

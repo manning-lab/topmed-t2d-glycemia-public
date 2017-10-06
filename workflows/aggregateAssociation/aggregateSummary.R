@@ -20,7 +20,7 @@ load(assoc.file)
 ppi <- 300
 results <- assoc$results
 results$chr <- rep(10,length(results[,1]))
-pdf(paste(label,".qqplot.pdf",sep="")
+pdf(paste(label,".qqplot.pdf",sep=""))
 qq(results$Score.pval)
 dev.off()
 
@@ -34,7 +34,7 @@ for (i in seq(2,length(l))){
   df <- rbind(df,l[[i]])
 }
 df$CHR <- as.numeric(as.vector(df$CHR))
-pdf(paste(label,".mhplot.pdf",sep="")
+pdf(paste(label,".mhplot.pdf",sep=""))
 manhattan(df,chr="CHR",bp="BP",p="P", main=label)
 dev.off()
 
