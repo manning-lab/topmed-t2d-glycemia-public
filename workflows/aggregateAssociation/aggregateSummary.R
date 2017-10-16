@@ -12,21 +12,47 @@ library(qqman)
 library(data.table)
 
 input_args <- commandArgs(trailingOnly=T)
-assoc.file <- input_args[1]
-label <- input_args[2]
+label <- input_args[1]
 
-load(assoc.file)
+assoc.files <- c() # list of input .assoc.RData files
+assoc.compilation <- c() # matrix of association results
+numAssocFiles <- (length(input_args) - 1)
+all_assoc <- list()
+
+for (i in 1:numAssocFiles) {
+  print(i)
+  assoc.files[i] <- input_args[i+1]
+  load(assoc.files[i])
+  res <- assoc$results
+  all_assoc[[i]]<-assoc
+
+  if (!is.na(res)[1]){
+    print(dim(res))
+    res <- res[!is.na(res[,"pval_0"]),]
+    
+    #add to assoc.compilation
+    assoc.compilation <- rbind(assoc.compilation, res)
+    
+    if (i == 1) {
+      write.table(res,paste(label, ".assoc.csv", sep=""),sep=",",row.names=F)
+    } else {
+      write.table(res,paste(label, ".assoc.csv", sep=""),col.names=FALSE,sep=",",row.names=F, append=TRUE)
+    }	
+  }
+}
+
+# load(assoc.file)
 
 ppi <- 300
-results <- assoc$results
-results$chr <- rep(10,length(results[,1]))
+# results <- assoc$results
+# results$chr <- rep(10,length(results[,1]))
 pdf(paste(label,".qqplot.pdf",sep=""))
-qq(results$Score.pval)
+qq(res$pval_0)
 dev.off()
 
 l <- list()
-for (i in seq(1,length(row.names(results)))){
-  l[[length(l)+1]] <- data.frame(P=rep(results$Score.pval[i],length(assoc$variantInfo[[i]][,1])), BP=assoc$variantInfo[[i]]$pos, CHR=assoc$variantInfo[[i]]$chr)
+for (i in seq(1,length(all_assoc))){
+  l[[length(l)+1]] <- data.frame(P=rep(res$pval_0[i],length(all_assoc[[i]]$variantInfo[,1])), BP=all_assoc[[i]]$variantInfo$pos, CHR=all_assoc[[i]]$variantInfo$chr)
 }
 
 df <- l[[1]]

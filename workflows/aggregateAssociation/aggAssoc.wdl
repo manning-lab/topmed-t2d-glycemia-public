@@ -1,6 +1,7 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/aggregateAssociationGroup.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/aggregateAssociation_v2.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/groupByGene.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/commonID.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/aggregateSummary.R"
 	}
@@ -10,7 +11,8 @@ task getScript {
 	}
 
 	output {
-		File assoc_script = "aggregateAssociationGroup.R"
+		File assoc_script = "aggregateAssociation_v2.R"
+		File group_script = "groupByGene.R"
 		File commonID_script = "commonID.R"
 		File summary_script = "aggregateSummary.R"
 	}
@@ -47,25 +49,54 @@ task common_ID {
         }
 }
 
+task get_groups {
+	File gds
+	File allGenes
+	File panGenes
+	File anno
+	File state
+	File chain
+	File groupScript
+
+	command {
+        	R --vanilla --args ${gds} ${allGenes} ${panGenes} ${anno} ${state} ${chain} < ${groupScript}
+    }
+
+    meta {
+            author: "TM"
+            email: "tmajaria@broadinstitute.org"
+    }
+
+    runtime {
+    	   docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
+		   disks: "local-disk 100 SSD"
+		   memory: "15G"
+    }
+
+    output {
+            File out_groups = "groups.RData"
+    }	
+
+}
+
 task aggAssocTest {
 # perform association test
 
 	File gds
 	File ped
-	File GRM
 	File commonIDs
-	File groups
 	String colname
 	String label
 	String outcome
 	String outcomeType
 	String test
 	String pval
-	String? covariates
+	File groups
+	File nullFile
 	File assocTestScript
 
 	command {
-		R --vanilla --args ${gds} ${ped} ${GRM} ${commonIDs} ${groups} ${colname} ${label} ${outcome} ${outcomeType} ${covariates} < ${assocTestScript} 
+		R --vanilla --args ${gds} ${ped} ${commonIDs} ${colname} ${label} ${outcome} ${outcomeType} ${test} ${pval} ${groups} ${nullFile} < ${assocTestScript} 
 	}
 
 	meta {
@@ -85,12 +116,12 @@ task aggAssocTest {
 }
 
 task summary {
-	File assoc
 	String label
+	Array[File] assoc
 	File summaryScript
 
 	command {
-		R --vanilla --args ${assoc} ${label} < ${summaryScript}	
+		R --vanilla --args ${label} ${sep = ' ' assoc} < ${summaryScript}	
 	}
 	
 	runtime {
@@ -109,24 +140,33 @@ task summary {
 workflow w_assocTest {
 	File this_gds
 	File this_ped
-	File this_GRM
-	File this_groups
-	String this_colname
 	String this_label
+	String this_colname
+
+	File this_allGenes
+	File this_panGenes
+	File this_anno
+	File this_state
+	File this_chain
+
 	String this_outcome
 	String this_outcomeType
 	String this_test
 	String this_pval
-	String? this_covariates
+	File this_null
 	
 	call getScript
 	
 	call common_ID {
             input: gds=this_gds, ped=this_ped, script=getScript.commonID_script, idcol=this_colname, label=this_label
 	}
+
+	call get_groups {
+			input: gds=this_gds, allGenes=this_allGenes, panGenes=this_panGenes, anno=this_anno, state=this_state, chain=this_chain, groupScript=getScript.group_script
+	}
 		
 	call aggAssocTest {
-		input: gds = this_gds, ped = this_ped, GRM = this_GRM, commonIDs = common_ID.commonIDsRData, groups = this_groups, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval, covariates = this_covariates, assocTestScript = getScript.assoc_script
+		input: gds = this_gds, ped = this_ped, commonIDs = common_ID.commonIDsRData, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval,  groups = get_groups.out_groups, nullFile = this_null assocTestScript = getScript.assoc_script
 	}
 
 

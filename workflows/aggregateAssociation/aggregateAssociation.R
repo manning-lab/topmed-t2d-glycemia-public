@@ -41,25 +41,25 @@ input_args <- commandArgs(trailingOnly=T)
 
 gds <- input_args[1] #"GoT2D.chr22.biallelic.gds"
 ped <- input_args[2] #"GoT2D.phenotype.ped"
-kinship_file <- input_args[3] # GoT2DSampleID
+# kinship_file <- input_args[3] # GoT2DSampleID
 commonID_file <- input_args[4]
-chr_st.file <- inputs_args[5]
-anno.file <- input_args[6]
-anno.type <- input_args[7]
-anno.value <- input_args[8]
+# chr_st.file <- inputs_args[5]
+# anno.file <- input_args[6]
+# anno.type <- input_args[7]
+# anno.value <- input_args[8]
 id.column.name <- input_args[9]
 label <- input_args[10]
 outcome <- input_args[11]
 outcomeType <- input_args[12]
-minMAC <- 30 # hard coded
-chr_st.names <- unlist(strsplit(input_args[13],split=","))
-source.file <- input_args[14]
+# minMAC <- 30 # hard coded
+# chr_st.names <- unlist(strsplit(input_args[13],split=","))
+# source.file <- input_args[14]
 test <- input_args[15]
 pval <- input_args[16]
-gene.file <- input_args[17]
-covariates <- NULL
+# gene.file <- input_args[17]
+# covariates <- NULL
 
-print(paste("GDS file:",gds))
+# print(paste("GDS file:",gds))
 print(paste("Ped file:",ped))
 print(paste("Kinship file:",kinship_file))
 print(paste("Common IDs file:",commonID_file))
@@ -198,7 +198,7 @@ geno <- seqOpen(gds)
   # get the groups
   
   # variant.groups <- groupByGene(geno.gds,chr_st.file,anno.file,gene.file,chr_st.names,anno.value,minmaf)
-  load("/Users/tmajaria/Documents/projects/topmed/code/varshney/results/groups_v1.RData")
+  load("/Users/tmajaria/Documents/projects/topmed/results/varshney/v1/groups_v1.RData")
   
   groups <- groups[!sapply(groups, is.null)]
  
