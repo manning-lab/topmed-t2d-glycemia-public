@@ -108,7 +108,7 @@ biocLite("SeqVarTools")
     gds.df <- .expandAlleles(gds.data)
     # library(SeqVarTools)
     # gds.df$maf <- alleleFrequency(gds.data,n=1)
-    ref.freq <- seqAlleleFreq(geno, .progress=TRUE)
+    ref.freq <- seqAlleleFreq(gds.data, .progress=TRUE)
     gds.df$maf <- pmin(ref.freq, 1-ref.freq)
 
     ## subset the variants to those with maf<1% and maf > 0
