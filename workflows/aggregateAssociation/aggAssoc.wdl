@@ -166,7 +166,7 @@ workflow w_assocTest {
 	}
 		
 	call aggAssocTest {
-		input: gds = this_gds, ped = this_ped, commonIDs = common_ID.commonIDsRData, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval,  groups = get_groups.out_groups, nullFile = this_null assocTestScript = getScript.assoc_script
+		input: gds = this_gds, ped = this_ped, commonIDs = common_ID.commonIDsRData, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval,  groups = get_groups.out_groups, nullFile = this_null, assocTestScript = getScript.assoc_script
 	}
 
 

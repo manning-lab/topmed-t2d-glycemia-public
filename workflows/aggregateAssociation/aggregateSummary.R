@@ -52,7 +52,9 @@ dev.off()
 
 l <- list()
 for (i in seq(1,length(all_assoc))){
+# for (i in seq(1,length(res[,1]))){
   l[[length(l)+1]] <- data.frame(P=rep(res$pval_0[i],length(all_assoc[[i]]$variantInfo[,1])), BP=all_assoc[[i]]$variantInfo$pos, CHR=all_assoc[[i]]$variantInfo$chr)
+  # l[[length(l)+1]] <- data.frame(P=rep(res$pval_0[i],length(groups[[i]]$variant.id)), BP=groups[[i]]$position, CHR=groups[[i]]$chromosome)
 }
 
 df <- l[[1]]
