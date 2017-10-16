@@ -11,6 +11,16 @@ genes.pad <- 5000
 anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
 states.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
 minmaf <- 0.01
+# genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
+# genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
+# gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
+# genes.pad <- 5000
+# anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
+# anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
+# states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/varshney_islets_chromatin_state.aggregation.chr10.csv"
+# state.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
+# minmaf <- 0.01
+# chain.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/hg38ToHg19.over.chain"
 
 
 
@@ -44,17 +54,6 @@ minmaf <- 0.01
   gds.data <- seqOpen(gds.file)
   chr_num <- seqGetData(gds.data,"chromosome")[1]
   chr <- paste("chr",chr_num,sep="")
-  
-  
-  # genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
-  # genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
-  # gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
-  # genes.pad <- 5000
-  # anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
-  # anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
-  # states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/varshney_islets_chromatin_state.aggregation.chr10.csv"
-  # state.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
-  # minmaf <- 0.01
   
   ## load genes first
   library(data.table)
@@ -105,6 +104,7 @@ minmaf <- 0.01
     print("got to 105")
     gds.df <- .expandAlleles(gds.data)
     print("got to 107")
+    library(SeqVarTools)
     gds.df$maf <- alleleFrequency(gds.data,n=1)
     print("got to 109")
     ## subset the variants to those with maf<1% and maf > 0
