@@ -11,6 +11,10 @@ genes.pad <- 5000
 anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
 states.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
 minmaf <- 0.01
+library(SeqVarTools)
+
+source("https://bioconductor.org/biocLite.R")
+biocLite("SeqVarTools")
 # genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
 # genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
 # gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
@@ -101,12 +105,12 @@ minmaf <- 0.01
     library(SeqVarTools)
     library(dplyr)
     library(tidyr)
-    print("got to 105")
     gds.df <- .expandAlleles(gds.data)
-    print("got to 107")
-    library(SeqVarTools)
-    gds.df$maf <- alleleFrequency(gds.data,n=1)
-    print("got to 109")
+    # library(SeqVarTools)
+    # gds.df$maf <- alleleFrequency(gds.data,n=1)
+    ref.freq <- seqAlleleFreq(geno, .progress=TRUE)
+    gds.df$maf <- pmin(ref.freq, 1-ref.freq)
+
     ## subset the variants to those with maf<1% and maf > 0
     gds.df.umaf <- gds.df[gds.df$maf<minmaf,]
     gds.df.umaf <- gds.df.umaf[gds.df.umaf$maf>0,]

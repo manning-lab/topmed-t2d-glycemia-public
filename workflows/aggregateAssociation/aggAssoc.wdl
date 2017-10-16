@@ -70,7 +70,7 @@ task get_groups {
     runtime {
     	   docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
 		   disks: "local-disk 100 SSD"
-		   memory: "15G"
+		   memory: "30G"
     }
 
     output {
@@ -138,7 +138,7 @@ task summary {
 }
 
 workflow w_assocTest {
-	File this_gds
+	Array[File] these_gds
 	File this_ped
 	String this_label
 	String this_colname
@@ -158,15 +158,17 @@ workflow w_assocTest {
 	call getScript
 	
 	call common_ID {
-            input: gds=this_gds, ped=this_ped, script=getScript.commonID_script, idcol=this_colname, label=this_label
+            input: gds=these_gds[1], ped=this_ped, script=getScript.commonID_script, idcol=this_colname, label=this_label
 	}
 
-	call get_groups {
-			input: gds=this_gds, allGenes=this_allGenes, panGenes=this_panGenes, anno=this_anno, state=this_state, chain=this_chain, groupScript=getScript.group_script
-	}
-		
-	call aggAssocTest {
-		input: gds = this_gds, ped = this_ped, commonIDs = common_ID.commonIDsRData, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval,  groups = get_groups.out_groups, nullFile = this_null, assocTestScript = getScript.assoc_script
+	scatter(this_gds in these_gds) {
+		call get_groups {
+				input: gds=this_gds, allGenes=this_allGenes, panGenes=this_panGenes, anno=this_anno, state=this_state, chain=this_chain, groupScript=getScript.group_script
+		}
+			
+		call aggAssocTest {
+			input: gds = this_gds, ped = this_ped, commonIDs = common_ID.commonIDsRData, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval,  groups = get_groups.out_groups, nullFile = this_null, assocTestScript = getScript.assoc_script
+		}
 	}
 
 
