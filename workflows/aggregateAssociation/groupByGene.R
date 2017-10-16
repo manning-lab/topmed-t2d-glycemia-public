@@ -102,9 +102,11 @@ minmaf <- 0.01
     library(SeqVarTools)
     library(dplyr)
     library(tidyr)
+    print("got to 105")
     gds.df <- .expandAlleles(gds.data)
+    print("got to 107")
     gds.df$maf <- alleleFrequency(gds.data,n=1)
-    
+    print("got to 109")
     ## subset the variants to those with maf<1% and maf > 0
     gds.df.umaf <- gds.df[gds.df$maf<minmaf,]
     gds.df.umaf <- gds.df.umaf[gds.df.umaf$maf>0,]
