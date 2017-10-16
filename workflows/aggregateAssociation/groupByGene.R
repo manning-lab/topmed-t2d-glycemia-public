@@ -1,11 +1,11 @@
-# groupByGene_v5 <- function( gds.file , genes.all.file , genes.pan.file , anno.file , state.file , genes.pad , anno.value , states.names , minmaf ){
+# groupByGene_v5 <- function( gds.file , genes.all.file , genes.pan.file , anno.file , states.file , genes.pad , anno.value , states.names , minmaf ){
 
 args <- commandArgs(trailingOnly=T)
 gds.file <- args[1]
 genes.all.file <- args[2]
 genes.pan.file <- args[3]
 anno.file <- args[4]
-state.file <- args[5]
+states.file <- args[5]
 chain.file <- args[6]
 genes.pad <- 5000
 anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
@@ -52,7 +52,7 @@ minmaf <- 0.01
   # genes.pad <- 5000
   # anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
   # anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
-  # state.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/varshney_islets_chromatin_state.aggregation.chr10.csv"
+  # states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/varshney_islets_chromatin_state.aggregation.chr10.csv"
   # state.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
   # minmaf <- 0.01
   
@@ -78,10 +78,10 @@ minmaf <- 0.01
   anno.raw <- fread(anno.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
   
   ## load chromatin states
-  states.raw <- fread(state.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
-  states.subset <- state.raw[which(state.raw[,7] %in% state.names),] # 14363
-  states.subset[,4] <- sub("chr","",state.subset[,4]) # 1329
-  states.gr <- GRanges(seqnames=state.subset$chr,ranges=IRanges(start=state.subset$start,end=state.subset$stop),state=state.subset$type)
+  states.raw <- fread(states.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+  states.subset <- states.raw[which(states.raw[,7] %in% states.names),] # 14363
+  states.subset[,4] <- sub("chr","",states.subset[,4]) # 1329
+  states.gr <- GRanges(seqnames=states.subset$chr,ranges=IRanges(start=states.subset$start,end=states.subset$stop),state=states.subset$type)
   
   ## collecting the groups
   groups <- list()
