@@ -92,11 +92,11 @@ task aggAssocTest {
 	String test
 	String pval
 	File groups
-	File nullFile
+	File modelFile
 	File assocTestScript
 
 	command {
-		R --vanilla --args ${gds} ${ped} ${commonIDs} ${colname} ${label} ${outcome} ${outcomeType} ${test} ${pval} ${groups} ${nullFile} < ${assocTestScript} 
+		R --vanilla --args ${gds} ${ped} ${commonIDs} ${colname} ${label} ${outcome} ${outcomeType} ${test} ${pval} ${groups} ${modelFile} < ${assocTestScript} 
 	}
 
 	meta {
@@ -153,7 +153,7 @@ workflow w_assocTest {
 	String this_outcomeType
 	String this_test
 	String this_pval
-	File this_null
+	File this_model
 	
 	call getScript
 	
@@ -167,7 +167,7 @@ workflow w_assocTest {
 		}
 			
 		call aggAssocTest {
-			input: gds = this_gds, ped = this_ped, commonIDs = common_ID.commonIDsRData, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval,  groups = get_groups.out_groups, nullFile = this_null, assocTestScript = getScript.assoc_script
+			input: gds = this_gds, ped = this_ped, commonIDs = common_ID.commonIDsRData, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, test = this_test, pval = this_pval,  groups = get_groups.out_groups, modelFile = this_model, assocTestScript = getScript.assoc_script
 		}
 	}
 
