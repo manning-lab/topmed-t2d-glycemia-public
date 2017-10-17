@@ -19,6 +19,7 @@ library(GenomicRanges)
 library(rtracklayer)
 library(data.table)
 library(SeqArray)
+library(biomaRt)
 
 # source("https://bioconductor.org/biocLite.R")
 # biocLite("SeqVarTools")
@@ -67,9 +68,13 @@ library(SeqArray)
   chr <- paste("chr",chr_num,sep="")
   
   ## load genes first
-  
-  genes.all <- fread(genes.all.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
-  genes.all <- genes.all[order(genes.all$hgnc_symbol),]
+  mart <- useMart("ensembl")
+  mart <- useDataset("hsapiens_gene_ensembl",mart)
+  mart=useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
+  genes.all <- select(mart,keys = chr_num,keytype = "chromosome_name",
+                    columns =  c( "ensembl_transcript_id","hgnc_symbol", "chromosome_name","transcript_start", "transcript_end", "ensembl_gene_id", "start_position","end_position"))
+  # genes.all <- fread(genes.all.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+  # genes.all <- genes.all[order(genes.all$hgnc_symbol),]
   genes.pan.raw <- fread(genes.pan.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
   genes.pan <- genes.all[genes.all$ensembl_gene_id %in%  genes.pan.raw[genes.pan.raw$RPKM>=2 & genes.pan.raw$Gene_Type=="protein_coding",1],]
   genes.pan <- genes.pan[!duplicated(genes.pan$ensembl_gene_id),]
