@@ -9,7 +9,8 @@ states.file <- args[5]
 chain.file <- args[6]
 genes.pad <- 5000
 anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
-states.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
+# states.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
+states.names <- c("9_Active_enhancer_1","10_Active_enhancer_2","1_Active_TSS")
 minmaf <- 0.01
 library(SeqVarTools)
 library(dplyr)
@@ -108,11 +109,14 @@ library(biomaRt)
   rm(anno.raw)
   
   ## load chromatin states
-  states.raw <- fread(states.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+  # states.raw <- fread(states.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+  states.unparsed <- fread(states.file,sep="\t",header=F,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+  states.raw <- data.frame(name=states.unparsed[,4],start=states.unparsed[,2],stop=states.unparsed[,3], chr=states.unparsed[,1],tissue=rep('islets',length(states.unparsed[,1])),category=rep('chromatin_state',length(states.unparsed[,1])),type=states.unparsed[,4])
   states.subset <- states.raw[which(states.raw[,7] %in% states.names),] # 14363
   states.subset[,4] <- sub("chr","",states.subset[,4]) # 1329
   states.gr <- GRanges(seqnames=states.subset$chr,ranges=IRanges(start=states.subset$start,end=states.subset$stop),state=states.subset$type)
   
+  rm(states.unparsed)
   rm(states.raw)
   rm(states.subset)
 
