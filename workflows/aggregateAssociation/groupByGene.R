@@ -26,6 +26,7 @@ library(biomaRt)
 # genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
 # genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
 # # gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
+# gds.file <- "/Users/tmajaria/Downloads/freeze4.chr21.pass.gtonly.minDP10.genotypes.gds"
 # genes.pad <- 5000
 # anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
 # anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
@@ -149,13 +150,13 @@ library(biomaRt)
     gds.gr <- GRanges(seqnames=gds.df.umaf$chromosome, ranges=IRanges(start=gds.df.umaf$position,end=gds.df.umaf$position))
     names(gds.gr) <- gds.df.umaf$variant.id
     
+    print(length(gds.df.umaf$variant.id))
     ## subset annotations to our range
-    
-    print(head(cur_gene.gr))
     anno.subset <- anno.sub_one[anno.sub_one$VEP_ensembl_Gene_ID == cur_gene.gr$id,]
-    print("here")
-    ## get only those annotations that have our consequences
     
+    print(length(anno.subset))
+    
+    ## get only those annotations that have our consequences
     anno.subvals <- anno.subset[apply(as.matrix(anno.subset$VEP_ensembl_Consequence), 1, function(x) any(sapply(anno.value, function(y) str_detect(unlist(str_split(x, pattern=",")),y)))),]
     anno.df <- data.frame(pos=anno.subvals$pos,alt=as.vector(anno.subvals$alt),annotation=as.vector(anno.subvals$VEP_ensembl_Consequence))
     gds_match <- data.frame(pos=gds.df.umaf$position,alt=as.vector(gds.df.umaf$allele))
