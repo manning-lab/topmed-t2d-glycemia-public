@@ -23,16 +23,16 @@ library(biomaRt)
 
 # source("https://bioconductor.org/biocLite.R")
 # biocLite("SeqVarTools")
-# genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
-# genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
+genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
+genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
 # gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
-# genes.pad <- 5000
-# anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
-# anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
-# states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/varshney_islets_chromatin_state.aggregation.chr10.csv"
-# state.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
-# minmaf <- 0.01
-# chain.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/hg38ToHg19.over.chain"
+genes.pad <- 5000
+anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
+anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
+states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/varshney_islets_chromatin_state.aggregation.chr10.csv"
+state.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
+minmaf <- 0.01
+chain.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/hg38ToHg19.over.chain"
 
 
 
@@ -85,7 +85,7 @@ library(biomaRt)
   ## remap to hg19
   
   hg38tohg19 <- import.chain(chain.file) # (http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/)
-  genes.hg38 <- GRanges(seqnames=rep(chr,length(genes.pan$chromosome_name)),ranges=IRanges(start=genes.pan$start_position, end=genes.pan$end_position),symbol=genes.pan$hgnc_symbol,id=genes.pan$ensembl_gene_id)
+  genes.hg38 <- GRanges(seqnames=sub("^","chr",genes.pan$chromosome_name),ranges=IRanges(start=genes.pan$start_position, end=genes.pan$end_position),symbol=genes.pan$hgnc_symbol,id=genes.pan$ensembl_gene_id)
   genes.hg19 <- unlist(liftOver(genes.hg38, hg38tohg19))
   
   rm(hg38tohg19)
@@ -129,6 +129,12 @@ library(biomaRt)
     
     ## subset gds
     seqSetFilter(gds.data,cur_gene.gr)
+    
+    num_var <- length(seqGetData(gds.data,"variant.id"))
+    
+    if(num_var==0){
+      next
+    }
     
     ## get the variants to a better format
     gds.df <- .expandAlleles(gds.data)
