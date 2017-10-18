@@ -7,7 +7,7 @@
 ## Example usage: R --vanilla --args GoT2D_T2D.assoc.RData Score.pval label T2D_covariates red black F F < summary.R
 
 #install.packages("calibrate_1.7.2.tar.gz")
-# install.packages("qqman",repos='http://cran.us.r-project.org')  #_0.14.tar.gz")
+install.packages("qqman",repos='http://cran.us.r-project.org')  #_0.14.tar.gz")
 library(qqman)
 library(data.table)
 
