@@ -20,6 +20,8 @@ groups.top <- groups[names(groups) %in% results.top$V1]
 names(groups.top)
 
 library(GenomicRanges)
+source("https://bioconductor.org/biocLite.R")
+biocLite("STAN")
 library(STAN)
 library(Gviz)
 library(biomaRt)
