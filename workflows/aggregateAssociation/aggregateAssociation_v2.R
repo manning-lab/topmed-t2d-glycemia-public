@@ -35,6 +35,7 @@ genoData <- SeqVarData(geno)
 
 ## load groups
 load(group.file)
+groups <- unique(groups)
 
 ## load null model
 load(null.file)
