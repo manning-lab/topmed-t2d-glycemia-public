@@ -43,7 +43,7 @@ state.subset[,1] <- sub("chr","",state.subset[,1]) # 1329
 state.gr <- GRanges(seqnames=state.subset[,1],ranges=IRanges(start=state.subset[,2],end=state.subset[,3]),state=state.subset[,4])
 head(state.gr)
 
-pdf(paste(out.file_pref,".pdf",sep=""),width=11)
+pdf(paste(out.file_pref,"top_hits_",".pdf",sep=""),width=11)
 layout(matrix(seq(length(groups.top)),nrow=length(groups.top),ncol=1,byrow=T))
 
 for (j in seq(1,length(groups.top))){
