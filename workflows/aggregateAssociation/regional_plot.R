@@ -19,6 +19,11 @@ load(groups.file)
 groups.top <- groups[names(groups) %in% results.top$V1]
 names(groups.top)
 
+if (length(groups.top) == 0){
+  pdf(paste(out.file_pref,"top_hits_",".pdf",sep=""),width=11)
+  dev.off()
+} else {
+
 library(GenomicRanges)
 source("https://bioconductor.org/biocLite.R")
 biocLite("STAN")
@@ -103,3 +108,4 @@ for (j in seq(1,length(groups.top))){
   plotTracks(c(list(axTrack,idxTrack,snpregtrack,gtrack),cs.track), showTitle = TRUE, sizes=c(2,1,5,6,1), from=from,to=to)
 }
 dev.off()
+}

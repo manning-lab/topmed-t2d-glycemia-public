@@ -27,15 +27,15 @@ library(biomaRt)
 # genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
 # genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
 # # gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
-# gds.file <- "/Users/tmajaria/Downloads/freeze4.chr21.pass.gtonly.minDP10.genotypes.gds"
+# gds.file <- "/Users/tmajaria/Documents/projects/topmed/results/varshney/genomewide_v1/group_check/freeze4.chr21.pass.gtonly.minDP10.genotypes.gds"
 # genes.pad <- 5000
 # anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
 # anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
-# states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/varshney_islets_chromatin_state.aggregation.chr10.csv"
-# state.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
+# states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/local_cs_states/Islets.chromatinStates.bed"
+# states.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
 # minmaf <- 0.01
 # chain.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/hg38ToHg19.over.chain"
-
+# 
 
 
   getAggList <- function(gds, variants.orig){
@@ -157,7 +157,7 @@ library(biomaRt)
     print(length(gds.df.umaf$variant.id))
     ## subset annotations to our range
     anno.subset <- anno.sub_one[anno.sub_one$VEP_ensembl_Gene_ID == cur_gene.gr$id,]
-    
+    head(anno.subset)
     print(length(anno.subset))
     
     ## get only those annotations that have our consequences
