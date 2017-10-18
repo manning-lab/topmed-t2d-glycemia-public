@@ -70,5 +70,5 @@ pdf(paste(label,".mhplot.pdf",sep=""))
 manhattan(df,chr="CHR",bp="BP",p="P", main=label)
 dev.off()
 
-write.csv(results, paste(label, ".groupAssoc.csv", sep=""))
+write.csv(assoc.compilation, paste(label, ".groupAssoc.csv", sep=""))
 
