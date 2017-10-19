@@ -8,18 +8,18 @@ task getScript {
 	}
 
 	output {
-		File group_script = "parse_wgsa.R"
+		File script = "parse_wgsa.R"
 	}
 }
 
 task parse {
+	File script
 	File anno
-
-	String anno_unzip = basename(anno,".gz")
+	String anno_unzip = sub(anno,".gz","")
 
 	command {
 			gunzip -d ${anno}
-        	R --vanilla --args ${gds} ${allGenes} ${panGenes} ${anno} ${state} ${chain} < ${groupScript}
+        	R --vanilla --args ${anno} ${anno_unzip} < ${script}
     }
 
     meta {
@@ -46,7 +46,7 @@ workflow wf {
 	
 	scatter(this_anno in these_anno) {
 		call parse {
-				input: anno=this_anno
+				input: script=getScript.script, anno=this_anno
 		}
 	}
 }

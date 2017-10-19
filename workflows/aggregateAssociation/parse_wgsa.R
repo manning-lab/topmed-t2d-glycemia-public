@@ -17,7 +17,7 @@ out.file <- paste(args[2],".csv",sep="")
 target_columns <- unlist(strsplit("#chr,pos,ref,alt,VEP_ensembl_Gene_ID,VEP_ensembl_Consequence",","))
 columns_to_split <- unlist(strsplit("VEP_ensembl_Gene_ID,VEP_ensembl_Consequence",","))
 
-devtools::install_github("UW-GAC/wgsaparsr")
+devtools::install_github("UW-GAC/wgsaparsr@2.0.1.4")
 library(wgsaparsr)
 all_fields <- get_fields(anno.file)
 print(all_fields)
