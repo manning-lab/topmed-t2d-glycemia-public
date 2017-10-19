@@ -166,10 +166,10 @@ library(biomaRt)
     
     ## get only those annotations that have our consequences
     anno.subvals <- anno.subset[apply(as.matrix(anno.subset$VEP_ensembl_Consequence), 1, function(x) any(sapply(anno.value, function(y) str_detect(unlist(str_split(x, pattern=",")),y)))),]
-    anno.df <- data.frame(pos=anno.subvals$pos,alt=as.vector(anno.subvals$alt),annotation=as.vector(anno.subvals$VEP_ensembl_Consequence))
-    gds_match <- data.frame(pos=gds.df.umaf$position,alt=as.vector(gds.df.umaf$allele))
-    gds_paste = do.call("paste", gds_match[,1:2])
-    anno_paste = do.call("paste", anno.df[,1:2])
+    anno.df <- data.frame(pos=anno.subvals$pos,ref=as.vector(anno.subvals$ref), alt=as.vector(anno.subvals$alt),annotation=as.vector(anno.subvals$VEP_ensembl_Consequence))
+    gds_match <- data.frame(pos=gds.df.umaf$position,ref=as.vector(gds.df.umaf$ref), alt=as.vector(gds.df.umaf$allele))
+    gds_paste = do.call("paste", gds_match[,1:3])
+    anno_paste = do.call("paste", anno.df[,1:3])
     anno_paste2 <- cbind(anno_paste,as.vector(anno.df$annotation))
     uv <- unique(anno_paste2[,1])
     anno_paste3 <- data.frame(uv, rep(0,length(uv)))
@@ -182,8 +182,8 @@ library(biomaRt)
       anno_paste3[j,2] <- paste(ap3[!duplicated(ap3)],collapse=",")
     }
     
-    anno.snps1 <- gds.df.umaf[gds_paste %in% anno_paste3[,1],]
-    anno.snps <- anno.snps1[!duplicated(anno.snps1[,3]),]
+    anno.snps <- gds.df.umaf[gds_paste %in% anno_paste3[,1],]
+    # anno.snps <- anno.snps1[!duplicated(anno.snps1[,3]),]
     anno.snps$annotation <- anno_paste3[anno_paste3[,1] %in% gds_paste,2]
     }
     ## get variants within the chromatin states
