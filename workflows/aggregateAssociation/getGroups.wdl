@@ -48,19 +48,21 @@ task get_groups {
 
 workflow wf {
 	Array[File] these_gds
+	Array[File] these_anno
 	String this_label
 
 	File this_allGenes
 	File this_panGenes
-	File this_anno
 	File this_state
 	File this_chain
 	
+	Array[Pair[File,File]] these_gds_anno = zip(these_gds,these_anno)
+
 	call getScript
 	
-	scatter(this_gds in these_gds) {
+	scatter(this_gds_anno in these_gds_anno) {
 		call get_groups {
-				input: gds=this_gds, allGenes=this_allGenes, panGenes=this_panGenes, anno=this_anno, state=this_state, chain=this_chain, groupScript=getScript.group_script
+				input: gds=this_gds_anno.left, allGenes=this_allGenes, panGenes=this_panGenes, anno=this_gds_anno.right, state=this_state, chain=this_chain, groupScript=getScript.group_script
 		}
 	}
 }
