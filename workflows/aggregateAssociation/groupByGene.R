@@ -126,7 +126,8 @@ library(biomaRt)
   groups <- list()
   
   ## loop through genes
-  for (gind in seq(1,length(genes.pan.gr[,1]))){
+  # for (gind in seq(1,length(genes.pan.gr[,1]))){
+  for (gind in seq(1,23)){
     print(paste(gind,"/",length(genes.pan.gr[,1]),sep=""))
     
     
@@ -181,7 +182,8 @@ library(biomaRt)
       anno_paste3[j,2] <- paste(ap3[!duplicated(ap3)],collapse=",")
     }
     
-    anno.snps <- gds.df.umaf[gds_paste %in% anno_paste3[,1],]
+    anno.snps1 <- gds.df.umaf[gds_paste %in% anno_paste3[,1],]
+    anno.snps <- anno.snps1[!duplicated(anno.snps1[,3]),]
     anno.snps$annotation <- anno_paste3[anno_paste3[,1] %in% gds_paste,2]
     }
     ## get variants within the chromatin states
