@@ -21,7 +21,10 @@ task get_groups {
 	File chain
 	File groupScript
 
+	String anno_unzip = basename(anno,".gz")
+
 	command {
+			gunzip -d ${anno}
         	R --vanilla --args ${gds} ${allGenes} ${panGenes} ${anno} ${state} ${chain} < ${groupScript}
     }
 
