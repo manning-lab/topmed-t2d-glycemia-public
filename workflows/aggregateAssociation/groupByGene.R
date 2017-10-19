@@ -26,17 +26,17 @@ library(biomaRt)
 # biocLite("SeqVarTools")
 # genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
 # genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
-# gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
+# gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr20.pass.gtonly.minDP10.genotypes.gds"
 # # # gds.file <- "/Users/tmajaria/Documents/projects/topmed/results/varshney/genomewide_v1/group_check/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
 # # # genes.pad <- 5000
 # anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
-# # anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotation/freezes_2a_3a_4.snp_indel.annotated.general20170422.subset.gz.chr10"
+# # anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freezes_2a_3a_4.snp_indel.annotated.general20170422.subset.gz.chr20.csv"
 # # # anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
 # states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/local_cs_states/Islets.chromatinStates.bed"
 # # # states.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
 # # minmaf <- 0.01
 # chain.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/hg38ToHg19.over.chain"
-# 
+# # 
 
 
   getAggList <- function(gds, variants.orig){
