@@ -24,18 +24,18 @@ library(biomaRt)
 
 # source("https://bioconductor.org/biocLite.R")
 # biocLite("SeqVarTools")
-# genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
-# genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
-# gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
+genes.all.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/ensembl_genes.csv"
+genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
+gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
 # # gds.file <- "/Users/tmajaria/Documents/projects/topmed/results/varshney/genomewide_v1/group_check/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds"
 # # genes.pad <- 5000
-# # # anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
+anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotations.subset.csv"
 # anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotation/freezes_2a_3a_4.snp_indel.annotated.general20170422.subset.gz.chr10"
 # # anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
-# states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/local_cs_states/Islets.chromatinStates.bed"
+states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/local_cs_states/Islets.chromatinStates.bed"
 # # states.names <- c("active_enhancer_1","active_enhancer_2","active_tss")
 # minmaf <- 0.01
-# chain.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/hg38ToHg19.over.chain"
+chain.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/hg38ToHg19.over.chain"
 # 
 
 
@@ -112,6 +112,7 @@ library(biomaRt)
   ## load chromatin states
   # states.raw <- fread(states.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
   states.unparsed <- fread(states.file,sep="\t",header=F,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+  print(head(states.unparsed))
   states.raw <- data.frame(name=states.unparsed[,4],start=states.unparsed[,2],stop=states.unparsed[,3], chr=states.unparsed[,1],tissue=rep('islets',length(states.unparsed[,1])),category=rep('chromatin_state',length(states.unparsed[,1])),type=states.unparsed[,4])
   states.subset <- states.raw[which(states.raw[,7] %in% states.names),] # 14363
   states.subset[,4] <- sub("chr","",states.subset[,4]) # 1329

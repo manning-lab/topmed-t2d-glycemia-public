@@ -15,10 +15,9 @@ task getScript {
 task parse {
 	File script
 	File anno
-	String anno_unzip = sub(anno,".gz","")
+	String anno_unzip = basename(anno,".gz")
 
 	command {
-			gunzip -d ${anno}
         	R --vanilla --args ${anno} ${anno_unzip} < ${script}
     }
 
@@ -34,7 +33,7 @@ task parse {
     }
 
     output {
-    	File anno_out = "${anno}.csv"
+    	File anno_out = "${anno_unzip}.csv"
     }	
 
 }
