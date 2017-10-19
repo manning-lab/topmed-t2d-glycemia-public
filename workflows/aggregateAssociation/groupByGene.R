@@ -160,7 +160,8 @@ library(biomaRt)
     ## subset annotations to our range
     anno.subset <- anno.sub_one[anno.sub_one$VEP_ensembl_Gene_ID == cur_gene.gr$id,]
     head(anno.subset)
-    print(length(anno.subset))
+    print(length(anno.subset[,1]))
+    if (length(anno.subset[,1])>0){
     
     ## get only those annotations that have our consequences
     anno.subvals <- anno.subset[apply(as.matrix(anno.subset$VEP_ensembl_Consequence), 1, function(x) any(sapply(anno.value, function(y) str_detect(unlist(str_split(x, pattern=",")),y)))),]
@@ -182,7 +183,7 @@ library(biomaRt)
     
     anno.snps <- gds.df.umaf[gds_paste %in% anno_paste3[,1],]
     anno.snps$annotation <- anno_paste3[anno_paste3[,1] %in% gds_paste,2]
-    
+    }
     ## get variants within the chromatin states
     states.subset_o <- states.gr[end(states.gr)>start(cur_gene.gr),]
     states.subset <- states.subset_o[start(states.subset_o)<end(cur_gene.gr),]
@@ -192,8 +193,11 @@ library(biomaRt)
     states.snps$annotation <- states.subset$state[subjectHits(states.hits)]
     
     ## now put all of the snps together for our gene
-    gds.subset.df <- rbind(states.snps,anno.snps)
-    
+    if (length(anno.subset[,1])>0){
+      gds.subset.df <- rbind(states.snps,anno.snps)
+    } else {
+      gds.subset.df <- states.snps
+    }
     groups[[cur_gene.gr$symbol]] <- gds.subset.df
     
   }
