@@ -43,24 +43,29 @@ task plot_top {
 
 
 workflow w_assocTest {
-	File this_results_file
+	Array[File] these_results_files
 	Array[Pair[File,File]] these_gds_groups
     File this_state_file
     File this_gene_file
+
+    Array[Pair[File,Pair[File,File]]] these_res_gds_group = zip(these_results_files,these_gds_groups)
     
     Array[String] these_out_pref = range(length(these_gds_groups))
-    Array[Pair[Int,Pair[File,File]]] ind_gds_pair = zip(these_out_pref,these_gds_groups)
+    Array[Pair[String,Pair[File,Pair[File,File]]]] ind_res_gds_pair = zip(these_out_pref,these_res_gds_group)
+    # Array[Pair[Int,Pair[File,File]]] ind_res_gds_group_pair = zip(these_out_pref,these_gds_groups)
 
     
 	
 	call getScript
 
-	scatter(this_pair in ind_gds_pair) {
+	scatter(this_pair in ind_res_gds_pair) {
+
+		Pair[File,Pair[File,File]] res_gds_group = this_pair.right
 		
-		Pair[File,File] gds_group = this_pair.right
+		Pair[File,File] gds_group = res_gds_group.right
 
 		call plot_top {
-			input: results_file=this_results_file, group_file=gds_group.right, state_file=this_state_file, gene_file=this_gene_file, out_pref=this_pair.left, script=getScript.plot_script
+			input: results_file=res_gds_group.left, group_file=gds_group.right, state_file=this_state_file, gene_file=this_gene_file, out_pref=this_pair.left, script=getScript.plot_script
 		}
 
 	}
