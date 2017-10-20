@@ -17,12 +17,11 @@ task plot_top {
 		File results_file
 		File group_file
         File state_file
-        File gene_file
         String out_pref
         File script
 
         command {
-                R --vanilla --args ${results_file} ${group_file} ${state_file} ${gene_file} ${out_pref} < ${script}
+                R --vanilla --args ${results_file} ${group_file} ${state_file} ${out_pref} < ${script}
         }
 
         meta {
@@ -37,7 +36,7 @@ task plot_top {
         }
 
         output {
-                File plots = "top_hits_${out_pref}.pdf"
+                File plots = "${out_pref}_top_hits.pdf"
         }
 }
 
@@ -46,7 +45,6 @@ workflow w_assocTest {
 	Array[File] these_results_files
 	Array[Pair[File,File]] these_gds_groups
     File this_state_file
-    File this_gene_file
 
     Array[Pair[File,Pair[File,File]]] these_res_gds_group = zip(these_results_files,these_gds_groups)
     
@@ -65,7 +63,7 @@ workflow w_assocTest {
 		Pair[File,File] gds_group = res_gds_group.right
 
 		call plot_top {
-			input: results_file=res_gds_group.left, group_file=gds_group.right, state_file=this_state_file, gene_file=this_gene_file, out_pref=this_pair.left, script=getScript.plot_script
+			input: results_file=res_gds_group.left, group_file=gds_group.right, state_file=this_state_file, out_pref=this_pair.left, script=getScript.plot_script
 		}
 
 	}

@@ -7,8 +7,7 @@ args <- commandArgs(trailingOnly=T)
 results.file <- args[1]
 groups.file <- args[2]
 state.file <- args[3]
-gene.file <- args[4]
-out.file_pref <- args[5]
+out.file_pref <- args[4]
 state.names <- c("9_Active_enhancer_1","10_Active_enhancer_2","1_Active_TSS")
 
 # results.raw <- fread(results.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
@@ -23,7 +22,7 @@ groups.top <- results.raw$variantInfo[names(results.raw$variantInfo) %in% row.na
 # names(groups.top)
 
 if (length(groups.top) == 0){
-  pdf(paste(out.file_pref,"top_hits_",".pdf",sep=""),width=11)
+  pdf(paste(out.file_pref,"_top_hits",".pdf",sep=""),width=11)
   dev.off()
 } else {
 
