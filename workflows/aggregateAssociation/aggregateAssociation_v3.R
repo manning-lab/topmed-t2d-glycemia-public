@@ -18,7 +18,7 @@ if ( length(input_args) > 6 ){
 	weights <- c(1,25)
 }
 
-if( !(test %in% c("SKAT", "Burden") ){
+if( !(test %in% c("SKAT", "Burden") ) ){
 	stop("wrong test input")
 } else if ( test == "SKAT" & !(pval %in% c("davies", "kuonen","liu") ) ) {
 	stop("wrong pval input")
