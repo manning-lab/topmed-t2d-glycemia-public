@@ -20,9 +20,9 @@ if ( length(input_args) > 6 ){
 
 if( !(test %in% c("SKAT", "Burden") ){
 	stop("wrong test input")
-} else if ( test == "SKAT" & !(pval %in% c("davies", "kuonen","liu") ) {
+} else if ( test == "SKAT" & !(pval %in% c("davies", "kuonen","liu") ) ) {
 	stop("wrong pval input")
-} else if ( test == "Burden" & !(pval %in% c("Score",  "Wald", "Firth") ) {
+} else if ( test == "Burden" & !(pval %in% c("Score",  "Wald", "Firth") ) ) {
 	stop("wrong pval input")
 } else {
 	print("inputs look fine")
