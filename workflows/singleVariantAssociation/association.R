@@ -31,6 +31,7 @@ library(GENESIS)
 library(GWASTools)
 library(SeqArray)
 library(SeqVarTools)
+library(data.table)
 
 input_args <- commandArgs(trailingOnly=T)
 
@@ -65,7 +66,8 @@ if(length(input_args)>8) {
 
 
 # load ped_file and re-order columns
-ped_file <- read.table(ped, header = TRUE, as.is = FALSE)
+# ped_file <- read.table(ped, header = TRUE, as.is = FALSE)
+ped_file <- fread(ped,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 rownames(ped_file) <- ped_file[,id.column.name]
 head(ped_file)
 
