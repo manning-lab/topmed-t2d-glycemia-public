@@ -4,7 +4,7 @@ args <- commandArgs(trailingOnly=T)
 gds.file <- args[1]
 genes.pan.file <- args[2]
 anno.file <- args[3]
-anno.values <- unlist(strsplit(args[4],","))
+anno.value <- unlist(strsplit(args[4],","))
 anno.field <- args[5]
 states.file <- args[6]
 states.names <- unlist(strsplit(args[7],","))
@@ -16,6 +16,20 @@ if (length(args) > 10){
   library(rtracklayer)
   chain.file <- args[11]
 }
+
+# library(rtracklayer)
+# gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze4.chr20.pass.gtonly.minDP10.genotypes.gds"
+# genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
+# anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotation/freezes_2a_3a_4.snp_indel.annotated.general20170422.subset.gz.chr20.csv"
+# anno.value <- c("splice_acceptor_variant")
+# anno.field <- "VEP_ensembl_consequence"
+# states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/local_cs_states/Islets.chromatinStates.bed"
+# states.names <- c("1_Active_TSS")
+# label <- "wdl_test"
+# minmaf <- 0.01
+# genes.pad <- 5000
+# chain.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/hg38ToHg19.over.chain"
+
 
 library(SeqVarTools)
 library(dplyr)
@@ -93,7 +107,7 @@ if ((length(args) > 9)){
 
 
 ## load annotations
-anno.raw <- fread(anno.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)\
+anno.raw <- fread(anno.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 a <- anno.raw[,anno.field] != "."
 anno.sub_one <- anno.raw[a,]
 
@@ -144,7 +158,7 @@ for (gind in seq(1,length(genes.pan.gr[,1]))){
   
   print(length(gds.df.umaf$variant.id))
   ## subset annotations to our range
-  anno.subset <- anno.sub_one[anno.sub_one[,anno.field] == cur_gene.gr$id,]
+  anno.subset <- anno.sub_one[anno.sub_one[,"VEP_ensembl_Gene_ID"] == cur_gene.gr$id,]
   head(anno.subset)
   print(length(anno.subset[,1]))
   if (length(anno.subset[,1])>0){
