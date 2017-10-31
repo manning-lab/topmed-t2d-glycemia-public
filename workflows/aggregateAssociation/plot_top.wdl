@@ -1,7 +1,7 @@
 task getScript {
 	command {
 		
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/regional_plot.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/aggregateAssociation/regional_plot.R"
 	}
 
 	runtime {
