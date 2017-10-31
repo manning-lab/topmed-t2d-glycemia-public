@@ -31,7 +31,7 @@ for (i in 1:numAssocFiles) {
     res <- res[!is.na(res[,"pval_0"]),]
     
     #add to assoc.compilation
-    res <- rbind(res,rep(assoc$variantInfo[[1]]$chr,legth(res[,1])))
+    res <- rbind(res,rep(assoc$variantInfo[[1]]$chr,length(res[,1])))
     assoc.compilation <- rbind(assoc.compilation, res)
     
     if (i == 1) {
