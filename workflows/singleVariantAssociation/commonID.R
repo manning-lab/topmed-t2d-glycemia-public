@@ -21,7 +21,8 @@ print(paste("label:",label))
 
 # get phenotype IDs
 # ped_file <- read.table(ped, header = TRUE, as.is = FALSE)
-ped_file <- fread(ped,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+ped_file <- fread(ped,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+ped_file <- ped_file[!duplicated(ped_file[,id.col]),]
 rownames(ped_file) <- ped_file[,id.col] #$GoT2DsampleID
 
 ## get genotype IDs

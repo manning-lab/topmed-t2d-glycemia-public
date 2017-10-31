@@ -67,7 +67,8 @@ if(length(input_args)>8) {
 
 # load ped_file and re-order columns
 # ped_file <- read.table(ped, header = TRUE, as.is = FALSE)
-ped_file <- fread(ped,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+ped_file <- fread(ped,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+ped_file <- ped_file[!duplicated(ped_file[,id.col]),]
 rownames(ped_file) <- ped_file[,id.column.name]
 head(ped_file)
 
