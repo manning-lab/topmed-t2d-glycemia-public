@@ -181,8 +181,3 @@ assoc <- cbind(snps.pos, assoc)
 }
 ## save assoc object
 save(assoc, file=paste(label, ".assoc.RData", sep=""))
-
-
-
- 
-
