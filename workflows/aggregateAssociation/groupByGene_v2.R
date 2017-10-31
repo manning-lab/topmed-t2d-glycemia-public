@@ -1,5 +1,3 @@
-# groupByGene_v5 <- function( gds.file , genes.all.file , genes.pan.file , anno.file , states.file , genes.pad , anno.value , states.names , minmaf ){
-
 args <- commandArgs(trailingOnly=T)
 gds.file <- args[1]
 genes.pan.file <- args[2]
@@ -16,20 +14,6 @@ if (length(args) > 10){
   library(rtracklayer)
   chain.file <- args[11]
 }
-
-# library(rtracklayer)
-# gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze4.chr20.pass.gtonly.minDP10.genotypes.gds"
-# genes.pan.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gtex/gtex.v6p.pancreas.expression.min.rpkm.0.1.txt"
-# anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotation/freezes_2a_3a_4.snp_indel.annotated.general20170422.subset.gz.chr20.csv"
-# anno.value <- c("splice_acceptor_variant")
-# anno.field <- "VEP_ensembl_consequence"
-# states.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/local_cs_states/Islets.chromatinStates.bed"
-# states.names <- c("1_Active_TSS")
-# label <- "wdl_test"
-# minmaf <- 0.01
-# genes.pad <- 5000
-# chain.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/hg38ToHg19.over.chain"
-
 
 library(SeqVarTools)
 library(dplyr)

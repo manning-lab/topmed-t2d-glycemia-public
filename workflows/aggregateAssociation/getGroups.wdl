@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/groupByGene.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/aggregateAssociation/groupByGene.R"
 	}
 
 	runtime {
@@ -14,44 +14,62 @@ task getScript {
 
 task get_groups {
 	File gds
-	File allGenes
-	File panGenes
+	File genes
 	File anno
+	Array[String] annotation_values
+	String anno_field
 	File state
-	File chain
+	Array[String] chromatin_states
+	String label
+
+	Float? min_maf
+	Int? pad
+
+	File? chain
+
 	File groupScript
 
+	Int? memory = 10
+	Int? disk = 50
+
 	command {
-        	R --vanilla --args ${gds} ${allGenes} ${panGenes} ${anno} ${state} ${chain} < ${groupScript}
+		R --vanilla --args ${gds} ${genes} ${anno} ${sep=',' annotation_values} ${anno_field} ${state} ${sep=',' chromatin_states} ${label} ${default="0.01" min_maf} ${default="5000" pad} ${chain} < ${groupScript}
     }
 
     meta {
-            author: "TM"
-            email: "tmajaria@broadinstitute.org"
+		author: "TM"
+		email: "tmajaria@broadinstitute.org"
     }
 
     runtime {
-    	   docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
-		   disks: "local-disk 100 SSD"
-		   memory: "30G"
+		docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
+		disks: "local-disk ${disk} SSD"
+	    memory: "${memory}G"
     }
 
     output {
-    	Pair[File,File] out_groups = (gds,"groups.RData")
-        # File out_groups = "groups.RData"
+    	Pair[File,File] out_groups = (gds,"${label}_groups.RData")
     }	
 
 }
 
 workflow wf {
 	Array[File] these_gds
+	File this_genes
 	Array[File] these_anno
+	Array[String] these_annotation_values
+	String this_anno_field
+	File this_state
+	Array[String] this_chromatin_states
 	String this_label
 
-	File this_allGenes
-	File this_panGenes
-	File this_state
-	File this_chain
+	Float? this_min_maf
+	Int? this_pad
+
+	File? this_chain
+
+	Int? this_memory
+	Int? this_disk 
 	
 	Array[Pair[File,File]] these_gds_anno = zip(these_gds,these_anno)
 
@@ -59,7 +77,7 @@ workflow wf {
 	
 	scatter(this_gds_anno in these_gds_anno) {
 		call get_groups {
-				input: gds=this_gds_anno.left, allGenes=this_allGenes, panGenes=this_panGenes, anno=this_gds_anno.right, state=this_state, chain=this_chain, groupScript=getScript.group_script
+				input: gds=this_gds_anno.left, genes=this_genes, anno=this_gds_anno.right, annotation_values=these_annotation_values, anno_field=this_anno_field, state=this_state, chromatin_states=this_chromatin_states, label=this_label, min_maf=this_min_maf, pad=this_pad, memory=this_memory, disk=this_disk, chain=this_chain, groupScript=getScript.group_script
 		}
 	}
 }
