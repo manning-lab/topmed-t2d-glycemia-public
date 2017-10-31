@@ -6,6 +6,7 @@
 # Example use: R --vanilla --args GoT2D.chr22.gds GoT2D.phenotype.ped GoT2DsampleID GoT2D_T2D < commonID.R
 
 library(SeqArray)
+library(data.table)
 
 input_args <- commandArgs(trailingOnly=T)
 gds <- input_args[1] #"GoT2D.chr22.biallelic.gds"
@@ -19,7 +20,9 @@ print(paste("id.column.name:",id.col))
 print(paste("label:",label))
 
 # get phenotype IDs
-ped_file <- read.table(ped, header = TRUE, as.is = FALSE)
+# ped_file <- read.table(ped, header = TRUE, as.is = FALSE)
+ped_file <- fread(ped,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+ped_file <- ped_file[!duplicated(ped_file[,id.col]),]
 rownames(ped_file) <- ped_file[,id.col] #$GoT2DsampleID
 
 ## get genotype IDs

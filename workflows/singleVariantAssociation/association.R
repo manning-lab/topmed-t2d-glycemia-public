@@ -31,6 +31,7 @@ library(GENESIS)
 library(GWASTools)
 library(SeqArray)
 library(SeqVarTools)
+library(data.table)
 
 input_args <- commandArgs(trailingOnly=T)
 
@@ -65,7 +66,9 @@ if(length(input_args)>8) {
 
 
 # load ped_file and re-order columns
-ped_file <- read.table(ped, header = TRUE, as.is = FALSE)
+# ped_file <- read.table(ped, header = TRUE, as.is = FALSE)
+ped_file <- fread(ped,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+ped_file <- ped_file[!duplicated(ped_file[,id.column.name]),]
 rownames(ped_file) <- ped_file[,id.column.name]
 head(ped_file)
 
@@ -178,7 +181,3 @@ assoc <- cbind(snps.pos, assoc)
 }
 ## save assoc object
 save(assoc, file=paste(label, ".assoc.RData", sep=""))
-
-
-
- 
