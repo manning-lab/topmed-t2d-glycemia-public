@@ -1,25 +1,19 @@
-
 library(data.table)
-install.packages("qqman",repos='http://cran.us.r-project.org')  #_0.14.tar.gz")
-library(qqman)
 
 args <- commandArgs(trailingOnly=T)
 results.file <- args[1]
 groups.file <- args[2]
 state.file <- args[3]
 out.file_pref <- args[4]
-state.names <- c("9_Active_enhancer_1","10_Active_enhancer_2","1_Active_TSS")
+state.names <- unlist(strsplit(args[5],","))
+pval <- as.numeric(args[6])
 
-# results.raw <- fread(results.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 load(results.file)
 results.raw <- assoc
 results.res <- results.raw$results[!is.na(results.raw$results$n.sample.alt),]
-results.top <- results.res[results.res$pval_0 < .005,]
+results.top <- results.res[results.res$pval_0 < pval,]
 
-# load(groups.file)
-# groups.top <- groups[names(groups) %in% results.top$V1]
 groups.top <- results.raw$variantInfo[names(results.raw$variantInfo) %in% row.names(results.top)]
-# names(groups.top)
 
 if (length(groups.top) == 0){
   pdf(paste(out.file_pref,"_top_hits",".pdf",sep=""),width=11)
@@ -37,16 +31,11 @@ library(biomaRt)
 grch37 = useMart(biomart="ENSEMBL_MART_ENSEMBL", host="grch37.ensembl.org", path="/biomart/martservice", dataset="hsapiens_gene_ensembl")
 ensembl_75 = useMart(biomart="ENSEMBL_MART_ENSEMBL", host="feb2014.archive.ensembl.org", path="/biomart/martservice", dataset="hsapiens_gene_ensembl")
 ensembl <- select(ensembl_75,keys = groups.top[[1]]$chr[1],keytype = "chromosome_name", columns =  c( "ensembl_transcript_id","hgnc_symbol", "chromosome_name","transcript_start","transcript_end", "start_position", "end_position", "ensembl_gene_id"))
-
-
-# gene.raw <- fread(gene.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
-# gene.prep <- ensembl[ensembl$ensembl_gene_id %in%  gene.raw[gene.raw$RPKM>=2 & gene.raw$Gene_Type=="protein_coding",1],] 
-# gene.top <- gene.prep[gene.prep$hgnc_symbol %in% names(groups.top),]
 gene.top <- ensembl[ensembl$hgnc_symbol %in% names(groups.top),]
 
 state.raw <- fread(state.file,sep="\t",header=F,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
-state.subset <- state.raw[which(state.raw[,4] %in% state.names),] # 14363
-state.subset[,1] <- sub("chr","",state.subset[,1]) # 1329
+state.subset <- state.raw[which(state.raw[,4] %in% state.names),] 
+state.subset[,1] <- sub("chr","",state.subset[,1]) 
 state.gr <- GRanges(seqnames=state.subset[,1],ranges=IRanges(start=state.subset[,2],end=state.subset[,3]),state=state.subset[,4])
 head(state.gr)
 
@@ -55,7 +44,6 @@ layout(matrix(seq(length(groups.top)),nrow=length(groups.top),ncol=1,byrow=T))
 
 for (j in seq(1,length(groups.top))){
   
-  # cur_group <- groups[[names(groups.top)[j]]]
   cur_group <- groups.top[[j]]
   cur_gene <- gene.top[gene.top$hgnc_symbol==names(groups.top)[j],]
   
@@ -76,13 +64,11 @@ for (j in seq(1,length(groups.top))){
   
   snpregtrack <- HighlightTrack(trackList = list(dtrack), start = start(cur_state.gr), end=end(cur_state.gr),chromosome = groups.top[[1]]$chr[1], col="lightgrey", fill="lightgrey", alpha=0.7, inBackground=TRUE, background.title="orangered4")
   
-  # plotTracks(snpregtrack)
   
   axTrack <- GenomeAxisTrack(genome = "hg19" , chromosome = groups.top[[1]]$chr[1])
   
   idxTrack <- IdeogramTrack(genome = "hg19" , chromosome = groups.top[[1]]$chr[1])
   
-  # plotTracks(list(axTrack,idxTrack,snpregtrack))
   cs.raw <- state.raw
   cs.raw[,1] <- sub("chr","",state.raw[,1])
   cs.raw$V1 <- as.numeric(cs.raw$V1)
