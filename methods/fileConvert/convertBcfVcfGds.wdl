@@ -49,8 +49,8 @@ task runVcf {
 	String no_path = basename(indat)
 	String no_vcf = sub(no_path,".vcf","")
 	String no_ext = sub(no_vcf,".bcf","")
-	String outfile = no_ext + ".vcf.gz"
-	String outfile_tbi = no_ext + ".vcf.gz.tbi"
+	String outfile = no_ext + ".vcf.bgz"
+	String outfile_tbi = no_ext + ".vcf.bgz.tbi"
 
 	String out_type = "vcf"
 
