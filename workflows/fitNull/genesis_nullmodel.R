@@ -216,7 +216,9 @@ if (NROW(dropped.ids) != 0 ) {
 # For GDS files
 f <- seqOpen(genotype.files)
 sample.ids <- seqGetData(f, "sample.id")
-all.terms <- unique(c(outcome.name, covariates, het_vars))
+all.terms <- unique(c(outcome.name, covariates))
+print(covariates)
+print(row.names(pheno))
 pheno <- pheno[row.names(pheno) %in% sample.ids,na.omit(all.terms,drop=F)]
 cat('Output pheno after mergeing with Genos N=',nrow(pheno),'\n')
 if(nrow(pheno) == 0){
