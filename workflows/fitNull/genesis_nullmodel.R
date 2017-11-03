@@ -1,5 +1,4 @@
-
-args<-commandArgs(TRUE)
+args<-commandArgs(trailingOnly=T)
 #===mandatory parameters
 phenotype.file <- args[1]
 outcome.name <- args[2]
