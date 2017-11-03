@@ -13,10 +13,10 @@ pheno.id <- args[8]
 
 
 # added these to JSON
-test.stat <-  args[9] # Score, Wald, Firth
-test.type  <-  args[10] # Burden, Single, SKAT
-conditional <- args[11]
-het_vars <-  args[12]
+test.stat <-  'NA' # Score, Wald, Firth
+test.type  <-  'NA' # Burden, Single, SKAT
+conditional <- 'NA'
+het_vars <-  'NA'
 
 
 
@@ -171,22 +171,7 @@ cat('outcome.type',outcome.type,'\n')
 cat('het_vars',het_vars,'\n')
 cat('conditional',conditional,'\n')
 
-if(conditional != 'NA'){
-  cpos = strsplit(conditional,':')[[1]][2]
-}else{
-  cpos = FALSE
-}
-cat('conditional',conditional,'\t pos',cpos,'\n')
-
-if (!(test.stat %in% test.stat.vals)){
-     msg = paste("The requested test statistic:", test.stat, "is not available (Use Firth, Score, Wald!")
-     stop(msg)
-}
-
-
-if(!test.type %in% test.type.vals){
-    stop("Test type must be one of ",paste(test.type.vals,sep=','))
-}
+cpos = FALSE
 
 
 suppressMessages(library(SeqArray))
