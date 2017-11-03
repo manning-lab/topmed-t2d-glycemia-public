@@ -1,0 +1,10 @@
+{
+  "nullModel.this_outcomename": "T2D",
+  "nullModel.this_label": "test",
+  "nullModel.this_genotypefile": "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze4.chr10.pass.gtonly.minDP10.genotypes.gds",
+  "nullModel.this_outcometype": "dichotomous",
+  "nullModel.this_kinshipmatrix": "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/grm/freeze4.autopass.gtonly.minDP10.mmap.grm.fixed.001.matrix.Rda",
+  "nullModel.this_covariates": "sex,last_exam_age,last_exam_bmi,study_ancestry",
+  "nullModel.this_phenofile": "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/jasen/Pooled_AFEU_WesselJ_25AUG2017_T2D_gtr_30.csv",
+  "nullModel.this_phenoid": "TOPMEDID"
+}
