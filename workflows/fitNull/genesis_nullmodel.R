@@ -28,6 +28,7 @@ test.stat.vals <- c("Score", "Wald", "Firth")
 # FROM pipelineFunctions.R
 
 library(plyr)
+install.packages("gap")
 library(gap)
 
 

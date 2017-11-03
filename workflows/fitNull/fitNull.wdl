@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/fitNull/genesis_nullmodel.R"
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/fitNull/genesis_nullmodel.R && head genesis_nullmodel.R
 	}
 
 	runtime {
@@ -26,7 +26,7 @@ task fitNull {
 	File script
 
 	command {
-		R --vanilla --args ${phenofile} ${outcomename} ${outcometype} ${covariates} ${genotypefile} ${label} ${kinshipmatrix} ${phenoid} > ${script}
+		R --vanilla --args ${phenofile} ${outcomename} ${outcometype} ${covariates} ${genotypefile} ${label} ${kinshipmatrix} ${phenoid} < ${script}
 	}
 
 	runtime {
@@ -56,9 +56,5 @@ workflow nullModel {
 	
 	call fitNull {
             input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covariates, genotypefile=this_genotypefile, label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenoid, script=getScript.null_script
-	}
-
-	output {
-		File nullMod = fitNull.model
 	}
 }
