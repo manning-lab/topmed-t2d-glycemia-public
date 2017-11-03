@@ -28,8 +28,8 @@ test.stat.vals <- c("Score", "Wald", "Firth")
 # FROM pipelineFunctions.R
 
 library(plyr)
-install.packages("gap",repos='http://cran.us.r-project.org')
-library(gap)
+# install.packages("gap",repos='http://cran.us.r-project.org')
+# library(gap)
 
 
 
@@ -192,7 +192,7 @@ if(!test.type %in% test.type.vals){
 suppressMessages(library(SeqArray))
 suppressMessages(library(SeqVarTools))
 suppressMessages(library(GWASTools))
-suppressMessages(library(gap))
+# suppressMessages(library(gap))
 suppressMessages(library(Matrix))
 suppressMessages(library(plyr))
 suppressMessages(library(gdsfmt))
