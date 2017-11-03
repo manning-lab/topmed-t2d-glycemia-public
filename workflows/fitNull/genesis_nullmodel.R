@@ -217,7 +217,7 @@ if (NROW(dropped.ids) != 0 ) {
 f <- seqOpen(genotype.files)
 sample.ids <- seqGetData(f, "sample.id")
 all.terms <- unique(c(outcome.name, covariates, het_vars))
-pheno <- pheno[row.names(pheno) %in% sample.ids,na.omit(all.terms),drop=F]
+pheno <- pheno[row.names(pheno) %in% sample.ids,na.omit(all.terms,drop=F)]
 cat('Output pheno after mergeing with Genos N=',nrow(pheno),'\n')
 if(nrow(pheno) == 0){
     msg = paste("Phenotype ID column doesn't match IDs in GDS")
