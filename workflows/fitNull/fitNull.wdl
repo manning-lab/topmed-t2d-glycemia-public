@@ -30,7 +30,9 @@ task fitNull {
 	}
 
 	runtime {
-		docker: "tmajarian/alpine_wget@sha256:f3402d7cb7c5ea864044b91cfbdea20ebe98fc1536292be657e05056dbe5e3a4"
+		docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
+		disks: "local-disk 20 SSD"
+		memory: "20G"
 	}
 
 	output {
@@ -53,7 +55,7 @@ workflow nullModel {
 	call getScript
 	
 	call fitNull {
-            input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covarites, genotypefile=this_genotypefile, label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenid, script=getScript.null_script
+            input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covariates, genotypefile=this_genotypefile, label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenoid, script=getScript.null_script
 	}
 
 	output {

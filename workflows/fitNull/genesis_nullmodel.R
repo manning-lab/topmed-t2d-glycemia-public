@@ -1,4 +1,4 @@
-#== Args 
+
 args<-commandArgs(TRUE)
 #===mandatory parameters
 phenotype.file <- args[1]
