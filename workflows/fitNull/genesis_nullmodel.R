@@ -193,6 +193,7 @@ covariates <- split.by.comma(covariate.string)
 ## phenotype 
 # phenotype.data <- read.csv(phenotype.file, header=TRUE, as.is=TRUE)
 phenotype.data <- fread(phenotype.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+phenotype.data <- phenotype.data[!duplicated(phenotype.data[,1]),]
 if(NCOL(phenotype.data) < 2){
     
      msg = paste("Is the phenotype file a CSV?  Too few columns from read.csv()")
@@ -201,14 +202,8 @@ if(NCOL(phenotype.data) < 2){
 
 
 cat('Input pheno N=',nrow(phenotype.data),'\n')
-if(het_vars != 'NA'){
-    cat('prep pheno with het vars')
-    pheno <- reducePheno(phenotype.data, outcome.name, covariates=covariates,hetvars=het_vars, id=pheno.id)
-}else{
-    cat('prep pheno without het vars\n')
-    het_vars = NA
-    pheno <- reducePheno(phenotype.data, outcome.name, covariates=covariates, id=pheno.id)
-}
+pheno <- reducePheno(phenotype.data, outcome.name, covariates=covariates, id=pheno.id)
+
 cat('Output pheno N=',nrow(pheno),'\n')
 
 ## Report dropped individuals
