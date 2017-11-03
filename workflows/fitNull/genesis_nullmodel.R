@@ -191,7 +191,8 @@ covariates <- split.by.comma(covariate.string)
 
 
 ## phenotype 
-phenotype.data <- read.csv(phenotype.file, header=TRUE, as.is=TRUE)
+# phenotype.data <- read.csv(phenotype.file, header=TRUE, as.is=TRUE)
+phenotype.data <- fread(phenotype.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 if(NCOL(phenotype.data) < 2){
     
      msg = paste("Is the phenotype file a CSV?  Too few columns from read.csv()")
