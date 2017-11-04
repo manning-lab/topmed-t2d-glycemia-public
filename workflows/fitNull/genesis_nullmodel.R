@@ -1,31 +1,16 @@
-args<-commandArgs(trailingOnly=T)
-#===mandatory parameters
-phenotype.file <- args[1]
-outcome.name <- args[2]
-outcome.type <-  args[3]
-covariate.string <- args[4]
-genotype.files <- args[5]
-label <- args[6]
+# args<-commandArgs(trailingOnly=T)
+# #===mandatory parameters
+# phenotype.file <- args[1]
+# outcome.name <- args[2]
+# outcome.type <-  args[3]
+# covariate.string <- args[4]
+# genotype.files <- args[5]
+# label <- args[6]
+# 
+# #==optional parameters
+# kinship.matrix <- args[7]
+# pheno.id <- args[8]
 
-#==optional parameters
-kinship.matrix <- args[7]
-pheno.id <- args[8]
-
-
-# added these to JSON
-test.stat <-  'NA' # Score, Wald, Firth
-test.type  <-  'NA' # Burden, Single, SKAT
-conditional <- 'NA'
-het_vars <-  'NA'
-
-
-
-# GLOBAL VARIABLES
-collapsing.tests <- c("SKAT",  "Burden")
-test.type.vals <- c("Single","SKAT", "Burden")
-test.stat.vals <- c("Score", "Wald", "Firth")
-
-# FROM pipelineFunctions.R
 
 library(plyr)
 # install.packages("gap",repos='http://cran.us.r-project.org')
@@ -165,13 +150,9 @@ GetKinshipMatrix <- function(kinship.matrix){
 
 cat('label',label,'\n')
 cat('kinship.matrix',kinship.matrix,'\n')
-cat('test.stat',test.stat,'\n')
-cat('test.type',test.type,'\n')
-cat('outcome.type',outcome.type,'\n')
-cat('het_vars',het_vars,'\n')
-cat('conditional',conditional,'\n')
 
-cpos = FALSE
+cat('outcome.type',outcome.type,'\n')
+
 
 
 suppressMessages(library(SeqArray))
@@ -237,29 +218,7 @@ pheno <- pheno[match(sample.ids,row.names(pheno)),,drop=F]
 
 
 
-## Conditional analaysis
-if(cpos >0){
-    
-    pos = seqGetData(f, "position")
-  cat('Conditioning on ',conditional,'...\n')
-  cidx = which(pos == as.numeric(cpos))
-  if(any(cidx)){
-    
-    seqSetFilter(f,variant.sel=cidx, sample.id = row.names(pheno),verbose=FALSE)
-    pheno$csnp = altDosage(f,  use.names=FALSE)
-  }else{
-    stop('Can not find snp ',conditional,' with position ',cpos,' to condition on in data file')
-  }
-  
-  dropConditionalCases = NROW(pheno)-NROW(pheno[complete.cases(pheno),])
-  if(dropConditionalCases > 0){
-    cat('Warning: Dropping ',dropConditionalCases,' samples due to missing conditional genotype calls\n')
-  }
 
-  pheno = pheno[complete.cases(pheno),]
-  
-  covariates[length(covariates) + 1] <- 'csnp'
-}
 
 
 
@@ -308,27 +267,11 @@ annotated.frame <- AnnotatedDataFrame(sample.data.for.annotated)
 
 cat('start fit....\n')
 kmatr = as.matrix(kmatr)
-if (test.stat == 'Firth'){
-  cat('WARNING: Firth test does NOT use kinship information - unrelated only')
-  nullmod <- fitNullReg(scanData = scan.annotated.frame,
+cat('Fitting model ')
+nullmod <- fitNullMM(scanData = scan.annotated.frame,
                      outcome = outcome.name,
                      covars = covariates,
-                     family = GetFamilyDistribution(outcome.type))
+                     family = GetFamilyDistribution(outcome.type),
+                     covMatList = kmatr)
 
-}else if (!is.na(het_vars)){
-  cat('Fitting model with heterogeneous variances')
-  nullmod <- fitNullMM(scanData = scan.annotated.frame,
-                     outcome = outcome.name,
-                     group.var = het_vars,
-                     covars = covariates,
-                     family = GetFamilyDistribution(outcome.type),
-                     covMatList = kmatr)
-}else{
-  cat('Fitting model ')
-  nullmod <- fitNullMM(scanData = scan.annotated.frame,
-                     outcome = outcome.name,
-                     covars = covariates,
-                     family = GetFamilyDistribution(outcome.type),
-                     covMatList = kmatr)
-}
 save(nullmod,annotated.frame,file=paste(label,".RDa",sep=""))

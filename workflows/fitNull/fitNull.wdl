@@ -46,7 +46,7 @@ workflow nullModel {
 	String this_outcomename
 	String this_outcometype
 	String this_covariates
-	File this_genotypefile
+	Array[File] this_genotypefile
 	String this_label
 
 	File this_kinshipmatrix
@@ -55,6 +55,6 @@ workflow nullModel {
 	call getScript
 	
 	call fitNull {
-            input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covariates, genotypefile=this_genotypefile, label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenoid, script=getScript.null_script
+            input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covariates, genotypefile=this_genotypefile[0], label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenoid, script=getScript.null_script
 	}
 }
