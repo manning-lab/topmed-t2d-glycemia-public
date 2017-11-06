@@ -4,7 +4,8 @@ phenotype.file <- args[1]
 outcome.name <- args[2]
 outcome.type <-  args[3]
 covariate.string <- args[4]
-genotype.files <- args[5]
+# genotype.files <- args[5]
+sample.file = args[5]
 label <- args[6]
 
 #==optional parameters
@@ -88,52 +89,31 @@ reducePheno <- function(pheno.data,
 
 
 Maf <- function(dose){
-       aaf <- colMeans(dose,na.rm=T)/2
-       return(min(1-aaf, aaf))
+  aaf <- colMeans(dose,na.rm=T)/2
+  return(min(1-aaf, aaf))
 }
 
 
 split.by.comma <- function(cur.string){
-    cur.string <- gsub('"', '', cur.string)
-    out <- unlist(strsplit(cur.string, ","))
-    if (length(out) == 0){
-        out = NULL
-    }
-    return(out)
+  cur.string <- gsub('"', '', cur.string)
+  out <- unlist(strsplit(cur.string, ","))
+  if (length(out) == 0){
+    out = NULL
+  }
+  return(out)
 }
-    
-
-
-filterByMAF <- function(gds, sample.id=NULL, mac.min=NA, maf.min=NA, verbose=TRUE) {
-    if ((!is.na(mac.min) & mac.min > 1) |
-        (!is.na(maf.min) & maf.min > 0)) {
-        if (is.null(sample.id)) sample.id <- seqGetData(gds, "sample.id")
-        seqSetFilter(gds, sample.id=sample.id, verbose=FALSE)
-        ref.freq <- seqAlleleFreq(gds)
-        maf <- pmin(ref.freq, 1-ref.freq)
-        if (!is.na(mac.min)) {
-            maf.filt <- 2 * maf * (1-maf) * length(sample.id) >= mac.min
-            if (verbose) message(paste("Running on", sum(maf.filt), "variants with MAC >=", mac.min))
-        } else {
-            maf.filt <- maf >= maf.min
-            if (verbose) message(paste("Running on", sum(maf.filt), "variants with MAF >=", maf.min))
-        }
-        seqSetFilter(gds, variant.sel=maf.filt, action="intersect", verbose=verbose)
-    }
-}
-
 
 GetFamilyDistribution <- function(response.type) {
-               if (response.type == "continuous"){
-                      family = "gaussian"
-               } else if (response.type == "dichotomous"){
-                      family = "binomial"
-               } else {
-                      msg = paste("Don't know how to deal with response type", response.type)
-                      stop(msg)
-               }
-               return(family)
-           }
+  if (response.type == "continuous"){
+    family = "gaussian"
+  } else if (response.type == "dichotomous"){
+    family = "binomial"
+  } else {
+    msg = paste("Don't know how to deal with response type", response.type)
+    stop(msg)
+  }
+  return(family)
+}
 
 GetKinshipMatrix <- function(kinship.matrix){
   cat('Loading Kinship Matrix:',kinship.matrix,'\n')
@@ -143,7 +123,7 @@ GetKinshipMatrix <- function(kinship.matrix){
   else{
     kmatr = as.matrix(read.csv(kinship.matrix,as.is=T,check.names=F,row.names=1))
   }
-
+  
   cat('Loaded Kinship NROW:',NROW(kmatr),' NCOL:',NCOL(kmatr),'\n')
   kmatr
 }
@@ -176,9 +156,9 @@ covariates <- split.by.comma(covariate.string)
 phenotype.data <- fread(phenotype.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 phenotype.data <- phenotype.data[!duplicated(phenotype.data[,1]),]
 if(NCOL(phenotype.data) < 2){
-    
-     msg = paste("Is the phenotype file a CSV?  Too few columns from read.csv()")
-     warning(msg)
+  
+  msg = paste("Is the phenotype file a CSV?  Too few columns from read.csv()")
+  warning(msg)
 }
 
 
@@ -194,27 +174,30 @@ if (NROW(dropped.ids) != 0 ) {
   cat("Dropped because of incomplete cases:", length(dropped.ids) )
 }
 
+
+# load sample ids
+sample.ids <- unique(readLines(sample.file))
 # For GDS files
-f <- seqOpen(genotype.files)
-sample.ids <- seqGetData(f, "sample.id")
-all.terms <- unique(c(outcome.name, covariates))
+# f <- seqOpen(genotype.files)
+# sample.ids <- seqGetData(f, "sample.id")
+# all.terms <- unique(c(outcome.name, covariates))
 print(covariates)
 print(row.names(pheno))
 pheno <- pheno[row.names(pheno) %in% sample.ids,na.omit(all.terms,drop=F)]
 cat('Output pheno after mergeing with Genos N=',nrow(pheno),'\n')
 if(nrow(pheno) == 0){
-    msg = paste("Phenotype ID column doesn't match IDs in GDS")
-    stop(msg)
+  msg = paste("Phenotype ID column doesn't match IDs in GDS")
+  stop(msg)
 }
 
 full.sample.ids <- sample.ids 
 
 #subset to phenotyped samples
-seqSetFilter(f,sample.id = row.names(pheno))
+# seqSetFilter(f,sample.id = row.names(pheno))
 
 # order pheno to the GDS subject order
-sample.ids <- seqGetData(f, "sample.id")
-pheno <- pheno[match(sample.ids,row.names(pheno)),,drop=F]
+# sample.ids <- seqGetData(f, "sample.id")
+# pheno <- pheno[match(sample.ids,row.names(pheno)),,drop=F]
 
 
 
@@ -231,24 +214,24 @@ kmatr = kmatr[row.names(kmatr) %in% row.names(pheno),colnames(kmatr) %in% row.na
 cat('Output pheno in Kinship N=',nrow(pheno),'\n')
 kmatr = kmatr[match(row.names(pheno),row.names(kmatr)),match(row.names(pheno),colnames(kmatr))]
 if(nrow(pheno) == 0){
-    msg = paste("Phenotype ID column doesn't match IDs in Kinship Matrix")
-    stop(msg)
+  msg = paste("Phenotype ID column doesn't match IDs in Kinship Matrix")
+  stop(msg)
 }
 
 
 # Get sample ids to check order 
-seqSetFilter(f,sample.id = row.names(pheno))
-sample.ids <- seqGetData(f, "sample.id")
+# seqSetFilter(f,sample.id = row.names(pheno))
+# sample.ids <- seqGetData(f, "sample.id")
 
-if (!(identical(sample.ids,row.names(pheno)) && identical(row.names(kmatr),row.names(pheno)))){
-        stop("Something is off problem with re-ordering")
-}
+# if (!(identical(sample.ids,row.names(pheno)) && identical(row.names(kmatr),row.names(pheno)))){
+  # stop("Something is off problem with re-ordering")
+# }
 
-seqClose(f)
+# seqClose(f)
 
 sample.data <- data.frame(scanID = row.names(pheno),  
-                    pheno, 
-                    stringsAsFactors=F)
+                          pheno, 
+                          stringsAsFactors=F)
 scan.annotated.frame <- ScanAnnotationDataFrame(sample.data)
 modified.pheno = pheno[full.sample.ids,,drop=FALSE]
 row.names(modified.pheno) <- full.sample.ids
