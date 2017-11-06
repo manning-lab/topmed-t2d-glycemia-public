@@ -37,6 +37,7 @@ task fitNull {
 
 	output {
 		File model = "${label}.Rda"
+		File sample_ids = "${label}_sample_ids.txt"
 	}
 }
 

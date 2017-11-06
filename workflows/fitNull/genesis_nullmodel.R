@@ -274,4 +274,8 @@ nullmod <- fitNullMM(scanData = scan.annotated.frame,
                      family = GetFamilyDistribution(outcome.type),
                      covMatList = kmatr)
 
+write(full.sample.ids, file =paste(label,"_sample_ids.txt",sep=""),
+      ncolumns = 1,
+      append = FALSE, sep = " ")
+
 save(nullmod,annotated.frame,file=paste(label,".RDa",sep=""))
