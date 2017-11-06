@@ -11,7 +11,7 @@ minmaf <- as.numeric(args[9])
 genes.pad <- as.numeric(args[10])
 
 anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
-state.names <- ("1_Active_TSS","10_Active_enhancer_2","9_Active_enhancer_1")
+state.names <- c("1_Active_TSS","10_Active_enhancer_2","9_Active_enhancer_1")
 
 if (length(args) > 10){
   library(rtracklayer)
