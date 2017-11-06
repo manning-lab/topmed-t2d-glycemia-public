@@ -1,15 +1,15 @@
-# args<-commandArgs(trailingOnly=T)
-# #===mandatory parameters
-# phenotype.file <- args[1]
-# outcome.name <- args[2]
-# outcome.type <-  args[3]
-# covariate.string <- args[4]
-# genotype.files <- args[5]
-# label <- args[6]
-# 
-# #==optional parameters
-# kinship.matrix <- args[7]
-# pheno.id <- args[8]
+args<-commandArgs(trailingOnly=T)
+#===mandatory parameters
+phenotype.file <- args[1]
+outcome.name <- args[2]
+outcome.type <-  args[3]
+covariate.string <- args[4]
+genotype.files <- args[5]
+label <- args[6]
+
+#==optional parameters
+kinship.matrix <- args[7]
+pheno.id <- args[8]
 
 
 library(plyr)
