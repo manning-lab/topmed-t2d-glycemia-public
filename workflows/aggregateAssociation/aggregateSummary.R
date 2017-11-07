@@ -48,7 +48,7 @@ ppi <- 300
 # results <- assoc$results
 # results$chr <- rep(10,length(results[,1]))
 pdf(paste(label,".qqplot.pdf",sep=""))
-qq(res$pval_0)
+qq(assoc.compilation$pval_0)
 dev.off()
 
 l <- list()
