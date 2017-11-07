@@ -47,6 +47,8 @@ for (i in 1:numAssocFiles) {
 ppi <- 300
 # results <- assoc$results
 # results$chr <- rep(10,length(results[,1]))
+
+assoc.compilation <- assoc.compilation[!is.na(assoc.compilation$pval_0),]
 pdf(paste(label,".qqplot.pdf",sep=""))
 qq(assoc.compilation$pval_0)
 dev.off()
