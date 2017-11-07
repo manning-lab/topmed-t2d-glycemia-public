@@ -50,7 +50,7 @@ ppi <- 300
 
 assoc.compilation <- assoc.compilation[!is.na(assoc.compilation$pval_0),]
 pdf(paste(label,".qqplot.pdf",sep=""))
-qq(assoc.compilation$pval_0)
+qq(as.numeic(assoc.compilation[,"pval_0"]))
 dev.off()
 
 l <- list()
