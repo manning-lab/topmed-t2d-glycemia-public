@@ -19,9 +19,8 @@ task fitNull {
 	String covariates
 	File sample_ids
 	String label
-
 	File kinshipmatrix
-	String phenoid # column name in other scripts
+	String phenoid 
 
 	File script
 
@@ -36,8 +35,9 @@ task fitNull {
 	}
 
 	output {
-		File model = "${label}.RDa"
-		File sample_ids = "${label}_sample_ids.txt"
+		File model = "${label}_null.RDa"
+		File plots = "${label}_plots.pdf"
+		Array[File] stats = glob("*.csv")
 	}
 }
 
@@ -49,7 +49,6 @@ workflow nullModel {
 	String this_covariates
 	File this_sample_ids
 	String this_label
-
 	File this_kinshipmatrix
 	String this_phenoid
 
