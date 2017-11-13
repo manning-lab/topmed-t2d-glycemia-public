@@ -5,6 +5,7 @@ anno.file <- args[3]
 tfbs.file <- args[4]
 states.file <- args[5]
 label <- args[6]
+anno.field <- "VEP_ensembl_Consequence"
 
 
 minmaf <- 0.01

@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/aggregateAssociation/groupByGene_tfbs.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/groupByGene_tfbs.R"
 	}
 
 	runtime {
@@ -47,12 +47,14 @@ task get_groups {
 }
 
 workflow wf {
-	Array[File] these_gds
-	Map[String,File] gds_anno
-	Map[String,File] gds_tfbs
+	Map[Int,File] chr_gds
+	Map[Int,File] chr_anno
+	Map[Int,File] chr_tfbs
 	File this_genes
 	File this_state
 	String this_label
+
+	Array[Int] chrs = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
 
 	Int? this_memory
 	Int? this_disk 
@@ -60,9 +62,9 @@ workflow wf {
 
 	call getScript
 	
-	scatter(this_gds in these_gds) {
+	scatter(chr in chrs) {
 		call get_groups {
-				input: gds=this_gds, genes=this_genes, anno=gds_anno[this_gds], tfbs=gds_tfbs[gds], state=this_state, label=this_label, memory=this_memory, disk=this_disk, groupScript=getScript.group_script
+				input: gds=chr_gds[chr], genes=this_genes, anno=chr_anno[chr], tfbs=chr_tfbs[chr], state=this_state, label=this_label, memory=this_memory, disk=this_disk, groupScript=getScript.group_script
 		}
 	}
 }
