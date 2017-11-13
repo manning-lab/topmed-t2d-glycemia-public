@@ -156,8 +156,9 @@ for (gind in seq(1,length(genes.pan.gr[,1]))){
     
     anno.snps <- gds.df.umaf[gds_paste %in% anno_paste3[,1],]
     anno.snps$annotation <- anno_paste3[anno_paste3[,1] %in% gds_paste,2]
-  }
+  
   print(paste("Number of exonic snps: ",length(anno.snps[,1]),sep=""))
+  }
   
   ## get variants within the chromatin states
   states.subset_o <- states.gr[end(states.gr)>start(cur_gene.gr),]
@@ -181,14 +182,14 @@ for (gind in seq(1,length(genes.pan.gr[,1]))){
   
   ## now put all of the snps together for our gene
   if (length(anno.subset[,1])>0){
-    gds.subset.df <- rbind(states.snps,anno.snps,tfbs.snps)
-    print(paste("Total snps in group: ",length(gds.subset.df[,1])))
+    gds.subset.df <- rbind(states.snps,anno.snps)
+    # print(paste("Total snps in group: ",length(gds.subset.df[,1])))
   } else {
     gds.subset.df <- states.snps
-    print(paste("Total snps in group: ",length(gds.subset.df[,1])))
+    
   }
   groups[[cur_gene.gr$trans_id]] <- rbind(gds.subset.df,tfbs.snps)
-  
+  # print(paste("Total snps in group: ",length(groups[[cur_gene.gr$trans_id]])
 }
 
 ## close the geno file
