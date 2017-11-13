@@ -8,6 +8,7 @@ results.file <- args[1]
 groups.file <- args[2]
 state.file <- args[3]
 out.file_pref <- args[4]
+tfbs.file <- args[5]
 state.names <- c("9_Active_enhancer_1","10_Active_enhancer_2","1_Active_TSS")
 
 
