@@ -58,6 +58,8 @@ genes.pan.gr <- GRanges(seqnames=rep(chr_num,length(genes.pan$ensembl_gene_id)),
 genes.pan.gr_nopad <- GRanges(seqnames=rep(chr_num,length(genes.pan$ensembl_gene_id)),ranges=IRanges(start=genes.pan$transcript_start, end=genes.pan$transcript_end),symbol=genes.pan$hgnc_symbol,trans_id=genes.pan$ensembl_transcript_id,id=genes.pan$ensembl_gene_id)
 genes.pan.gr <- genes.pan.gr[!duplicated(genes.pan.gr$trans_id),]
 genes.pan.gr_nopad <- genes.pan.gr_nopad[!duplicated(genes.pan.gr_nopad$trans_id),]
+genes.pan.gr <- genes.pan.gr[seqnames(genes.pan.gr) == chr_num,]
+genes.pan.gr_nopad <- genes.pan.gr_nopad[seqnames(genes.pan.gr_nopad) == chr_num,]
 
 ## load annotations
 anno.raw <- fread(anno.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
