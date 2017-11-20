@@ -134,10 +134,10 @@ for (j in seq(1,length(groups.top))){
   dtrack <- DataTrack(data= var.gr$maf, start=start(var.gr),end=end(var.gr)+1,chromosome = chr, genome = gen,ylim=y_bounds, name = "-logMAF",background.title="orangered4")
   # ovt <- OverlayTrack(trackList = list(reg_track,sav_track,sdv_track,srv_track,sg_track,srl_track,fv_track),legend=T,box.legend=FALSE, ylim=y_bounds, background.title="darkred", name="-log MAF",cex.legend=0.8)
   
-  # snpregtrack <- HighlightTrack(trackList = list(ovt), start = start(cur_state.gr), end=end(cur_state.gr),chromosome = groups.top[[1]]$chr[1], col="lightgrey", fill="lightgrey", alpha=0.7, inBackground=TRUE, background.title="orangered4")
+  snpregtrack <- HighlightTrack(trackList = list(ovt), start = start(cur_state.gr), end=end(cur_state.gr),chromosome = groups.top[[1]]$chr[1], col="lightgrey", fill="lightgrey", alpha=0.7, inBackground=TRUE, background.title="orangered4")
   
   # snpregtrack2 <- HighlightTrack(trackList = list(snpregtrack), start = start(cur_tfbs.gr), end=end(cur_tfbs.gr),chromosome = groups.top[[1]]$chr[1], col="red", fill="red", alpha=0.7, inBackground=TRUE, background.title="orangered4")
-  snpregtrack2 <- HighlightTrack(trackList = list(dtrack), start = start(cur_tfbs.gr), end=end(cur_tfbs.gr),chromosome = groups.top[[1]]$chr[1], col="orangered4", fill="orangered4", alpha=0.3, inBackground=TRUE, background.title="orangered4")
+  # snpregtrack2 <- HighlightTrack(trackList = list(dtrack), start = start(cur_tfbs.gr), end=end(cur_tfbs.gr),chromosome = groups.top[[1]]$chr[1], col="orangered4", fill="orangered4", alpha=0.3, inBackground=TRUE, background.title="orangered4")
   
   # plotTracks(snpregtrack)
   
