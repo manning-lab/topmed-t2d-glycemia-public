@@ -7,7 +7,6 @@ task subset {
 	String label
 	String out = "${label}.vcf.bgz"
 
-	File script
 	Float? memory
 	Int? disksize
 	
@@ -16,7 +15,7 @@ task subset {
 		tabix -p vcf ${out}
 	}
 	runtime {
-		docker: "robbyjo/r-mkl-bioconductor@sha256:96d6b7b1ab1ec89d6413c09f7fef3fdaac5e9d4293b259492ddda4cf5883d354"
+		docker: "biocontainers/vcftools@sha256:2e9dbb86adc69833634e35512a0791bc7ce25e87e1a0f4604a6df15d46ed4f7f"
 		disks: "local-disk ${disksize} SSD"
 		memory: "${memory}G"
 	}
@@ -29,16 +28,17 @@ task subset {
 workflow w {
 	Array[File] these_vcf
 	File these_samples
+	Boolean this_filtersamples
 	File these_variants
+	Boolean this_filtervariants
 	String this_label
-	File script
 	
 	Float? this_memory = 10.0
 	Int? this_disksize = 20
 	
 	scatter(this_vcf in these_vcf) {
 		call subset { 
-			input: vcf=this_vcf, samples=these_samples, variants=these_variants, label=this_label, script=script, memory=this_memory, disksize=this_disksize}
+			input: vcf=this_vcf, samples=these_samples, filtersamples=this_filtersamples, variants=these_variants, filtervariants=this_filtervariants, label=this_label, memory=this_memory, disksize=this_disksize}
 	}
 
 	output {

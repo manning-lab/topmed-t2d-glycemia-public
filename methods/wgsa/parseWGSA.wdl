@@ -15,6 +15,7 @@ task getScript {
 task parse {
 	File anno
 	String label
+	String chr
 	String desired_columns
 	String columns_to_split
 	File script
@@ -38,7 +39,7 @@ task parse {
     }
 
     output {
-    	File anno_out = "${label}.tsv"
+    	Pair[String, File] anno_out = (chr,"${label}.tsv")
     }	
 
 }
@@ -58,7 +59,7 @@ workflow wf {
 	
 	scatter(pair in these_chr_anno) {
 		call parse {
-				input: anno=pair.right, label="${this_label}_${pair.left}", desired_columns=these_cols, columns_to_split=these_split, script=getScript.script, disk=this_disk, mem=this_mem
+				input: anno=pair.right, label="${this_label}_${pair.left}", chr=pair.left, desired_columns=these_cols, columns_to_split=these_split, script=getScript.script, disk=this_disk, mem=this_mem
 		}
 	}
 }
