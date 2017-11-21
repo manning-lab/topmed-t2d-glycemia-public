@@ -8,22 +8,21 @@
 
 args <- commandArgs(trailingOnly=T)
 anno.file <- args[1]
-out.file <- paste(args[2],".csv",sep="")
-# target_columns <- unlist(strsplit(args[3],","))
-# columns_to_split <- unlist(strsplit(args[4],","))
+out.file <- paste(args[2],".tsv",sep="")
+target_columns <- unlist(strsplit(args[3],","))
+columns_to_split <- unlist(strsplit(args[4],","))
+source.file <- args[5]
 
-# anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotation/subset/freezes_2a_3a_4.snp_indel.annotated.general20170422.subset.gz.chr7"
-# out.file <- "anno.subset.full.csv"
-target_columns <- unlist(strsplit("#chr,pos,ref,alt,VEP_ensembl_Gene_ID,VEP_ensembl_Consequence",","))
-columns_to_split <- unlist(strsplit("VEP_ensembl_Gene_ID,VEP_ensembl_Consequence",","))
+anno.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotation/freeze5/freeze.5.chr10.pass_and_fail.sites.gz.snp.general.annotated.gz"
+out.file <- "/Users/tmajaria/Documents/projects/topmed/data/varshney/annotation/freeze5/freeze.5.chr10.wgsa.noncoding.vep.csv"
+target_columns <- unlist(strsplit("CHROM,POS,REF,ALT,VEP_ensembl_Gene_ID,VEP_ensembl_Transcript_ID,VEP_ensembl_Consequence,CADD_phred,CADD_raw,DANN_score,fathmm_MKL_non_coding_pred,GenoCanyon_score,Eigen_coding_or_noncoding,Eigen_raw,Eigen_phred,Eigen_PC_raw,Eigen_PC_phred,integrated_fitCons_score,funseq_noncoding_score,funseq2_noncoding_score,RegulomeDB_score",","))
+columns_to_split <- unlist(strsplit("VEP_ensembl_Gene_ID,VEP_ensembl_Transcript_ID,VEP_ensembl_Consequence,fathmm_MKL_non_coding_pred",","))
+source.file <- "/Users/tmajaria/Documents/projects/topmed/code/topmed-t2d-glycemia-public/workflows/aggregateAssociation/wgsa_parser.R"
 
-devtools::install_github("UW-GAC/wgsaparsr@2.0.1.4")
-library(wgsaparsr)
+
+source(source.file)
 all_fields <- get_fields(anno.file)
 print(all_fields)
-
-# target_columns <- c("#chr", "pos", "ref", "alt", "VEP_ensembl_Gene_ID","VEP_ensembl_Consequence")
-# columns_to_split <- c("VEP_ensembl_Gene_ID","VEP_ensembl_Consequence")
 
 parse_to_file(source = anno.file, 
               destination = out.file, 

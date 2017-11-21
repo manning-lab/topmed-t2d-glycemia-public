@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/aggregateAssociation/parse_wgsa.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/aggregateAssociation/wgsa_parser.R"
 	}
 
 	runtime {
@@ -8,17 +8,22 @@ task getScript {
 	}
 
 	output {
-		File script = "parse_wgsa.R"
+		File script = "wgsa_parser.R"
 	}
 }
 
 task parse {
-	File script
 	File anno
-	String anno_unzip = basename(anno,".gz")
+	String label
+	String desired_columns
+	String columns_to_split
+	File script
+
+	Int? disk = 100
+	Int? mem = 10
 
 	command {
-        	R --vanilla --args ${anno} ${anno_unzip} < ${script}
+        	R --vanilla --args ${anno} ${label} ${desired_columns} ${columns_to_split} < ${script}
     }
 
     meta {
@@ -27,25 +32,33 @@ task parse {
     }
 
     runtime {
-    	   docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
-		   disks: "local-disk 100 SSD"
-		   memory: "30G"
+    	   docker: "tmajarian/wgsa_parser"
+		   disks: "local-disk ${disk} SSD"
+		   memory: "${mem}G"
     }
 
     output {
-    	File anno_out = "${anno_unzip}.csv"
+    	File anno_out = "${label}.tsv"
     }	
 
 }
 
 workflow wf {
-	Array[File] these_anno
+	Map[String,File] these_chr_anno
+	String this_label
+	String these_cols
+	String these_split
+
+	Int? this_disk
+	Int? this_mem
+
+	Array[String] chrs = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X]
 
 	call getScript
 	
-	scatter(this_anno in these_anno) {
+	scatter(this_chr in chrs) {
 		call parse {
-				input: script=getScript.script, anno=this_anno
+				input: anno=these_chr_anno[this_chr], label=this_label, desired_columns=these_cols, columns_to_split=these_split, script=getScript.script, disk=this_disk, mem=this_mem
 		}
 	}
 }
