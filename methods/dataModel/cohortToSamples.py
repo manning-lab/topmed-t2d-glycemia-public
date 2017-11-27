@@ -5,7 +5,8 @@ parser.add_argument('--outfile_pref', nargs=1, default='', help='label for outpu
 
 args = parser.parse_args()
 args.cohorts = args.cohorts[0].split(',')
-out_file = args.outfile_pref+'.txt'
+out_file = args.outfile_pref[0]+'.txt'
+
 
 from firecloud import fiss
 samples = fiss.fapi.get_entities('topmed-shared','topmed-shared', 'sample').json()
