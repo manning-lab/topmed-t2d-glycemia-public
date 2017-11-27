@@ -38,7 +38,7 @@ workflow w {
 	
 	call getScript
 
-	call subset { 
+	call runScript { 
 		input: cohorts=this_cohorts, label=this_label, script=getScript.outscript
 	}
 
