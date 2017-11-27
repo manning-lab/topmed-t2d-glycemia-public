@@ -4,7 +4,7 @@ parser.add_argument('--cohorts', nargs=1, default='', help='common separated lis
 parser.add_argument('--outfile_pref', nargs=1, default='', help='label for output file of sample ids')
 
 args = parser.parse_args()
-args.cohorts = args.cohorts.split(',')
+args.cohorts = args.cohorts[0].split(',')
 out_file = args.outfile_pref+'.txt'
 
 from firecloud import fiss
