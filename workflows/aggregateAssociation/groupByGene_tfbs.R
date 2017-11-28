@@ -2,17 +2,25 @@ args <- commandArgs(trailingOnly=T)
 gds.file <- args[1]
 genes.pan.file <- args[2]
 anno.file <- args[3]
-tfbs.file <- args[4]
-states.file <- args[5]
-label <- args[6]
-anno.field <- "VEP_ensembl_Consequence"
+anno.value <- unlist(strsplit(args[4],","))
+anno.field <- args[5]
+tfbs.file <- args[6]
+states.file <- args[7]
+states.names <- unlist(strsplit(args[8],","))
+label <- args[9]
+minmaf <- as.numeric(args[10])
+genes.pad <- as.numeric(args[11])
+states.prom <- unlist(strsplit(args[12],","))
 
 
-minmaf <- 0.01
-genes.pad <-5000
-anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
-states.names <- c("1_Active_TSS")
-states.prom <- c("10_Active_enhancer_2","9_Active_enhancer_1")
+
+
+
+# minmaf <- 0.01
+# genes.pad <-5000
+# anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
+# states.names <- c("1_Active_TSS")
+# states.prom <- c("10_Active_enhancer_2","9_Active_enhancer_1")
 
 library(SeqVarTools)
 library(dplyr)

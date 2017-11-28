@@ -16,24 +16,20 @@ task get_groups {
 	File gds
 	File genes
 	File anno
-	Array[String] annotation_values
+	String annotation_values
 	String anno_field
 	File state
-	Array[String] chromatin_states
+	String chromatin_states
 	String label
-
-	Float? min_maf
-	Int? pad
-
-	File? chain
-
+	Float min_maf
+	Int pad
 	File groupScript
 
 	Int? memory = 10
 	Int? disk = 50
 
 	command {
-		R --vanilla --args ${gds} ${genes} ${anno} ${sep=',' annotation_values} ${anno_field} ${state} ${sep=',' chromatin_states} ${label} ${default="0.01" min_maf} ${default="5000" pad} ${chain} < ${groupScript}
+		R --vanilla --args ${gds} ${genes} ${anno} ${annotation_values} ${anno_field} ${state} ${chromatin_states} ${label} ${min_maf} ${pad} < ${groupScript}
     }
 
     meta {
@@ -57,16 +53,14 @@ workflow wf {
 	Array[File] these_gds
 	File this_genes
 	Array[File] these_anno
-	Array[String] these_annotation_values
+	String these_annotation_values
 	String this_anno_field
 	File this_state
-	Array[String] this_chromatin_states
+	String this_chromatin_states
 	String this_label
 
-	Float? this_min_maf
-	Int? this_pad
-
-	File? this_chain
+	Float this_min_maf
+	Int this_pad
 
 	Int? this_memory
 	Int? this_disk 
@@ -77,7 +71,7 @@ workflow wf {
 	
 	scatter(this_gds_anno in these_gds_anno) {
 		call get_groups {
-				input: gds=this_gds_anno.left, genes=this_genes, anno=this_gds_anno.right, annotation_values=these_annotation_values, anno_field=this_anno_field, state=this_state, chromatin_states=this_chromatin_states, label=this_label, min_maf=this_min_maf, pad=this_pad, memory=this_memory, disk=this_disk, chain=this_chain, groupScript=getScript.group_script
+				input: gds=this_gds_anno.left, genes=this_genes, anno=this_gds_anno.right, annotation_values=these_annotation_values, anno_field=this_anno_field, state=this_state, chromatin_states=this_chromatin_states, label=this_label, min_maf=this_min_maf, pad=this_pad, memory=this_memory, disk=this_disk, groupScript=getScript.group_script
 		}
 	}
 }

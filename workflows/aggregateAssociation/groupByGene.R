@@ -10,13 +10,9 @@ label <- args[8]
 minmaf <- as.numeric(args[9])
 genes.pad <- as.numeric(args[10])
 
-anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
-state.names <- c("1_Active_TSS","10_Active_enhancer_2","9_Active_enhancer_1")
+# anno.value <- c("splice_acceptor_variant","splice_donor_variant","splice_region_variant","stop_gained","stop_lost", "start_gained", "start_lost", "frameshift_variant")
+# state.names <- c("1_Active_TSS","10_Active_enhancer_2","9_Active_enhancer_1")
 
-if (length(args) > 10){
-  library(rtracklayer)
-  chain.file <- args[11]
-}
 
 library(SeqVarTools)
 library(dplyr)
@@ -72,24 +68,8 @@ rm(genes.all)
 rm(genes.pan.raw)
 
 
-## if needed, remap to hg19
-if ((length(args) > 9)){
-  hg38tohg19 <- import.chain(chain.file) # (http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/)
-  genes.hg38 <- GRanges(seqnames=sub("^","chr",genes.pan$chromosome_name),ranges=IRanges(start=genes.pan$start_position, end=genes.pan$end_position),symbol=genes.pan$hgnc_symbol,id=genes.pan$ensembl_gene_id)
-  genes.hg19 <- unlist(liftOver(genes.hg38, hg38tohg19))
-
-  rm(hg38tohg19)
-  rm(genes.hg38)
-
-  genes.pan.gr <- GRanges(seqnames=rep(chr_num,length(genes.hg19$id)),ranges=IRanges(start=start(genes.hg19)-genes.pad, end=end(genes.hg19)+genes.pad),symbol=genes.hg19$symbol,id=genes.hg19$id)
-  genes.pan.gr_nopad <- GRanges(seqnames=rep(chr_num,length(genes.hg19$id)),ranges=IRanges(start=start(genes.hg19), end=end(genes.hg19)),symbol=genes.hg19$symbol,id=genes.hg19$id)
-
-  rm(genes.hg19)
-
-} else {
-  genes.pan.gr <- GRanges(seqnames=rep(chr_num,length(genes.pan$ensembl_gene_id)),ranges=IRanges(start=genes.pan$start_position-genes.pad, end=genes.pan$start_position+genes.pad),symbol=genes.pan$hgnc_symbol,id=genes.pan$ensembl_gene_id)
-  genes.pan.gr_nopad <- GRanges(seqnames=rep(chr_num,length(genes.pan$ensembl_gene_id)),ranges=IRanges(start=genes.pan$start_position, end=genes.pan$start_position),symbol=genes.pan$hgnc_symbol,id=genes.pan$ensembl_gene_id)
-}
+genes.pan.gr <- GRanges(seqnames=rep(chr_num,length(genes.pan$ensembl_gene_id)),ranges=IRanges(start=genes.pan$start_position-genes.pad, end=genes.pan$start_position+genes.pad),symbol=genes.pan$hgnc_symbol,id=genes.pan$ensembl_gene_id)
+genes.pan.gr_nopad <- GRanges(seqnames=rep(chr_num,length(genes.pan$ensembl_gene_id)),ranges=IRanges(start=genes.pan$start_position, end=genes.pan$start_position),symbol=genes.pan$hgnc_symbol,id=genes.pan$ensembl_gene_id)
 
 
 
