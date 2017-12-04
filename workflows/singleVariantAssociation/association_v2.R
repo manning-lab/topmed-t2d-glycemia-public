@@ -24,8 +24,8 @@ library(data.table)
 input_args <- commandArgs(trailingOnly=T)
 
 gds <- input_args[1] #"GoT2D.chr22.biallelic.gds"
-label <- input_args[6]
-outcomeType <- input_args[8]
+label <- input_args[2]
+outcomeType <- input_args[3]
 nullmod <- input_args[4]
 minMAC <- 30 # hard coded
 
