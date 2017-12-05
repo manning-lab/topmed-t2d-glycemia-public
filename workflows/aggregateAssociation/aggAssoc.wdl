@@ -16,7 +16,6 @@ task getScript {
 
 task aggAssocTest {
 	File gds
-	File sample_ids
 	String label
 	String test
 	String pval
@@ -29,7 +28,7 @@ task aggAssocTest {
 	Int? disk = 50
 
 	command {
-		R --vanilla --args ${gds} ${sample_ids} ${label} ${test} ${pval} ${groups} ${model_file} < ${assocTestScript} 
+		R --vanilla --args ${gds} ${label} ${test} ${pval} ${groups} ${model_file} < ${assocTestScript} 
 	}
 
 	meta {
@@ -76,7 +75,6 @@ task summary {
 
 workflow group_assoc_wf {
 	Array[Pair[File,File]] these_gds_groups
-	File this_sample_ids
 	File this_model
 	String this_label
 	String this_test
@@ -89,7 +87,7 @@ workflow group_assoc_wf {
 	scatter(this_gds in these_gds_groups) {
 		
 		call aggAssocTest {
-			input: gds = this_gds.left, sample_ids=this_sample_ids, groups = this_gds.right, model_file = this_model, label=this_label, test = this_test, pval = this_pval, memory = this_memory, disk = this_disk, assocTestScript = getScript.assoc_script
+			input: gds = this_gds.left, groups = this_gds.right, model_file = this_model, label=this_label, test = this_test, pval = this_pval, memory = this_memory, disk = this_disk, assocTestScript = getScript.assoc_script
 		}
 	}
 
