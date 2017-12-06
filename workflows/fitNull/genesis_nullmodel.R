@@ -13,13 +13,13 @@ label <- args[6]
 kinship.matrix <- args[7]
 pheno.id <- args[8]
 
-# phenotype.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/fitNull/Pooled_AFEU_WesselJ_25AUG2017_T2D.ped"
+# phenotype.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_Glycemic_Traits_freeze5b.ped"
 # outcome.name <- "T2D"
 # outcome.type <-  "dichotomous"
-# covariate.string <- "sex,last_exam_age,last_exam_bmi,study_ancestry"
-# sample.file = "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/fitNull/samples.txt"
-# label <- "test_fitNull"
-# kinship.matrix <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/grm/freeze4.autopass.gtonly.minDP10.mmap.grm.fixed.001.matrix.Rda"
+# covariate.string <- "sex,age_FG,STUDY_ANCESTRY"
+# sample.file = "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/null_models/freeze5b_sampleids.txt"
+# label <- "freeze5b_sex_agefg_studyancestry"
+# kinship.matrix <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/grm/freeze.5b.auto.pass.gtonly.minDP10.mmap.grm.DP.fixed.0.001.matrix.cor.Rda"
 # pheno.id <- "TOPMEDID"
 
 
@@ -149,6 +149,7 @@ if(nrow(pheno) == 0){
 sample.data <- data.frame(scanID = row.names(pheno),  
                           pheno, 
                           stringsAsFactors=F)
+
 scan.annotated.frame <- ScanAnnotationDataFrame(sample.data)
 modified.pheno = pheno[sample.ids,,drop=FALSE]
 row.names(modified.pheno) <- sample.ids
