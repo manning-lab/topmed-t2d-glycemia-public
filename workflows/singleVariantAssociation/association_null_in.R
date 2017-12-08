@@ -22,7 +22,7 @@ geno <- seqOpen(gds)
 seqSetFilter(geno,sample.id=nullmod$scanID, action="intersect", verbose=TRUE)
 
 #### filter to only passing sites
-var_filter_flag <- data.table(varid=seqGetData(geno,"variant.id"), flag=seqGetData(geno,"annotation/filter"))
+var_filt_flag <- data.table(varid=seqGetData(geno,"variant.id"), flag=seqGetData(geno,"annotation/filter"))
 keep_var <- var_filt_flag$varid[var_filt_flag$flag == "PASS"]
 leave_var <- var_filt_flag$varid[var_filt_flag$flag != "PASS"]
 seqSetFilter(geno,variant.id=keep_var, action="intersect", verbose=TRUE)
