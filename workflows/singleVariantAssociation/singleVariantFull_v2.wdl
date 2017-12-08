@@ -43,12 +43,12 @@ task assocTest {
 
 task summary {
 	Array[File] assoc
-	String pval
+	String test
 	String label
 	File script
 
 	command {
-		R --vanilla --args ${pval} ${label} ${sep = ' ' assoc} < ${script}	
+		R --vanilla --args ${test} ${label} ${sep = ' ' assoc} < ${script}	
 	}
 	
 	runtime {
@@ -76,7 +76,6 @@ workflow w_assocTest {
 	File this_null
 	String this_label
 	String this_test
-	String this_pval
 
 	call getScript
 	
@@ -88,7 +87,7 @@ workflow w_assocTest {
 	}
 
 	call summary {
-		input: assoc = assocTest.assoc, pval=this_pval, label=this_label, script = getScript.summary_script
+		input: assoc = assocTest.assoc, test=this_test, label=this_label, script = getScript.summary_script
 	}
 
 }

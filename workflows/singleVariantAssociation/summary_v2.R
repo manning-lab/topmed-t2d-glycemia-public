@@ -2,9 +2,10 @@ install.packages("qqman",repos='http://cran.us.r-project.org')  #_0.14.tar.gz")
 library(qqman)
 
 input_args <- commandArgs(trailingOnly=T)
-
-pval <- input_args[1]
+test <- input_args[1]
 label <- input_args[2] 
+
+pval <- paste(test,"pval",sep=".")
 
 assoc.files <- c() # list of input .assoc.RData files
 assoc.compilation <- c() # matrix of association results
