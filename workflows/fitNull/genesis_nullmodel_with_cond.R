@@ -67,6 +67,18 @@ split.by.comma <- function(cur.string){
   return(out)
 }
 
+GetFamilyDistribution <- function(response.type) {
+  if (response.type == "continuous"){
+    family = "gaussian"
+  } else if (response.type == "dichotomous"){
+    family = "binomial"
+  } else {
+    msg = paste("Don't know how to deal with response type", response.type)
+    stop(msg)
+  }
+  return(family)
+}
+
 GetKinshipMatrix <- function(kinship.matrix){
   cat('Loading Kinship Matrix:',kinship.matrix,'\n')
   if(grepl('Rda',kinship.matrix,ignore.case=TRUE)){
