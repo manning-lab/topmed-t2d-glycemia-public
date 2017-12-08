@@ -116,6 +116,16 @@ if (NCOL(phenotype.data) < 2){
   phenotype.data <- fread(phenotype.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 }
 
+if (outcome.type == "continuous"){
+  phenotype.data[,outcome.name] <- as.numeric(phenotype.data[,outcome.name])
+}
+
+for (cur_cov in covariates){
+  if (cur_cov %in% c("age_FG", "age", "FG", "FI","PC","age_T2D","age_FI")){
+    phenotype.data[,cur_cov] <- as.numeric(phenotype.data[,cur_cov])
+  }
+}
+
 phenotype.data <- phenotype.data[!duplicated(phenotype.data[,1]),]
 pa <- reducePheno(phenotype.data, outcome.name, covariates=covariates, id=pheno.id)
 pheno <- pa[[1]]
