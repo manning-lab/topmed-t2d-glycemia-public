@@ -10,7 +10,7 @@ gds <- input_args[1] #"GoT2D.chr22.biallelic.gds"
 null.file <- input_args[2]
 label <- input_args[3]
 test <- input_args[4]
-minMAC <- 20 # hard coded
+minMAC <- 10 # hard coded
 
 #### load null model
 load(null.file)
