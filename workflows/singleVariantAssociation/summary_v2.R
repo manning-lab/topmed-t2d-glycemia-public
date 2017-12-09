@@ -9,7 +9,7 @@ pval <- paste(test,"pval",sep=".")
 
 assoc.files <- c() # list of input .assoc.RData files
 assoc.compilation <- c() # matrix of association results
-numAssocFiles <- (length(input_args) - 3)
+numAssocFiles <- (length(input_args) - 2)
 print(numAssocFiles)
 print(input_args)
 
@@ -17,7 +17,7 @@ print(date())
 
 for (i in 1:numAssocFiles) {
   print(i)
-  assoc.files[i] <- input_args[i+3]
+  assoc.files[i] <- input_args[i+2]
   
   print(assoc.files[i])
   load(assoc.files[i])

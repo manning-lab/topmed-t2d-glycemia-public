@@ -9,7 +9,7 @@ input_args <- commandArgs(trailingOnly=T)
 gds <- input_args[1] #"GoT2D.chr22.biallelic.gds"
 ped <- input_args[2] #"GoT2D.phenotype.ped"
 kinship_file <- input_args[3] # GoT2DSampleID
-commonID_file <- input_args[4]
+sample.file <- input_args[4]
 id.column.name <- input_args[5]
 label <- input_args[6]
 outcome <- input_args[7]
@@ -18,15 +18,17 @@ minMAC <- 30 # hard coded
 conditional <- args[9]
 covariates <- NULL
 
-print(paste("GDS file:",gds))
-print(paste("Ped file:",ped))
-print(paste("Kinship file:",kinship_file))
-print(paste("Common IDs file:",commonID_file))
-print(paste("ID column name:",id.column.name))
-print(paste("label:",label))
-print(paste("outcome:",outcome))
-print(paste("outcomeType:",outcomeType))
-
+# gds <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr10.pass_and_fail.gtonly.minDP10.SUBSET.1000000.gds"
+# ped <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_Glycemic_Traits_freeze5b_TDM_12062017_FG.ped"
+# kinship_file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/grm/freeze.5b.auto.pass.gtonly.minDP10.mmap.grm.DP.fixed.0.001.matrix.cor.Rda"
+# sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_Glycemic_Traits_freeze5b_TDM_12062017_FG_sampleids.txt"
+# id.column.name <- "TOPMEDID"
+# label <- "cond_test"
+# outcome <- "FastingGlucose"
+# outcomeType <- "continuous"
+# minMAC <- 20 # hard coded
+# conditional <- "A:6687759"
+# covariates <- unlist(strsplit("sex,age_FG,STUDY_ANCESTRY",","))
 
 if(length(input_args)>9) {
   covariates <- strsplit(input_args[10],split=",")[[1]]
@@ -42,7 +44,7 @@ rownames(ped_file) <- ped_file[,id.column.name]
 head(ped_file)
 
 # load common ID and kinship files
-load(commonID_file)
+sample.ids <- fread(sample.file,sep="\n",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 
 library(gdsfmt)
 geno.pcrelate <- openfn.gds(kinship_file)
@@ -55,7 +57,7 @@ ped_file.trimmed <- ped_file.trimmed[both,]
 cpos = unlist(strsplit(conditional,':'))[2]
 
 geno <- seqOpen(gds)
-pos <- seqGetdata(gds,"position")
+pos <- seqGetData(geno,"position")
 
 ## Conditional analaysis
 if(cpos >0){
