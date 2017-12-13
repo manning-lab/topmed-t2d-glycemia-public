@@ -17,7 +17,7 @@ pheno.id <- args[8]
 # outcome.name <- "T2D"
 # outcome.type <-  "dichotomous"
 # covariate.string <- "sex,age_FG,STUDY_ANCESTRY"
-# sample.file = "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/null_models/freeze5b_sampleids.txt"
+# sample.file = "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_Glycemic_Traits_freeze5b_TDM_12062017_FG_sampleids.txt"
 # label <- "freeze5b_sex_agefg_studyancestry"
 # kinship.matrix <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/grm/freeze.5b.auto.pass.gtonly.minDP10.mmap.grm.DP.fixed.0.001.matrix.cor.Rda"
 # pheno.id <- "TOPMEDID"
@@ -121,7 +121,7 @@ if (outcome.type == "continuous"){
 }
 
 for (cur_cov in covariates){
-  if (cur_cov %in% c("age_FG", "age", "FG", "FI","PC","age_T2D","age_FI")){
+  if (cur_cov %in% c("age_FG", "age", "FG", "FI","PC","age_T2D","age_FI","last_exam_age")){
     phenotype.data[,cur_cov] <- as.numeric(phenotype.data[,cur_cov])
   }
 }
