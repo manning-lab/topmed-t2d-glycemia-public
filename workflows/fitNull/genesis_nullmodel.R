@@ -1,9 +1,4 @@
-## outputs are: 
-# null model = ${label}_null.RDa
-# plots = ${label}_plots.pdf
-# stats = glob(*.csv)
-
-args<-commandArgs(trailingOnly=T)
+args<-commandArgs(TRUE)
 phenotype.file <- args[1]
 outcome.name <- args[2]
 outcome.type <-  args[3]
@@ -12,16 +7,20 @@ sample.file = args[5]
 label <- args[6]
 kinship.matrix <- args[7]
 pheno.id <- args[8]
+genotype.files <- args[9]
+conditional <- args[10]
 
-# phenotype.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_Glycemic_Traits_freeze5b.ped"
-# outcome.name <- "T2D"
-# outcome.type <-  "dichotomous"
-# covariate.string <- "sex,age_FG,STUDY_ANCESTRY"
-# sample.file = "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_Glycemic_Traits_freeze5b_TDM_12062017_FG_sampleids.txt"
-# label <- "freeze5b_sex_agefg_studyancestry"
+
+# genotype.files <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr10.pass_and_fail.gtonly.minDP10.SUBSET.1000000.gds"
+# phenotype.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_Glycemic_Traits_freeze5b_TDM_12062017_FG.ped"
 # kinship.matrix <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/grm/freeze.5b.auto.pass.gtonly.minDP10.mmap.grm.DP.fixed.0.001.matrix.cor.Rda"
+# sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_Glycemic_Traits_freeze5b_TDM_12062017_FG_sampleids.txt"
 # pheno.id <- "TOPMEDID"
-
+# label <- "cond_test"
+# outcome.name <- "FastingGlucose"
+# outcome.type <- "Continuous"
+# conditional <- "A:6687759"
+# covariate.string <- "sex,age_FG,STUDY_ANCESTRY"
 
 library(plyr)
 checkPhenotype <- function(p, outcome, covariates, id.col=NULL, gender.col=NULL) {
@@ -60,11 +59,6 @@ reducePheno <- function(pheno.data,
   return(list(pheno,all.terms))
 }
 
-Maf <- function(dose){
-  aaf <- colMeans(dose,na.rm=T)/2
-  return(min(1-aaf, aaf))
-}
-
 split.by.comma <- function(cur.string){
   cur.string <- gsub('"', '', cur.string)
   out <- unlist(strsplit(cur.string, ","))
@@ -94,10 +88,16 @@ GetKinshipMatrix <- function(kinship.matrix){
   else{
     kmatr = as.matrix(read.csv(kinship.matrix,as.is=T,check.names=F,row.names=1))
   }
-  
   cat('Loaded Kinship NROW:',NROW(kmatr),' NCOL:',NCOL(kmatr),'\n')
   kmatr
 }
+
+if(conditional != 'NA'){
+  cpos = strsplit(conditional,':')[[1]][2]
+}else{
+  cpos = FALSE
+}
+cat('conditional',conditional,'\t pos',cpos,'\n')
 
 suppressMessages(library(SeqArray))
 suppressMessages(library(SeqVarTools))
@@ -111,6 +111,7 @@ suppressMessages(library(data.table))
 
 covariates <- split.by.comma(covariate.string)  
 
+## phenotype 
 phenotype.data <- fread(phenotype.file,sep="\t",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 if (NCOL(phenotype.data) < 2){
   phenotype.data <- fread(phenotype.file,sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
@@ -121,14 +122,13 @@ if (outcome.type == "continuous"){
 }
 
 for (cur_cov in covariates){
-  if (cur_cov %in% c("age_FG", "age", "FG", "FI","PC","age_T2D","age_FI","last_exam_age")){
+  if (cur_cov %in% c("age_FG", "age", "FG", "FI","PC","age_T2D","age_FI")){
     phenotype.data[,cur_cov] <- as.numeric(phenotype.data[,cur_cov])
   }
 }
 
 phenotype.data <- phenotype.data[!duplicated(phenotype.data[,1]),]
 pa <- reducePheno(phenotype.data, outcome.name, covariates=covariates, id=pheno.id)
-# pheno,all_term <- reducePheno(phenotype.data, outcome.name, covariates=covariates, id=pheno.id)
 pheno <- pa[[1]]
 all.terms <- pa[[2]]
 
@@ -146,20 +146,49 @@ if(nrow(pheno) == 0){
   stop(msg)
 }
 
+if(cpos >0){
+  cat('Conditioning on ',conditional,'...\n')
+  f <- seqOpen(genotype.files)
+  pos = seqGetData(f, "position")
+  variant.ids = seqGetData(f, "variant.id")
+  cidx = which(pos == as.numeric(cpos))
+  if(any(cidx)){
+    
+    seqSetFilter(f,variant.sel=cidx, sample.id = row.names(pheno),verbose=FALSE)
+    pheno$csnp = altDosage(f,  use.names=FALSE)
+  }else{
+    stop('Can not find snp ',conditional,' with position ',cpos,' to condition on in data file')
+  }
+  
+  dropConditionalCases = NROW(pheno)-NROW(pheno[complete.cases(pheno),])
+  if(dropConditionalCases > 0){
+    cat('Warning: Dropping ',dropConditionalCases,' samples due to missing conditional genotype calls\n')
+  }
+  
+  pheno = pheno[complete.cases(pheno),]
+  
+  covariates[length(covariates) + 1] <- 'csnp'
+
+  seqClose(f)
+}
+
+
+## Load KINSHIP matrix
+## Kinship doesn't contain all samples
 kmatr = GetKinshipMatrix(kinship.matrix)
 pheno = pheno[row.names(pheno) %in% row.names(kmatr),,drop=F]
 kmatr = kmatr[row.names(kmatr) %in% row.names(pheno),colnames(kmatr) %in% row.names(pheno)]
-
 kmatr = kmatr[match(row.names(pheno),row.names(kmatr)),match(row.names(pheno),colnames(kmatr))]
 if(nrow(pheno) == 0){
   msg = paste("Phenotype ID column doesn't match IDs in Kinship Matrix")
   stop(msg)
 }
 
+
+
 sample.data <- data.frame(scanID = row.names(pheno),  
                           pheno, 
                           stringsAsFactors=F)
-
 scan.annotated.frame <- ScanAnnotationDataFrame(sample.data)
 modified.pheno = pheno[sample.ids,,drop=FALSE]
 row.names(modified.pheno) <- sample.ids
@@ -171,6 +200,11 @@ rm(modified.pheno)
 
 annotated.frame <- AnnotatedDataFrame(sample.data.for.annotated)
 
+###################
+## NULL MODEL
+##################
+# Should depend on response type
+
 cat('start fit....\n')
 kmatr = as.matrix(kmatr)
 cat('Fitting model ')
@@ -179,10 +213,6 @@ nullmod <- fitNullMM(scanData = scan.annotated.frame,
                      covars = covariates,
                      family = GetFamilyDistribution(outcome.type),
                      covMatList = kmatr)
-
-# write(sample.ids, file =paste(label,"_sample_ids.txt",sep=""),
-#       ncolumns = 1,
-#       append = FALSE, sep = " ")
 
 save(nullmod,annotated.frame,file=paste(label,"_null.RDa",sep=""))
 

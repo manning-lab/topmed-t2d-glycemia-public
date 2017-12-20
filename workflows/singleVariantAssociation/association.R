@@ -43,7 +43,7 @@ id.column.name <- input_args[5]
 label <- input_args[6]
 outcome <- input_args[7]
 outcomeType <- input_args[8]
-minMAC <- 30 # hard coded
+minMAC <- as.numeric(input_args[9]) # hard coded
 covariates <- NULL
 
 print(paste("GDS file:",gds))
@@ -56,9 +56,9 @@ print(paste("outcome:",outcome))
 print(paste("outcomeType:",outcomeType))
 
 
-if(length(input_args)>8) {
+if(length(input_args)>9) {
 	
-	covariates <- strsplit(input_args[9],split=",")[[1]]
+	covariates <- strsplit(input_args[10],split=",")[[1]]
 	print(paste("covariates:",paste(covariates,collapse=" ")))
 
 }

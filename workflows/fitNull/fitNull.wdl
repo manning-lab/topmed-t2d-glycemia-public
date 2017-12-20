@@ -20,18 +20,21 @@ task fitNull {
 	File sample_ids
 	String label
 	File kinshipmatrix
-	String phenoid 
+	String phenoid
+	String? conditional
+	Array[File]? gds
 
 	File script
+	Int memory
 
 	command {
-		R --vanilla --args ${phenofile} ${outcomename} ${outcometype} ${covariates} ${sample_ids} ${label} ${kinshipmatrix} ${phenoid} < ${script}
+		R --vanilla --args ${phenofile} ${outcomename} ${outcometype} ${covariates} ${sample_ids} ${label} ${kinshipmatrix} ${phenoid} ${gds} ${conditional} < ${script}
 	}
 
 	runtime {
 		docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
-		disks: "local-disk 20 SSD"
-		memory: "20G"
+		disks: "local-disk 200 SSD"
+		memory: "${memory}G"
 	}
 
 	output {
@@ -51,10 +54,16 @@ workflow nullModel {
 	String this_label
 	File this_kinshipmatrix
 	String this_phenoid
+	String? this_conditional
+	Array[File]? this_gds
+	Int? gds_ind = 0
+	Int this_memory
+
+	gds_file = this_gds[gds_ind]
 
 	call getScript
 	
 	call fitNull {
-            input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covariates, sample_ids=this_sample_ids, label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenoid, script=getScript.null_script
+            input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covariates, sample_ids=this_sample_ids, label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenoid, conditional=this_conditional, gds=gds_file, script=getScript.null_script, memory=this_memory
 	}
 }

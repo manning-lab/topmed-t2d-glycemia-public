@@ -1,7 +1,7 @@
 task getScript {
 	command {
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/association_null_in.R"
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/summary_v2.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/summary.R"
 	}
 
 	runtime {
@@ -10,7 +10,7 @@ task getScript {
 
 	output {
 		File assoc_script = "association_null_in.R"
-		File summary_script = "summary_v2.R"
+		File summary_script = "summary.R"
 	}
 }
 
