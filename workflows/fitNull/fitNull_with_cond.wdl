@@ -22,12 +22,12 @@ task fitNull {
 	File kinshipmatrix
 	String phenoid
 	String? conditional
-	File? gds
+	Array[File]? gds
 
 	File script
 
 	command {
-		R --vanilla --args ${phenofile} ${outcomename} ${outcometype} ${covariates} ${sample_ids} ${label} ${kinshipmatrix} ${phenoid} ${conditional} ${gds} < ${script}
+		R --vanilla --args ${phenofile} ${outcomename} ${outcometype} ${covariates} ${sample_ids} ${label} ${kinshipmatrix} ${phenoid} ${conditional} ${gds[0]} < ${script}
 	}
 
 	runtime {
@@ -54,7 +54,7 @@ workflow nullModel {
 	File this_kinshipmatrix
 	String this_phenoid
 	String? this_conditional
-	File? this_gds
+	Array[File]? this_gds
 
 	call getScript
 	

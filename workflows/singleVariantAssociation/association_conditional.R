@@ -15,7 +15,7 @@ label <- input_args[6]
 outcome <- input_args[7]
 outcomeType <- input_args[8]
 minMAC <- 30 # hard coded
-conditional <- args[9]
+conditional <- input_args[9]
 covariates <- NULL
 
 # gds <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr10.pass_and_fail.gtonly.minDP10.SUBSET.1000000.gds"
@@ -168,7 +168,7 @@ if(outcomeType=="dichotomous" ) {
 
 ## continuous 
 if(outcomeType=="continuous" ) {
-  assoc <- assocTestMM(genoData = genoData, nullMMobj = nullmod, test = "Wald")
+  assoc <- assocTestMM(genoData = genoData, nullMMobj = nullmod, test = "Score")
 }
 print("Finished Association Step")
 print(dim(assoc))

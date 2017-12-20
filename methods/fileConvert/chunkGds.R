@@ -14,15 +14,18 @@ chunk <- function(x,n) {
 }
 
 gds <- seqOpen(gds.file)
+pass <- seqGetData(gds,"annotation/filter")
+seqSetFilter(gds,variant.sel=pass=="PASS")
 variant.id <- seqGetData(gds, "variant.id")
-variant.id.chunks <- chunk(variant.id,400000)
+variant.id.chunks <- chunk(variant.id,1102094)
 
 # loop through the chunks
 for(j in 1:length(variant.id.chunks)) {
   print(paste("Chunk ",j," / ",length(variant.id.chunks),sep=""))
-  seqSetFilter(gds, variant.id=variant.id.chunks[[j]])
+  seqSetFilter(gds, variant.id=variant.id.chunks[[j]],action="intersect")
   seqExport(gds, paste(outbase,".chunk",j,".gds",sep=""))
   # reset filter
   seqResetFilter(gds)
+  seqSetFilter(gds,variant.sel=pass=="PASS")
 }
 seqClose(gds)
