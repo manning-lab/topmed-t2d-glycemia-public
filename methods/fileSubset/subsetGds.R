@@ -7,14 +7,27 @@ library(SeqArray)
 ## real inputs
 args <- commandArgs(trailingOnly=T)
 gds.file <- args[1]
-gds.subset.ids <- unlist(strsplit(args[2],","))
-gds.subset.file <- args[3]
+gds.sample.file <- args[2]
+gds.variant.file <- args[3]
+label <- args[4]
+
+# get the right output file
+gds.subset.file <- paste(label,"gds",sep=".")
 
 # load the gds file
 gds.data <- seqOpen(gds.file)
 
-# subset data
-seqSetFilter(gds.data, variant.id=gds.subset.ids)
+# filter samples
+if(gds.sample.file != "none"){
+	sample.ids <- unique(readLines(gds.sample.file))
+	seqSetFilter(gds.data, sample.id=sample.ids)
+}
+
+# filter variants
+if(gds.variant.file != "none"){
+	variant.ids <- unique(readLines(gds.variant.file))
+	seqSetFilter(gds.data, variant.id=variant.ids, action="intersect")
+}
 
 # save the subset
 seqExport(gds.data, gds.subset.file)

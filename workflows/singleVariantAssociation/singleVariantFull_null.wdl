@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/association.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/association_null_in.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/singleVariantAssociation/summary.R"
 	}
 
@@ -9,40 +9,31 @@ task getScript {
 	}
 
 	output {
-		File assoc_script = "association.R"
+		File assoc_script = "association_null_in.R"
 		File summary_script = "summary.R"
 	}
 }
 
 task assocTest {
-
 	File gds
-	File ped
-	File GRM
-	File commonIDs
-	String colname
+	File null_file
 	String label
-	String outcome
-	String outcomeType
-	Int minmac
-	String? covariates
-	File assocTestScript
-
-	Int memory
+	String test
+	File script
 
 	command {
-		R --vanilla --args ${gds} ${ped} ${GRM} ${commonIDs} ${colname} ${label} ${outcome} ${outcomeType} ${minmac} ${covariates} < ${assocTestScript} 
+		R --vanilla --args ${gds} ${null_file} ${label} ${test} < ${script} 
 	}
 
 	meta {
-		author: "jasen jackson; Alisa Manning, Tim Majarian"
-		email: "jasenjackson97@gmail.com; amanning@broadinstitute.org, tmajaria@braodinstitute.org"	
+		author: "Tim Majarian"
+		email: "tmajaria@braodinstitute.org"	
 	}
 	
 	runtime {
 		docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
 		disks: "local-disk 100 SSD"
-		memory: "${memory}G"
+		memory: "40G"
 	}
 
 	output {
@@ -56,8 +47,6 @@ task summary {
 	String label
 	File script
 
-	Int memory
-
 	command {
 		R --vanilla --args ${test} ${label} ${sep = ' ' assoc} < ${script}	
 	}
@@ -65,7 +54,7 @@ task summary {
 	runtime {
 		docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
   	    disks: "local-disk 100 SSD"
-        memory: "${memory}G"
+        memory: "30G"
 	}
 
 	output {
@@ -84,23 +73,16 @@ task summary {
 
 workflow w_assocTest {
 	Array[File] gdsFiles
-	File this_ped
-	File this_kinshipGDS
-	File this_sampleids
-	String this_colname
+	File this_null
 	String this_label
-	String this_outcome
-	String this_outcomeType
-	Int this_minmac
-	String? this_covariates
 	String this_test
 
 	call getScript
-		
+	
 	scatter(oneFile in gdsFiles) {
 		
 		call assocTest {
-			input: gds = oneFile, ped = this_ped, GRM = this_kinshipGDS, commonIDs = this_sampleids, colname = this_colname, label=this_label, outcome = this_outcome, outcomeType = this_outcomeType, minmac = this_minmac, covariates = this_covariates, assocTestScript = getScript.assoc_script
+			input: gds = oneFile, null_file = this_null, label = this_label, test = this_test, script = getScript.assoc_script
 		}
 	}
 

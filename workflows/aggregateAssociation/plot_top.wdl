@@ -18,10 +18,11 @@ task plot_top {
 		File group_file
         File state_file
         String out_pref
+        String states
         File script
 
         command {
-                R --vanilla --args ${results_file} ${group_file} ${state_file} ${out_pref} < ${script}
+                R --vanilla --args ${results_file} ${group_file} ${state_file} ${out_pref} ${states}< ${script}
         }
 
         meta {

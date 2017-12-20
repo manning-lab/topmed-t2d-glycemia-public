@@ -47,25 +47,27 @@ for (i in 1:numAssocFiles) {
 ppi <- 300
 # results <- assoc$results
 # results$chr <- rep(10,length(results[,1]))
+
+assoc.compilation <- assoc.compilation[!is.na(assoc.compilation$pval_0),]
 pdf(paste(label,".qqplot.pdf",sep=""))
-qq(res$pval_0)
+qq(as.numeric(assoc.compilation[,"pval_0"]))
 dev.off()
 
 l <- list()
-for (i in seq(1,length(all_assoc))){
-# for (i in seq(1,length(res[,1]))){
-  l2 <- list()
-    for (j in seq(1,length(all_assoc[[i]]$variantInfo))){
-      l2[[length(l2)+1]] <- data.frame(P=rep(all_assoc[[i]]$results$pval_0[j],length(all_assoc[[i]]$variantInfo[[j]][,1])), BP=all_assoc[[i]]$variantInfo[[j]]$pos, CHR=all_assoc[[i]]$variantInfo[[j]]$chr)
-  # l[[length(l)+1]] <- data.frame(P=rep(res$pval_0[i],length(groups[[i]]$variant.id)), BP=groups[[i]]$position, CHR=groups[[i]]$chromosome)
-    }
-  l <- unlist(list(l,l2),recursive=F)
-}
+ for (i in seq(1,length(all_assoc))){
+ # for (i in seq(1,length(res[,1]))){
+   l2 <- list()
+     for (j in seq(1,length(all_assoc[[i]]$variantInfo))){
+       l2[[length(l2)+1]] <- data.frame(P=rep(all_assoc[[i]]$results$pval_0[j],length(all_assoc[[i]]$variantInfo[[j]][,1])), BP=all_assoc[[i]]$variantInfo[[j]]$pos, CHR=all_assoc[[i]]$variantInfo[[j]]$chr)
+   # l[[length(l)+1]] <- data.frame(P=rep(res$pval_0[i],length(groups[[i]]$variant.id)), BP=groups[[i]]$position, CHR=groups[[i]]$chromosome)
+     }
+   l <- unlist(list(l,l2),recursive=F)
+ }
 
-df <- l[[1]]
-for (i in seq(2,length(l))){
-  df <- rbind(df,l[[i]])
-}
+ df <- l[[1]]
+ for (i in seq(2,length(l))){
+   df <- rbind(df,l[[i]])
+ }
 df$CHR <- as.numeric(as.vector(df$CHR))
 pdf(paste(label,".mhplot.pdf",sep=""))
 manhattan(df,chr="CHR",bp="BP",p="P", main=label)

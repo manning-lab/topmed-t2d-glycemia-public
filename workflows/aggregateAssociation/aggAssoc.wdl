@@ -1,7 +1,7 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/aggregateAssociation/aggregateAssociation.R"
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/aggregateAssociation/aggregateSummary.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/aggregateAssociation.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/aggregateSummary.R"
 	}
 
 	runtime {
@@ -16,12 +16,11 @@ task getScript {
 
 task aggAssocTest {
 	File gds
-	File groups
-	File model_file
 	String label
 	String test
 	String pval
-	Array[Int]? weights
+	File groups
+	File model_file
 	
 	File assocTestScript
 
@@ -29,7 +28,7 @@ task aggAssocTest {
 	Int? disk = 50
 
 	command {
-		R --vanilla --args ${gds} ${groups} ${model_file} ${label} ${test} ${pval} ${sep=',' weights} < ${assocTestScript} 
+		R --vanilla --args ${gds} ${label} ${test} ${pval} ${groups} ${model_file} < ${assocTestScript} 
 	}
 
 	meta {
@@ -80,7 +79,6 @@ workflow group_assoc_wf {
 	String this_label
 	String this_test
 	String this_pval
-	Array[Int]? these_weights = [1,25]
 	Int? this_memory
 	Int? this_disk
 	
@@ -89,7 +87,7 @@ workflow group_assoc_wf {
 	scatter(this_gds in these_gds_groups) {
 		
 		call aggAssocTest {
-			input: gds = this_gds.left, groups = this_gds.right, model_file = this_model, label=this_label, test = this_test, pval = this_pval, weights = these_weights, memory = this_memory, disk = this_disk, assocTestScript = getScript.assoc_script
+			input: gds = this_gds.left, groups = this_gds.right, model_file = this_model, label=this_label, test = this_test, pval = this_pval, memory = this_memory, disk = this_disk, assocTestScript = getScript.assoc_script
 		}
 	}
 
