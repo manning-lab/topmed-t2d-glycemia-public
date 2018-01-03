@@ -1,4 +1,3 @@
-
 library(data.table)
 
 args <- commandArgs(trailingOnly=T)
@@ -6,12 +5,12 @@ results.file <- args[1]
 groups.file <- args[2]
 state.file <- args[3]
 out.file_pref <- args[4]
-state.names <- unlist(strsplit(args[5],','))
 
+state.names <- unlist(strsplit(args[5],','))
 load(results.file)
 results.raw <- assoc
 results.res <- results.raw$results[!is.na(results.raw$results$n.sample.alt),]
-results.top <- results.res[results.res$pval_0 < .005,]
+results.top <- results.res[results.res$pval_0 < pval,]
 
 load(groups.file)
 groups.top <- groups[names(groups) %in% results.top$V1]
@@ -36,8 +35,8 @@ ensembl <- select(ensembl_75,keys = groups.top[[1]]$chr[1],keytype = "chromosome
 gene.top <- ensembl[ensembl$hgnc_symbol %in% names(groups.top),]
 
 state.raw <- fread(state.file,sep="\t",header=F,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
-state.subset <- state.raw[which(state.raw[,4] %in% state.names),] # 14363
-state.subset[,1] <- sub("chr","",state.subset[,1]) # 1329
+state.subset <- state.raw[which(state.raw[,4] %in% state.names),] 
+state.subset[,1] <- sub("chr","",state.subset[,1]) 
 state.gr <- GRanges(seqnames=state.subset[,1],ranges=IRanges(start=state.subset[,2],end=state.subset[,3]),state=state.subset[,4])
 
 pdf(paste(out.file_pref,"_top_hits",".pdf",sep=""),width=11)
@@ -45,7 +44,6 @@ layout(matrix(seq(length(groups.top)),nrow=length(groups.top),ncol=1,byrow=T))
 
 for (j in seq(1,length(groups.top))){
   
-  # cur_group <- groups[[names(groups.top)[j]]]
   cur_group <- groups.top[[j]]
   all_group_info <- groups[[names(groups.top)[j]]]
   cur_gene <- gene.top[gene.top$hgnc_symbol==names(groups.top)[j],]
@@ -67,6 +65,7 @@ for (j in seq(1,length(groups.top))){
   
   dtrack <- DataTrack(data= var.gr$maf, start=start(var.gr),end=end(var.gr)+1,chromosome = chr, genome = gen,ylim=y_bounds, name = "-logMAF",background.title="orangered4")
   
+
   snpregtrack <- HighlightTrack(trackList = list(ovt), start = start(cur_state.gr), end=end(cur_state.gr),chromosome = groups.top[[1]]$chr[1], col="lightgrey", fill="lightgrey", alpha=0.7, inBackground=TRUE, background.title="orangered4")
   
   axTrack <- GenomeAxisTrack(genome = "hg19" , chromosome = groups.top[[1]]$chr[1])
