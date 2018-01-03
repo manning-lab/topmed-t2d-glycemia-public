@@ -1,0 +1,20 @@
+FROM robbyjo/r-mkl:3.4.1
+RUN mkdir -pv /gs_install
+COPY ghostscript-8.70.tar.gz /gs_install/
+#see http://bugs.ghostscript.com/show_bug.cgi?id=692443 that offers some minor explanation of the non-standard use of XCFLAGS
+RUN cd /gs_install && tar -xvzf ghostscript-8.70.tar.gz && cd ghostscript-8.70 && ./configure &&    make XCFLAGS=-DHAVE_SYS_TIME_H=1
+RUN apt-get update && apt-get install -y groff gnuplot gnuplot-x11
+RUN apt-get update
+RUN apt-get install -y build-essential gcc git libtool
+
+RUN sudo apt-get install autotools-dev
+RUN sudo apt-get install -y automake
+
+RUN git clone https://github.com/achilleasNP/EPACTS
+
+RUN cd EPACTS && git checkout hg38_mods && aclocal && autoconf && automake --add-missing && ./configure --prefix="/EPACTS" && make && make install
+
+RUN apt-get install -y tabix
+
+ENV runepacts=/EPACTS/bin/epacts
+ENV epactsdata=/EPACTS/data/
