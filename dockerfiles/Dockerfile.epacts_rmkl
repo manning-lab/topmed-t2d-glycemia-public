@@ -16,5 +16,8 @@ RUN cd EPACTS && git checkout hg38_mods && aclocal && autoconf && automake --add
 
 RUN apt-get install -y tabix
 
+COPY GRCh38_full_analysis_set_plus_decoy_hla.fa.fai /EPACTS/data/
+COPY GRCh38_full_analysis_set_plus_decoy_hla.fa /EPACTS/data
+
 ENV runepacts=/EPACTS/bin/epacts
 ENV epactsdata=/EPACTS/data/
