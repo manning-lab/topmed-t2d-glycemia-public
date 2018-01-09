@@ -5,7 +5,7 @@ library(SeqVarTools)
 library(data.table)
 
 input_args <- commandArgs(trailingOnly=T)
-
+##
 gds <- input_args[1] #"GoT2D.chr22.biallelic.gds"
 label <- input_args[2]
 test <- input_args[3]
