@@ -55,9 +55,25 @@ groups <- groups[!duplicated(names(groups))]
 ## load null model
 load(null.file)
 
+pos <- seqGetData(geno,'position')
+min_pos <- min(pos)
+max_pos <- max(pos)
+
+new_groups <- list()
+for (g in names(groups)){
+  min_g <- min(groups[[g]]$position)
+  max_g <- max(groups[[g]]$position)
+  
+  if (min_g >= min_pos){
+    if (max_g <= max_pos) {
+      new_groups[[g]] <- groups[[g]]
+    }
+  }
+}
+
 #### run association test
 if(test=="SKAT"){
-  assoc <- assocTestSeq(genoData, nullmod, groups, test=test, pval.method=pval, weight.beta = c(1,25))
+  assoc <- assocTestSeq(genoData, nullmod, new_groups, test=test, pval.method=pval, weight.beta = c(1,25))
   save(assoc, file=paste(label, ".assoc.RData", sep=""))
 }
 
