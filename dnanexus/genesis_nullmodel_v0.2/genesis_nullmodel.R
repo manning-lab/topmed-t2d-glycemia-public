@@ -185,7 +185,7 @@ if (!(test.stat %in% test.stat.vals)){
 
 # if(!test.type %in% test.type.vals){
     # stop("Test type must be one of ",paste(test.type.vals,sep=','))
-}
+# }
 
 
 suppressMessages(library(SeqArray))
