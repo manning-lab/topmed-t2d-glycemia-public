@@ -141,9 +141,9 @@ filterByMAF <- function(gds, sample.id=NULL, mac.min=NA, maf.min=NA, verbose=TRU
 
 
 GetFamilyDistribution <- function(response.type) {
-               if (response.type == "Continuous"){
+               if (tolower(response.type) == "continuous"){
                       family = "gaussian"
-               } else if (response.type == "Dichotomous"){
+               } else if (tolower(response.type) == "dichotomous"){
                       family = "binomial"
                } else {
                       msg = paste("Don't know how to deal with response type", response.type)
