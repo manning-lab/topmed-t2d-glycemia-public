@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/fitNull/genesis_nullmodel.R
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/fitNull/genesis_nullmodel_conditional.R
 	}
 
 	runtime {
@@ -8,7 +8,7 @@ task getScript {
 	}
 
 	output {
-		File null_script = "genesis_nullmodel.R"
+		File null_script = "genesis_nullmodel_conditional.R"
 	}
 }
 
@@ -21,12 +21,14 @@ task fitNull {
 	String label
 	File kinshipmatrix
 	String phenoid
+	String? conditional
+	Array[File]? gds
 
 	File script
 	Int memory
 
 	command {
-		R --vanilla --args ${phenofile} ${outcomename} ${outcometype} ${covariates} ${sample_ids} ${label} ${kinshipmatrix} ${phenoid} < ${script}
+		R --vanilla --args ${phenofile} ${outcomename} ${outcometype} ${covariates} ${sample_ids} ${label} ${kinshipmatrix} ${phenoid} ${gds} ${conditional} < ${script}
 	}
 
 	runtime {
@@ -52,11 +54,16 @@ workflow nullModel {
 	String this_label
 	File this_kinshipmatrix
 	String this_phenoid
+	String? this_conditional
+	Array[File]? this_gds
+	Int? gds_ind = 0
 	Int this_memory
+
+	gds_file = this_gds[gds_ind]
 
 	call getScript
 	
 	call fitNull {
-            input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covariates, sample_ids=this_sample_ids, label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenoid, script=getScript.null_script, memory=this_memory
+            input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covariates, sample_ids=this_sample_ids, label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenoid, conditional=this_conditional, gds=gds_file, script=getScript.null_script, memory=this_memory
 	}
 }
