@@ -7,8 +7,8 @@ sample.file = args[5]
 label <- args[6]
 kinship.matrix <- args[7]
 pheno.id <- args[8]
-# genotype.files <- args[9]
-# conditional <- args[10]
+genotype.files <- args[9]
+conditional <- args[10]
 
 
 # genotype.files <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr10.pass_and_fail.gtonly.minDP10.SUBSET.1000000.gds"
@@ -92,14 +92,12 @@ GetKinshipMatrix <- function(kinship.matrix){
   kmatr
 }
 
-# if(conditional != 'NA'){
-#   cpos = strsplit(conditional,':')[[1]][2]
-# }else{
-#   cpos = FALSE
-# }
-
-cpos <- FALSE
-# cat('conditional',conditional,'\t pos',cpos,'\n')
+if(conditional != 'NA'){
+  cpos = strsplit(conditional,':')[[1]][2]
+}else{
+  cpos = FALSE
+}
+cat('conditional',conditional,'\t pos',cpos,'\n')
 
 suppressMessages(library(SeqArray))
 suppressMessages(library(SeqVarTools))
@@ -148,31 +146,31 @@ if(nrow(pheno) == 0){
   stop(msg)
 }
 
-# if(cpos >0){
-#   cat('Conditioning on ',conditional,'...\n')
-#   f <- seqOpen(genotype.files)
-#   pos = seqGetData(f, "position")
-#   variant.ids = seqGetData(f, "variant.id")
-#   cidx = which(pos == as.numeric(cpos))
-#   if(any(cidx)){
+if(cpos >0){
+  cat('Conditioning on ',conditional,'...\n')
+  f <- seqOpen(genotype.files)
+  pos = seqGetData(f, "position")
+  variant.ids = seqGetData(f, "variant.id")
+  cidx = which(pos == as.numeric(cpos))
+  if(any(cidx)){
     
-#     seqSetFilter(f,variant.sel=cidx, sample.id = row.names(pheno),verbose=FALSE)
-#     pheno$csnp = altDosage(f,  use.names=FALSE)
-#   }else{
-#     stop('Can not find snp ',conditional,' with position ',cpos,' to condition on in data file')
-#   }
+    seqSetFilter(f,variant.sel=cidx, sample.id = row.names(pheno),verbose=FALSE)
+    pheno$csnp = altDosage(f,  use.names=FALSE)
+  }else{
+    stop('Can not find snp ',conditional,' with position ',cpos,' to condition on in data file')
+  }
   
-#   dropConditionalCases = NROW(pheno)-NROW(pheno[complete.cases(pheno),])
-#   if(dropConditionalCases > 0){
-#     cat('Warning: Dropping ',dropConditionalCases,' samples due to missing conditional genotype calls\n')
-#   }
+  dropConditionalCases = NROW(pheno)-NROW(pheno[complete.cases(pheno),])
+  if(dropConditionalCases > 0){
+    cat('Warning: Dropping ',dropConditionalCases,' samples due to missing conditional genotype calls\n')
+  }
   
-#   pheno = pheno[complete.cases(pheno),]
+  pheno = pheno[complete.cases(pheno),]
   
-#   covariates[length(covariates) + 1] <- 'csnp'
+  covariates[length(covariates) + 1] <- 'csnp'
 
-#   seqClose(f)
-# }
+  seqClose(f)
+}
 
 
 ## Load KINSHIP matrix
