@@ -31,9 +31,6 @@ test.stat.vals <- c("Score", "Wald", "Firth")
 # FROM pipelineFunctions.R
 
 library(plyr)
-library(gap)
-
-
 
 # This function provides a basic check that the phenotype file is a suitable
 # for seqMeta.  It checks that the required column names are in the phenotype
@@ -194,7 +191,6 @@ if (!(test.stat %in% test.stat.vals)){
 suppressMessages(library(SeqArray))
 suppressMessages(library(SeqVarTools))
 suppressMessages(library(GWASTools))
-suppressMessages(library(gap))
 suppressMessages(library(Matrix))
 suppressMessages(library(plyr))
 suppressMessages(library(gdsfmt))
