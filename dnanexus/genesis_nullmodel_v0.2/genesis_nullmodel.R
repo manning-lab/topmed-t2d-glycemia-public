@@ -346,4 +346,4 @@ if (test.stat == 'Firth'){
                      family = GetFamilyDistribution(outcome.type),
                      covMatList = kmatr)
 }
-save(nullmod,annotated.frame,file=paste(output.file,".RDa",sep="")
+save(nullmod,annotated.frame,file=paste(output.file,".RDa",sep=""))
