@@ -52,7 +52,8 @@ workflow nullModel {
 	String this_outcomename
 	String this_outcometype
 	String this_covariates
-	File this_genotype
+	Array[File] these_genotype
+	File this_genotype = these_genotype[0]
 	String this_output_file
 	File this_kinshipmatrix
 	String this_phenoid

@@ -199,7 +199,7 @@ suppressMessages(library(GENESIS))
 suppressMessages(library(data.table))
 #suppressMessages(library(parallel))
 ## Setup
-source("/home/dnanexus/pipelineFunctions.R")
+# source("/home/dnanexus/pipelineFunctions.R")
 covariates <- split.by.comma(covariate.string)  
 
 
