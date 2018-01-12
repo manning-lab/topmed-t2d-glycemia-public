@@ -5,14 +5,6 @@ covars <- unlist(strsplit(input_args[3],","))
 label <- input_args[4]
 cohort_column <- input_args[5]
 
-#####
-# ped.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_MIXED_TM_9DEC2017_T2D_freeze5b_EU.csv"
-# outcome <- "t2d_ctrl" # outcome <- "last_exam_bmi"
-# covars <- unlist(strsplit("last_exam_age,sex,study",","))
-# label <- "testing"
-# cohort_column <- "study"
-#####
-
 # Load phenotype data
 library(data.table)
 ped.data <- fread(ped.file,header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
