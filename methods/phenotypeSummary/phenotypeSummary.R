@@ -122,6 +122,80 @@ if (!(is.continuous)){
     # Store the cohort specific stats in the list
     stats[[length(stats)+1]] <- all_dat
   }
+  
+  # Get totals for all cohorts
+  row_names <- c("All cohorts")
+  for (v in outcome.vals){
+    row_names <- c(row_names,paste("All cohorts",":",outcome,"=",v,sep=" "))
+  }
+  
+  # total samples
+  total <- length(ped.data[,1])
+  samp <- c(total)
+  for (v in outcome.vals){
+    samp <- c(samp, length(ped.data[ped.data[,outcome] == v,1]))
+  }
+  
+  all_dat <- data.frame(V1 = row_names, Samples=samp)
+  
+  # Loop through the continuous covariates to calculate mean, median, std, min, max
+  for (c in covars[val.type == "continuous"]){
+    if (c == cohort_column){
+      next
+    }
+    
+    # Store the values for the whole cohort first
+    means <- c(mean(ped.data[,c]))
+    medians <- c(median(ped.data[,c]))
+    sds <- c(sd(ped.data[,c]))
+    mins <- c(min(ped.data[,c]))
+    maxes <- c(max(ped.data[,c]))
+    
+    # Loop through each outcome condition and calculate values
+    for (v in outcome.vals){
+      ped.new <- ped.data[ped.data[,outcome] == v,c]
+      means = c(means,mean(ped.new))
+      medians = c(medians, median(ped.new))
+      sds = c(sds, sd(ped.new))
+      mins = c(mins, min(ped.new))
+    }
+    
+    # Store the values back in the whole data frame
+    all_dat <- cbind(all_dat,means,medians,sds,mins,maxes)
+    
+  }
+  
+  # Loop through the categorical covariates
+  for (c in covars[val.type == "categorical"]){
+    if (c == cohort_column){
+      next
+    }
+    
+    # Get all possible values of the current covar
+    curvals <- unique(ped.data[,c])
+    
+    # Loop through the possible values of this covar
+    for (cv in curvals){
+      
+      # Subset the phenotypes to only cases with this covar value
+      pd.c <- ped.data[ped.data[,c] == cv,]
+      
+      # Total percent with this value for the covar
+      percents <- c(length(pd.c[,1])/total)
+      
+      # Calculate percents of samples with this value over total with given condition
+      for (v in outcome.vals){
+        ped.new <- pd.c[pd.c[,outcome] == v,c]
+        percents <- c(percents,length(ped.new)/length(ped.data[ped.data[,outcome] == v,1]))
+      }
+      
+      # Store back in the total data frame
+      all_dat <- cbind(all_dat,percents)  
+    }
+    stats[[length(stats)+1]] <- all_dat
+  }
+  
+# If we have a continuous outcome
 } else {
   for (study in unique(ped.data[,cohort_column])){
     
@@ -159,7 +233,7 @@ if (!(is.continuous)){
       }
       
       # Get all possible values of the current covar
-      curvals <- unique(ped.cur[,c])
+      curvals <- unique(ped.data[,c])
       
       # Loop through the possible values of this covar
       for (cv in curvals){
@@ -178,6 +252,56 @@ if (!(is.continuous)){
     # Store the cohort specific stats in the list
     stats[[length(stats)+1]] <- all_dat
   }
+  
+  # Get the total number of samples in this cohort
+  total <- length(ped.data[,1])
+  
+  # This is where we will store all stats for this cohort
+  all_dat <- data.frame(V1 = "All cohorts", Samples=total)
+  
+  # Loop through the continuous covariates to calculate mean, median, std, min, max
+  for (c in covars[val.type == "continuous"]){
+    if (c == cohort_column){
+      next
+    }
+    
+    # Store the values for the whole cohort first
+    means <- c(mean(ped.data[,c]))
+    medians <- c(median(ped.data[,c]))
+    sds <- c(sd(ped.data[,c]))
+    mins <- c(min(ped.data[,c]))
+    maxes <- c(max(ped.data[,c]))
+    
+    # Store the values back in the whole data frame
+    all_dat <- cbind(all_dat,means,medians,sds,mins,maxes)
+    
+  }
+  
+  # Loop through the categorical covariates
+  for (c in covars[val.type == "categorical"]){
+    if (c == cohort_column){
+      next
+    }
+    
+    # Get all possible values of the current covar
+    curvals <- unique(ped.data[,c])
+    
+    # Loop through the possible values of this covar
+    for (cv in curvals){
+      
+      # Subset the phenotypes to only cases with this covar value
+      pd.c <- ped.data[ped.data[,c] == cv,]
+      
+      # Total percent with this value for the covar
+      percents <- c(length(pd.c[,1])/total)
+      
+      # Store back in the total data frame
+      all_dat <- cbind(all_dat,percents)  
+    }
+  }
+  
+  # Store the cohort specific stats in the list
+  stats[[length(stats)+1]] <- all_dat
 }
 # Determine the column and row names for the data frame
 # Continuous covars go first
