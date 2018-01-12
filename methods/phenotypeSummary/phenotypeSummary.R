@@ -6,7 +6,7 @@ label <- input_args[4]
 cohort_column <- input_args[5]
 
 #####
-# ped.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_AFEU_WesselJ_25AUG2017_T2D.csv"
+# ped.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_MIXED_TM_9DEC2017_T2D_freeze5b_EU.csv"
 # outcome <- "t2d_ctrl" # outcome <- "last_exam_bmi"
 # covars <- unlist(strsplit("last_exam_age,sex,study",","))
 # label <- "testing"
@@ -97,7 +97,7 @@ if (!(is.continuous)){
       }
       
       # Get all possible values of the current covar
-      curvals <- unique(ped.cur[,c])
+      curvals <- unique(ped.data[,c])
       
       # Loop through the possible values of this covar
       for (cv in curvals){
