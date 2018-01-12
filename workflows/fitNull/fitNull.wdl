@@ -8,7 +8,7 @@ task getScript {
 	}
 
 	output {
-		File null_script = "genesis_nullmodel.R"
+		File script = "genesis_nullmodel.R"
 	}
 }
 
@@ -44,7 +44,7 @@ task fitNull {
 
 
 workflow nullModel {
-	Array[File] this_genotype_file
+	Array[File] these_genotype_file
 	File this_phenotype_file
 	String this_outcome_name
 	String this_outcome_type
@@ -57,6 +57,7 @@ workflow nullModel {
 	Int this_memory
 	Int this_disk
 	
+	File this_genotype_file = these_genotype_file[0]
 
 	call getScript
 	
