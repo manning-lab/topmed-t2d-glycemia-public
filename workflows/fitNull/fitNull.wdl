@@ -13,50 +13,58 @@ task getScript {
 }
 
 task fitNull {
-	File phenofile
-	String outcomename
-	String outcometype
-	String covariates
-	File sample_ids
+	File genotype_file
+	File phenotype_file
+	String outcome_name
+	String outcome_type
+	String covariates_string
+	File sample_file
 	String label
-	File kinshipmatrix
-	String phenoid
-
+	File kinship_matrix
+	String id_col
 	File script
+
 	Int memory
+	Int disk
 
 	command {
-		R --vanilla --args ${phenofile} ${outcomename} ${outcometype} ${covariates} ${sample_ids} ${label} ${kinshipmatrix} ${phenoid} < ${script}
+		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${covariates_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
 	}
 
 	runtime {
 		docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
-		disks: "local-disk 200 SSD"
+		disks: "local-disk ${disk} SSD"
 		memory: "${memory}G"
 	}
 
 	output {
 		File model = "${label}_null.RDa"
-		File plots = "${label}_plots.pdf"
-		Array[File] stats = glob("*.csv")
 	}
 }
 
 
 workflow nullModel {
-	File this_phenofile
-	String this_outcomename
-	String this_outcometype
-	String this_covariates
-	File this_sample_ids
+	Array[File] this_genotype_file
+	File this_phenotype_file
+	String this_outcome_name
+	String this_outcome_type
+	String this_covariates_string
+	File this_sample_file
 	String this_label
-	File this_kinshipmatrix
-	String this_phenoid
+	File this_kinship_matrix
+	String this_id_col
+	
 	Int this_memory
+	Int this_disk
+	
 
 	call getScript
 	
 	call fitNull {
-            input: phenofile=this_phenofile, outcomename=this_outcomename, outcometype=this_outcometype, covariates=this_covariates, sample_ids=this_sample_ids, label=this_label, kinshipmatrix=this_kinshipmatrix, phenoid=this_phenoid, script=getScript.null_script, memory=this_memory
+            input: genotype_file = this_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.script, memory = this_memory, disk = this_disk
+	}
+
+	output {
+		File out_file = fitNull.model
 	}
 }
