@@ -212,4 +212,55 @@ for (j in 1:nrow(d)){
 
 table(d$keep1_fg,d$keep2_fg,useNA='always')
 table(d$keep1_a1c,d$keep2_a1c,useNA='always')
+
+
+
+####Insulin: different method for selecting for a trait.
+
+
+
+
+
+p3<-p[,c("TOPMEDID", "FastingInsulin")]
+names(p3) <- c("TOPMEDID", "FastingInsulin1")
+d<-merge(d,p3,by.x = 'ID1',by.y = 'TOPMEDID',all.x=T)
+
+p3<-p[,c("TOPMEDID", "FastingInsulin")]
+names(p3) <- c("TOPMEDID", "FastingInsulin2")
+d<-merge(d,p3,by.x = 'ID2',by.y = 'TOPMEDID',all.x=T)
+
+d$keep1_fi<-d$keep1
+d$keep2_fi<-d$keep2
+
+for (j in 1:nrow(d)){
+	
+		
+	if(is.na(d$FastingInsulin1[j])==F&is.na(d$FastingInsulin2[j])==F){
+			d$keep1_fi[j]<-ifelse(is.na(d$FastingInsulin1[j])==F,d$keep1[j],ifelse(is.na(d$FastingInsulin1[j])==T,0,NA))
+			d$keep2_fi[j]<-ifelse(is.na(d$FastingInsulin2[j])==F,d$keep2[j],ifelse(is.na(d$FastingInsulin2[j])==T,0,NA))
+	}
+	else if(is.na(d$FastingInsulin1[j])==T&is.na(d$FastingInsulin2[j])==F)
+	{
+		d$keep1_fi[j]<-0
+		d$keep2_fi[j]<-1
+	} 
+	else if(is.na(d$FastingInsulin1[j])==F&is.na(d$FastingInsulin2[j])==T)
+	{
+		d$keep1_fi[j]<-1
+		d$keep2_fi[j]<-0
+	}
+	else if (is.na(d$FastingInsulin1[j])==T&is.na(d$FastingInsulin2[j])==T)
+	{
+		d$keep1_fi[j]<-0
+		d$keep2_fi[j]<-0
+	}
+	else{ 
+		d$keep1_fi[j]<-NA
+		d$keep2_fi[j]<-NA
+	}
+}
+
+table(d$keep1_fi,d$keep2_fi,useNA='always')
+
+
 write.table(d,"/restricted/projectnb/glycemic/peitao/phenotype_harmonization/pooled_analysis/duplicates.txt",row.names=F,col.names=F,quote=F,sep='\t')
