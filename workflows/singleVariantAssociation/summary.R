@@ -1,73 +1,79 @@
-install.packages("qqman",repos='http://cran.us.r-project.org')  #_0.14.tar.gz")
-library(qqman)
+# Check if required packages are installed (sourced from https://stackoverflow.com/questions/4090169/elegant-way-to-check-for-missing-packages-and-install-them)
+packages <- c("qqman","data.table")
+to_install <- packages[!(packages %in% installed.packages()[,"Package"])]
+if(length(to_install)) install.packages(to_install)
 
+# Load packages
+lapply(packages, library, character.only = TRUE)
+
+# Parse inputs
 input_args <- commandArgs(trailingOnly=T)
-test <- input_args[1]
-label <- input_args[2] 
+pval <- input_args[1]
+pval.threshold <- as.numeric(input_args[2])
+label <- input_args[3]
+assoc.files <- unlist(strsplit(input_args[4],","))
 
-pval <- paste(test,"pval",sep=".")
-
-assoc.files <- c() # list of input .assoc.RData files
-assoc.compilation <- c() # matrix of association results
-numAssocFiles <- (length(input_args) - 2)
-print(numAssocFiles)
-print(input_args)
-
-print(date())
-
-for (i in 1:numAssocFiles) {
-  print(i)
-  assoc.files[i] <- input_args[i+2]
+# Stop if no assoc files
+if (length(assoc.files) == 0){
+  fwrite(list(),paste(label, ".assoc.csv", sep=""),sep=",",row.names=F)
+  fwrite(list(), paste(label, ".topassoc.csv", sep=""),row.names=F)
+  pdf(paste(label,"_association_plots.pdf",sep=""),width=8,height=8)
+  dev.off()
   
-  print(assoc.files[i])
-  load(assoc.files[i])
+} else {
 
-  if (!is.na(assoc)[1]){
-    print(dim(assoc))
-    assoc <- assoc[!is.na(assoc[,pval]),]
-    print(dim(assoc))
+  # Prep for association files
+  assoc.compilation <- c() 
+  
+  # Loop through association files
+  for (i in seq(1,length(assoc.files))) {
+    load(assoc.files[i])
     
-    if (i == 1) {
-      write.table(assoc,paste(label, ".assoc.csv", sep=""),sep=",",row.names=F)
-    } else {
-      write.table(assoc,paste(label, ".assoc.csv", sep=""),col.names=FALSE,sep=",",row.names=F, append=TRUE)
-    }	
+    # Check that the file is not empty
+    if (!is.na(assoc)[1]){
+      assoc <- assoc[!is.na(assoc[,pval]),]
+      print(dim(assoc))
+      
+      # Write the results out to a master file
+      if (i == 1) {
+        write.table(assoc,paste(label, ".assoc.csv", sep=""),sep=",",row.names=F)
+      } else {
+        write.table(assoc,paste(label, ".assoc.csv", sep=""),col.names=FALSE,sep=",",row.names=F, append=TRUE)
+      }	
+    }
   }
+  
+  # Read master file back in
+  assoc.compilation <- fread(paste(label, ".assoc.csv", sep=""),sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+  
+  # Make sure the columns are in the right format
+  assoc.compilation$chr <- as.numeric(as.character(assoc.compilation$chr))
+  assoc.compilation$pos <- as.numeric(as.character(assoc.compilation$pos))
+  assoc.compilation$P <- as.numeric(as.character(assoc.compilation[,pval]))
+  
+  # Write out the top results
+  fwrite(assoc.compilation[assoc.compilation[,pval] < pval.threshold, ], paste(label, ".topassoc.csv", sep=""), sep=",", row.names = F)
+  
+  # QQ plots by maf
+  pdf(paste(label,"_association_plots.pdf",sep=""),width=8,height = 8)
+  
+  # All variants
+  qq(assoc.compilation$P,main="All variants")
+  
+  # Common variants
+  qq(assoc.compilation$P[assoc.compilation$MAF>=0.05],main="Variants with MAF>=0.05")
+  
+  # Rare/Low frequency variants
+  qq(assoc.compilation$P[assoc.compilation$MAF<=0.05],main="Variants with MAF<=0.05")
+  
+  # Manhattan plots by maf
+  # All variants
+  manhattan(assoc.compilation,chr="chr",bp="pos",p="P", main="All variants")
+  
+  # Common variants
+  manhattan(assoc.compilation[assoc.compilation$MAF>=0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF>=0.05")
+  
+  # Rare/Low frequency variants
+  manhattan(assoc.compilation[assoc.compilation$MAF<=0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF<=0.05")
+  dev.off()
 }
-
-library(data.table)
-assoc.compilation <- fread(paste(label, ".assoc.csv", sep=""),sep=",",header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
-
-assoc.compilation$chr <- as.numeric(as.character(assoc.compilation$chr))
-assoc.compilation$pos <- as.numeric(as.character(assoc.compilation$pos))
-assoc.compilation$P <- as.numeric(as.character(assoc.compilation[,pval]))
-
-write.csv(assoc.compilation[assoc.compilation[,pval] < 0.0001, ], paste(label, ".topassoc.csv", sep=""))
-
-ppi <- 300
-
-# plot results: Q-Q
-png(paste(label, ".all.qqplot.png", sep=""),width = 7*ppi, height = 7*ppi, res=ppi, type="cairo")
-qq(assoc.compilation$P,main="All variants")
-dev.off()
-
-png(paste(label, ".common.qqplot.png", sep=""),width = 7*ppi, height = 7*ppi, res=ppi, type="cairo")
-qq(assoc.compilation$P[assoc.compilation$MAF>=0.05],main="Variants with MAF>=0.05")
-dev.off()
-
-png(paste(label, ".uncommon.qqplot.png", sep=""),width = 7*ppi, height = 7*ppi, res=ppi, type="cairo")
-qq(assoc.compilation$P[assoc.compilation$MAF<=0.05],main="Variants with MAF<=0.05")
-dev.off()
-
-# plot results
-png(paste(label, ".all.mhplot.png", sep=""), width = 7*ppi, height = 7*ppi, res = ppi, type="cairo")
-manhattan(assoc.compilation,chr="chr",bp="pos",p="P", main="All variants")
-dev.off()
-
-png(paste(label, ".common.mhplot.png", sep=""), width = 7*ppi, height = 7*ppi, res = ppi, type="cairo")
-manhattan(assoc.compilation[assoc.compilation$MAF>=0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF>=0.05")
-dev.off()
-
-png(paste(label, ".uncommon.mhplot.png", sep=""), width = 7*ppi, height = 7*ppi, res = ppi, type="cairo")
-manhattan(assoc.compilation[assoc.compilation$MAF<=0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF<=0.05")
-dev.off()
