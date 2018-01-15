@@ -59,7 +59,7 @@ task assocTest {
 	Int disk
 
 	command {
-		R --vanilla --args ${gds_file} ${null_file} ${label} ${outcome} ${test} ${mac} < ${script} 
+		R --vanilla --args ${gds_file} ${null_file} ${label} ${test} ${mac} < ${script} 
 	}
 
 	meta {
@@ -143,22 +143,27 @@ workflow w_assocTest {
 		scatter(this_genotype_file in these_genotype_files) {
 		
 			call assocTest {
-				input: gds_file = this_genotype_file, null_file = fitNull.model, label = this_label, test = this_test, mac = this_mac, assocTestScript = getScript.assoc_script, memory = this_memory, disk = this_disk
+				input: gds_file = this_genotype_file, null_file = fitNull.model, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
 			}
 		}
 
-	} else {
+		call summary {
+			input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocTest.assoc, script = getScript.summary_script
+		}
+
+	} 
+
+	if(defined(this_null_file)) {
 
 		scatter(this_genotype_file in these_genotype_files) {
 		
-			call assocTest {
-				input: gds_file = this_genotype_file, null_file = this_null_file, label = this_label, test = this_test, mac = this_mac, assocTestScript = getScript.assoc_script, memory = this_memory, disk = this_disk
+			call assocTest as assocNull {
+				input: gds_file = this_genotype_file, null_file = this_null_file, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
 			}
 		}
-	}
-	
-	call summary {
-		input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocTest.assoc, script = getScript.summary_script
-	}
 
+		call summary as summaryNull {
+			input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocNull.assoc, script = getScript.summary_script
+		}
+	}
 }
