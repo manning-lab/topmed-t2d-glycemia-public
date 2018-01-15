@@ -98,9 +98,9 @@ for (j in 1:nrow(d))
     d$keep1[j]<-ifelse(as.character(d$study1[j])=='VU_AF',1,0)
     d$keep2[j]<-1-d$keep1[j]
   }
-  ###WHI>     COPDGene, HyperGEN, Mayo_VTE
-  else if ((as.character(d$study1[j])=='WHI'&as.character(d$study2[j])%in%c("COPDGene", "HyperGEN", "Mayo_VTE"))|
-           (as.character(d$study2[j])=='WHI'&as.character(d$study1[j])%in%c("COPDGene", "HyperGEN", "Mayo_VTE")))
+   ###WHI>     COPDGene, HyperGEN, Mayo_VTE, MESA ######Added in MESA######
+  else if ((as.character(d$study1[j])=='WHI'&as.character(d$study2[j])%in%c("COPDGene", "HyperGEN", "Mayo_VTE", "MESA"))|
+           (as.character(d$study2[j])=='WHI'&as.character(d$study1[j])%in%c("COPDGene", "HyperGEN", "Mayo_VTE", "MESA")))
   {
     d$keep1[j]<-ifelse(as.character(d$study1[j])=='WHI',1,0)
     d$keep2[j]<-1-d$keep1[j]
@@ -125,6 +125,13 @@ for (j in 1:nrow(d))
            (as.character(d$study2[j])=='GeneSTAR'&as.character(d$study1[j])%in%c("MESA")))
   {
     d$keep1[j]<-ifelse(as.character(d$study1[j])=='GeneSTAR',1,0)
+    d$keep2[j]<-1-d$keep1[j]
+  } 
+    ####CHS > MESA, WHI ###Added in CHS ordering####
+  else if ((as.character(d$study1[j])=='CHS'&as.character(d$study2[j])%in%c("MESA", "WHI"))|
+          (as.character(d$study2[j])=='CHS'&as.character(d$study1[j])%in%c("MESA", "WHI")))
+  {
+    d$keep1[j]<-ifelse(as.character(d$study1[j])=='CHS',1,0)
     d$keep2[j]<-1-d$keep1[j]
   } 
   
