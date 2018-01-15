@@ -1,7 +1,7 @@
 # Check if required packages are installed (sourced from https://stackoverflow.com/questions/4090169/elegant-way-to-check-for-missing-packages-and-install-them)
 packages <- c("qqman","data.table")
 to_install <- packages[!(packages %in% installed.packages()[,"Package"])]
-if(length(to_install)) install.packages(to_install)
+if(length(to_install)) install.packages(to_install,repos='http://cran.us.r-project.org')
 
 # Load packages
 lapply(packages, library, character.only = TRUE)
