@@ -18,14 +18,14 @@ task getScript {
 
 task fitNull {
 	File genotype_file
-	File phenotype_file
-	String outcome_name
-	String outcome_type
-	String covariates_string
-	File sample_file
+	File? phenotype_file
+	String? outcome_name
+	String? outcome_type
+	String? covariates_string
+	File? sample_file
 	String label
-	File kinship_matrix
-	String id_col
+	File? kinship_matrix
+	String? id_col
 	File script
 
 	Int memory
@@ -49,7 +49,7 @@ task fitNull {
 task assocTest {
 
 	File gds_file
-	File null_file
+	File? null_file
 	String label
 	String test
 	Int mac
@@ -80,7 +80,7 @@ task assocTest {
 
 task summary {
 	String pval
-	String pval_threshold
+	Float pval_threshold
 	String label
 	Array[File] assoc
 	File script
@@ -124,7 +124,7 @@ workflow w_assocTest {
 
 	# summary inputs
 	String this_pval
-	String this_pval_threshold	
+	Float this_pval_threshold	
 
 	# inputs to all
 	Int this_memory
@@ -137,7 +137,7 @@ workflow w_assocTest {
 		File null_genotype_file = these_genotype_files[0]
 		
 		call fitNull {
-			input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
+			input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
 		}
 
 		scatter(this_genotype_file in these_genotype_files) {
@@ -148,7 +148,7 @@ workflow w_assocTest {
 		}
 
 		call summary {
-			input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocTest.assoc, script = getScript.summary_script
+			input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocTest.assoc, script = getScript.summary_script, memory = this_memory, disk = this_disk
 		}
 
 	} 
@@ -163,7 +163,7 @@ workflow w_assocTest {
 		}
 
 		call summary as summaryNull {
-			input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocNull.assoc, script = getScript.summary_script
+			input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocNull.assoc, script = getScript.summary_script, memory = this_memory, disk = this_disk
 		}
 	}
 }
