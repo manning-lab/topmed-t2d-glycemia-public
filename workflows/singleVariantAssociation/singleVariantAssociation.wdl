@@ -1,8 +1,8 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/single_var/workflows/singleVariantAssociation/association.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/association.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/fitnull/workflows/fitNull/genesis_nullmodel.R"
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/single_var/workflows/singleVariantAssociation/summary.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/summary.R"
 	}
 
 	runtime {
