@@ -1,6 +1,7 @@
 task getScript {
 	command {
 		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/fitnull/workflows/fitNull/genesis_nullmodel.R
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/methods/phenotypeSummary/phenotypeSummary.R
 	}
 
 	runtime {
@@ -9,6 +10,7 @@ task getScript {
 
 	output {
 		File script = "genesis_nullmodel.R"
+		File summary_script = "phenotypeSummary.R"
 	}
 }
 
@@ -42,8 +44,35 @@ task fitNull {
 	}
 }
 
+task summary {
+	File phenotype_file
+	String outcome_name
+	String covariates_string
+	String label
+	String cohort_column
+
+	File script
+	Int memory
+	Int disk
+
+	command {
+		R --vanilla --args ${phenotype_file} ${outcome_name} ${covariates_string} ${label} ${cohort_column} < ${script}
+	}
+
+	runtime {
+		docker: "tmajarian/r-ggplot@sha256:e4a9a53a49faf7a4d0318e56db14b85284b8d1a1bb5ceee8b04a9979efa8d4ca"
+		disks: "local-disk ${disk} SSD"
+		memory: "${memory}G"
+	}
+
+	output {
+		File plots = "${label}_plots.pdf"
+		File stats = "${label}_stats.csv"
+	}
+}
 
 workflow nullModel {
+	# fitNull inputs
 	Array[File] these_genotype_file
 	File this_phenotype_file
 	String this_outcome_name
@@ -54,6 +83,10 @@ workflow nullModel {
 	File this_kinship_matrix
 	String this_id_col
 	
+	# summary inputs
+	String this_cohort_column
+
+	# other workflow inputs
 	Int this_memory
 	Int this_disk
 	
@@ -65,7 +98,13 @@ workflow nullModel {
             input: genotype_file = this_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.script, memory = this_memory, disk = this_disk
 	}
 
+	call summary {
+		input: phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, covariates_string = this_covariates_string, label = this_label, cohort_column = this_cohort_column, script = getScript.summary_script, memory = this_memory, disk = this_disk
+	}
+
 	output {
 		File out_file = fitNull.model
+		File out_plots = summary.plots
+		File out_stats = summary.stats
 	}
 }
