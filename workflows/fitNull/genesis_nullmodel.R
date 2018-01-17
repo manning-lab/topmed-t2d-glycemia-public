@@ -1,22 +1,22 @@
 # genesis_nullmodel.R
-#   Description: Generate a null model using the Genesis package; this code is mainly derived from code written by Jen Brody for the DNANexus platform.
-#   Inputs:
-#   genotype.file : a genotype file, only sample ids will be used (.gds)
-#   phenotype.file : delimited text file with columns for each of id.col, outcome, and covariates (.csv or .tsv) 
-#   outcome.name : column name of the outcome to be tested (string)
-#   outcome.type : type of outcome (string = continuous, dichotomous)
-#   covariate.string : comma separated list of covariates to include (string, ex: age,sex)
-#   sample.file : a text file with one sample id per line (matching both the genotype file and phenotype file) to be included in analysis (.txt)
-#   label : prefix for output file (string)
-#   kinship.matrix : a file containing a matrix of relatedness between samples, this should be numeric with entries i,j = relatedness measure for sample i and sample j (.RDa)
-#   id.col : sample id column in phenotype file (string)
-# ...
+# Description: Generate a null model using the Genesis package; this code is mainly derived from code written by Jen Brody for the DNANexus platform.
+# Inputs:
+# genotype.file : a genotype file, only sample ids will be used (.gds)
+# phenotype.file : delimited text file with columns for each of id.col, outcome, and covariates (.csv or .tsv) 
+# outcome.name : column name of the outcome to be tested (string)
+# outcome.type : type of outcome (string = continuous, dichotomous)
+# covariate.string : comma separated list of covariates to include (string, ex: age,sex)
+# sample.file : a text file with one sample id per line (matching both the genotype file and phenotype file) to be included in analysis (.txt)
+# label : prefix for output file (string)
+# kinship.matrix : a file containing a matrix of relatedness between samples, this should be numeric with entries i,j = relatedness measure for sample i and sample j (.RDa)
+# id.col : sample id column in phenotype file (string)
+# 
 # Ouputs:
-#   <label>_null.RDa : a null model generated from the desired samples (.RDa)
-# ...
+# <label>_null.RDa : a null model generated from the desired samples (.RDa)
+# 
 # 
 # Author : Tim Majarian tmajaria@broadinstitute.org The Broad Institute
-#   The majority of code was derived from Jen Brody's DNANexus app 'genesis_nullmodel'
+# The majority of code was derived from Jen Brody's DNANexus app 'genesis_nullmodel'
 
 input_args <- commandArgs(trailingOnly=T)
 genotype.file <- input_args[1]
