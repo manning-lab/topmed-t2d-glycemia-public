@@ -4,21 +4,25 @@
 
 This workflow performs a single variant association analysis of genotype data with a single phenotype using linear mixed models with fixed effects. The primary code is written in R using the GENESIS package for model fitting and association testing. The workflow can either generate a null model from phenotype and relatedness data or use a pregenerated null model.
 
+### Authors
+
+This workflow is produced and maintained by the [Manning Lab](https://manning-lab.github.io/). Contributing authors include Tim Majarian (tmajaria@broadinstitute.org), Jasen Jackson (jasenjackson97@gmail.com), and Alisa Manning (amanning@broadinstitute.org).
+
 ## Dependencies
 
 ### Workflow execution
 
-* WDL
-* Chromwell (or another compatible exicution engine, see the [WDL documentation](wdllink) for more details)
+* [WDL](https://software.broadinstitute.org/wdl/documentation/quickstart)
+* [Chromwell](http://cromwell.readthedocs.io/en/develop/)
 
 ### R packages
 
-* [GENESIS](link)
-* [GWASTools](link)
-* [SeqArray](link)
-* [SeqVarTools](link)
-* [data.table](link)
-* [qqman](link)
+* [GENESIS](https://www.bioconductor.org/packages/release/bioc/html/GENESIS.html)
+* [GWASTools](https://www.bioconductor.org/packages/release/bioc/html/GWASTools.html)
+* [SeqArray](https://www.bioconductor.org/packages/release/bioc/html/SeqArray.html)
+* [SeqVarTools](https://www.bioconductor.org/packages/release/bioc/html/SeqVarTools.html)
+* [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
+* [qqman](https://cran.r-project.org/web/packages/qqman/index.html)
 
 ## Main Functions
 
