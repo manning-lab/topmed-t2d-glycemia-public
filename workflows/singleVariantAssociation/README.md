@@ -6,7 +6,11 @@ This workflow performs a single variant association analysis of genotype data wi
 
 ### Authors
 
-This workflow is produced and maintained by the [Manning Lab](https://manning-lab.github.io/). Contributing authors include Tim Majarian (tmajaria@broadinstitute.org), Jasen Jackson (jasenjackson97@gmail.com), and Alisa Manning (amanning@broadinstitute.org).
+This workflow is produced and maintained by the [Manning Lab](https://manning-lab.github.io/). Contributing authors include:
+
+* Tim Majarian (tmajaria@broadinstitute.org)
+* Jasen Jackson (jasenjackson97@gmail.com)
+* Alisa Manning (amanning@broadinstitute.org).
 
 ## Dependencies
 
