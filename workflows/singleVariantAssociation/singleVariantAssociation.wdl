@@ -80,7 +80,7 @@ task assocTest {
 
 task summary {
 	String pval
-	Float ?pval_threshold
+	Float? pval_threshold
 	String label
 	Array[File] assoc
 	File script
