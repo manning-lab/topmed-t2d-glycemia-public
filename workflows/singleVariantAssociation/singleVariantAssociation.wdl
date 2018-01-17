@@ -59,7 +59,7 @@ task assocTest {
 	Int disk
 
 	command {
-		R --vanilla --args ${gds_file} ${null_file} ${label} ${default="Score" test} ${default=5 mac} < ${script} 
+		R --vanilla --args ${gds_file} ${null_file} ${label} ${default="Score" test} ${default="5" mac} < ${script} 
 	}
 
 	meta {
@@ -89,7 +89,7 @@ task summary {
 	Int disk
 
 	command {
-		R --vanilla --args ${pval} ${default=0.0001 pval_threshold} ${label} ${sep = ',' assoc} < ${script}	
+		R --vanilla --args ${pval} ${default="0.0001" pval_threshold} ${label} ${sep = ',' assoc} < ${script}	
 	}
 	
 	runtime {
