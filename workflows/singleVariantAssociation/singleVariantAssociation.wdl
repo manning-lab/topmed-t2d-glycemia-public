@@ -51,15 +51,15 @@ task assocTest {
 	File gds_file
 	File? null_file
 	String label
-	String test
-	Int mac
+	String? test
+	Int? mac
 	File script
 
 	Int memory
 	Int disk
 
 	command {
-		R --vanilla --args ${gds_file} ${null_file} ${label} ${test} ${mac} < ${script} 
+		R --vanilla --args ${gds_file} ${null_file} ${label} ${default="Score" test} ${default=5 mac} < ${script} 
 	}
 
 	meta {
@@ -80,7 +80,7 @@ task assocTest {
 
 task summary {
 	String pval
-	Float pval_threshold
+	Float ?pval_threshold
 	String label
 	Array[File] assoc
 	File script
@@ -89,7 +89,7 @@ task summary {
 	Int disk
 
 	command {
-		R --vanilla --args ${pval} ${pval_threshold} ${label} ${sep = ',' assoc} < ${script}	
+		R --vanilla --args ${pval} ${default=0.0001 pval_threshold} ${label} ${sep = ',' assoc} < ${script}	
 	}
 	
 	runtime {
@@ -119,12 +119,12 @@ workflow w_assocTest {
 	
 	# assocTest inputs
 	File? this_null_file
-	String this_test
-	Int this_mac
+	String? this_test
+	Int? this_mac
 
 	# summary inputs
 	String this_pval
-	Float this_pval_threshold	
+	Float? this_pval_threshold	
 
 	# inputs to all
 	Int this_memory
