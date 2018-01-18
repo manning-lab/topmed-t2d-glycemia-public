@@ -444,4 +444,102 @@ write.table(not_keep_fi,"/data4/dloesch/Duplicates/Test/not_keep_fi.txt",row.nam
 
 
 
+
+#### for subsetting phenotype data for fasting glucose (and removing duplicates)
+
+
+fg <- subset(p, (!is.na(p$FastingGlucose)))
+
+
+not_keep1<-subset(d, subset=(keep1_fg==0&is.na(FastingGlucose1)==F))
+not_keep1<-not_keep1[c("ID1","keep1_fg")]
+
+
+
+not_keep2<-subset(d, subset=(keep2_fg==0&is.na(FastingGlucose2)==F))
+not_keep2<-not_keep2[c("ID2","keep2_fg")]
+
+names<-c("ID","KEEP")
+not_keep<-data.frame()
+colnames(not_keep1)<-names
+colnames(not_keep2)<-names
+not_keep <-rbind(not_keep1, not_keep2)
+
+
+fg<-merge(fg,not_keep,by.x="TOPMEDID",by.y="ID",all.x=T)
+
+
+fg$KEEP[is.na(fg$KEEP)] <- 1
+
+final_fg <-subset(fg, KEEP==1)
+
+
+write.table(final_fg,"/data4/dloesch/Duplicates/Test/removed_duplicates_fg.ped",row.names=F,col.names=T,quote=F,sep='\t')
+
+### for subsetting phenotype data for HbA1c (and removing duplicates)
+
+HbA1c <- subset(p, (!is.na(p$HbA1c)))
+
+
+not_keep1<-subset(d, subset=(keep1_a1c==0&is.na(HbA1c1)==F))
+not_keep1<-not_keep1[c("ID1","keep1_a1c")]
+
+
+
+not_keep2<-subset(d, subset=(keep2_a1c==0&is.na(HbA1c2)==F))
+not_keep2<-not_keep2[c("ID2","keep2_a1c")]
+
+names<-c("ID","KEEP")
+not_keep<-data.frame()
+colnames(not_keep1)<-names
+colnames(not_keep2)<-names
+not_keep <-rbind(not_keep1, not_keep2)
+
+
+HbA1c<-merge(HbA1c,not_keep,by.x="TOPMEDID",by.y="ID",all.x=T)
+
+
+HbA1c$KEEP[is.na(HbA1c$KEEP)] <- 1
+
+final_HbA1c <-subset(HbA1c, KEEP==1)
+
+
+write.table(final,"/data4/dloesch/Duplicates/Test/removed_duplicates_HbA1c.ped",row.names=F,col.names=T,quote=F,sep='\t')
+
+
+### for subsetting phenotype data for fasting insulin (and removing duplicates)
+
+####to subset for fasting insulin and to remove duplicates from phenotype file 
+
+fi <- subset(p, (!is.na(p$FastingInsulin)))
+
+
+not_keep1<-subset(d, subset=(keep1_fi==0&is.na(FastingInsulin1)==F))
+not_keep1<-not_keep1[c("ID1","keep1_fi")]
+
+
+
+not_keep2<-subset(d, subset=(keep2_fi==0&is.na(FastingInsulin2)==F))
+not_keep2<-not_keep2[c("ID2","keep2_fi")]
+
+names<-c("ID","KEEP")
+not_keep<-data.frame()
+colnames(not_keep1)<-names
+colnames(not_keep2)<-names
+not_keep <-rbind(not_keep1, not_keep2)
+
+
+fi<-merge(fi,not_keep,by.x="TOPMEDID",by.y="ID",all.x=T)
+
+
+fi$KEEP[is.na(fi$KEEP)] <- 1
+
+final <-subset(fi, KEEP==1)
+
+
+write.table(final,"/data4/dloesch/Duplicates/Test/removed_duplicates_fi.ped",row.names=F,col.names=T,quote=F,sep='\t')
+
+
+
+
 write.table(d,"/restricted/projectnb/glycemic/peitao/phenotype_harmonization/pooled_analysis/duplicates.txt",row.names=F,col.names=F,quote=F,sep='\t')
