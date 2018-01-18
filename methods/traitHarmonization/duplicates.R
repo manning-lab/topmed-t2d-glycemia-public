@@ -34,7 +34,8 @@ for (j in 1:nrow(d))
   
   }
 
-
+ ##remove controls
+d<-d[which(!(d$study1%in%c("CONTROL"))&!(d$study2%in%c("CONTROL"))),]
 
 for (j in 1:nrow(d))
 {
@@ -137,7 +138,7 @@ for (j in 1:nrow(d))
   else { d$keep1[j]<-NA; d$keep2[j]<-NA}
 }
 
-d<-d[which(!(d$study1%in%c("CONTROL"))&!(d$study2%in%c("CONTROL"))),]
+
 ####add phenotype
 
 p<-read.table("/restricted/projectnb/glycemic/peitao/phenotype_harmonization/pooled_analysis/Pooled_Glycemic_Traits_freeze5_duplicate_ID.ped",header=T)
