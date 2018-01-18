@@ -542,4 +542,11 @@ write.table(final,"/data4/dloesch/Duplicates/Test/removed_duplicates_fi.ped",row
 
 
 
+### for reordering so ID1 and ID2 are no longer flipped (ID2 was listed before ID1, but everything else was in the correct order). 
+
+d <- d[c("ID1", "ID2", "study1", "study2", "MZtwinID", "center1", "center2", "cr1", "cr2", "p1", "p2", "keep1", "keep2","FastingGlucose1", "FastingGlucose2","keep1_fg",
+"keep2_fg","HbA1c1","HbA1c2","keep1_a1c", "keep2_a1c","FastingInsulin1", "FastingInsulin2", "keep1_fi", "keep2_fi")]
+
+
+###for the duplicates.txt file with keep columns
 write.table(d,"/restricted/projectnb/glycemic/peitao/phenotype_harmonization/pooled_analysis/duplicates.txt",row.names=F,col.names=F,quote=F,sep='\t')
