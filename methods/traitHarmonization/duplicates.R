@@ -262,25 +262,86 @@ d<-merge(d,p2,by.x = 'ID2',by.y = 'TOPMEDID',all.x=T)
 d$keep1_a1c<-d$keep1
 d$keep2_a1c<-d$keep2
 
-for (j in 1:nrow(d)){
-  if (is.na(d$keep1[j])==T&is.na(d$keep2[j])==T) {
-    d$keep1_a1c[j]<-ifelse(is.na(d$HbA1c1[j])==F&is.na(d$HbA1c2[j])==T,1,ifelse(is.na(d$HbA1c1[j])==T&is.na(d$HbA1c2[j])==F,0,NA))
-    d$keep2_a1c[j]<-1-d$keep1_a1c[j]
-  }
-}
+#for building output file for listing removed duplicates
+missing_a1c <-c()
+keep_a1c <- c()
+cohort_ranking_a1c <-c()
+callrate_a1c <-c()
 
 for (j in 1:nrow(d)){
-  if (is.na(d$keep1[j])==T&is.na(d$keep2[j])==T) {
-    if(is.na(d$HbA1c1[j])==T&is.na(d$HbA1c2[j])==T){
-      d$keep1_a1c[j]<-0
-      d$keep2_a1c[j]<-0
-    }
-  }
+	
+		
+	if(is.na(d$HbA1c1[j])==F&is.na(d$HbA1c2[j])==F){
+			d$keep1_a1c[j]<-ifelse(is.na(d$HbA1c1[j])==F,d$keep1[j],ifelse(is.na(d$HbA1c1[j])==T,0,NA))
+			d$keep2_a1c[j]<-ifelse(is.na(d$HbA1c2[j])==F,d$keep2[j],ifelse(is.na(d$HbA1c2[j])==T,0,NA))
+		##for additional output a1cles
+			if(d$keep1[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
+				keep_a1c <- c(keep_a1c,d$ID1[j])
+				cohort_ranking_a1c <-c(cohort_ranking_a1c, as.character(d$ID2[j]))
+			}
+			else if(d$keep2[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
+				keep_a1c <- c(keep_a1c,as.character(d$ID2[j]))
+				cohort_ranking_a1c <-c(cohort_ranking_a1c, as.character(d$ID1[j]))
+			}
+			else if(d$keep1[j]==1&d$keep2[j]==1){
+				keep_a1c <- c(keep_a1c,as.character(d$ID1[j]), as.character(d$ID2[j]))
+			}
+			else if(d$keep1[j]==1&d$keep2[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
+				keep_a1c <- c(keep_a1c, as.character(d$ID1[j]))
+				callrate_a1c <-c(callrate_a1c, as.character(d$ID2[j]))
+			}
+			else if(d$keep2[j]==1&d$keep1[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
+				keep_a1c <- c(keep_a1c,as.character(d$ID2[j]))
+				callrate_a1c <-c(callrate_a1c, as.character(d$ID1[j]))
+			}
+	}
+	else if(is.na(d$HbA1c1[j])==T&is.na(d$HbA1c2[j])==F)
+	{
+		d$keep1_a1c[j]<-0
+		d$keep2_a1c[j]<-1
+		missing_a1c<-c(missing_a1c,as.character(d$ID1[j]))
+		keep_a1c<-c(keep_a1c, as.character(d$ID2[j]))
+	} 
+	else if(is.na(d$HbA1c1[j])==F&is.na(d$HbA1c2[j])==T)
+	{
+		d$keep1_a1c[j]<-1
+		d$keep2_a1c[j]<-0
+		missing_a1c<-c(missing_a1c,as.character(d$ID2[j]))
+		keep_a1c<-c(keep_a1c, as.character(d$ID1[j]))
+	}
+	else if (is.na(d$HbA1c1[j])==T&is.na(d$HbA1c2[j])==T)
+	{
+		d$keep1_a1c[j]<-0
+		d$keep2_a1c[j]<-0
+		missing_a1c<-c(missing_a1c, as.character(d$ID1[j]),as.character(d$ID2[j]))
+	}
+	else{ 
+		d$keep1_a1c[j]<-NA
+		d$keep2_a1c[j]<-NA
+	}
 }
 
-
-table(d$keep1_fg,d$keep2_fg,useNA='always')
 table(d$keep1_a1c,d$keep2_a1c,useNA='always')
+
+names <- c("ID","reason")
+
+missing_a1c.df <- data.frame(missing_a1c)
+missing_a1c.df$reason<-"missing trait data"
+colnames(missing_a1c.df) <-names
+
+cohort_ranking_a1c.df <-data.frame(cohort_ranking_a1c)
+cohort_ranking_a1c.df$reason<-"used duplicate from older study"
+colnames(cohort_ranking_a1c.df) <-names
+
+callrate_a1c.df <-data.frame(callrate_a1c)
+callrate_a1c.df$reason <-"used duplicate with higher call rate" 
+colnames(callrate_a1c.df) <-names
+
+not_keep_a1c <- rbind(missing_a1c.df,cohort_ranking_a1c.df, callrate_a1c.df)
+colnames(not_keep_a1c) <-names
+
+#for building output file for listing removed duplicates
+write.table(not_keep_a1c,"/data4/dloesch/Test/Duplicates/not_keep_a1c.txt",row.names=F,col.names=T,quote=F,sep='\t')
 
 
 
@@ -378,6 +439,9 @@ colnames(not_keep_fi) <-names
 
 #this output file lists ID and reason for removed duplicates
 write.table(not_keep_fi,"/data4/dloesch/Duplicates/Test/not_keep_fi.txt",row.names=F,col.names=T,quote=F,sep='\t')
+
+
+
 
 
 write.table(d,"/restricted/projectnb/glycemic/peitao/phenotype_harmonization/pooled_analysis/duplicates.txt",row.names=F,col.names=F,quote=F,sep='\t')
