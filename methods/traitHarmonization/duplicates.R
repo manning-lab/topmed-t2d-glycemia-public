@@ -229,27 +229,58 @@ d<-merge(d,p3,by.x = 'ID2',by.y = 'TOPMEDID',all.x=T)
 d$keep1_fi<-d$keep1
 d$keep2_fi<-d$keep2
 
+#for building output file for listing removed duplicates
+missing_fi <-c()
+keep_fi <- c()
+cohort_ranking_fi <-c()
+callrate_fi <-c()
+
 for (j in 1:nrow(d)){
 	
 		
 	if(is.na(d$FastingInsulin1[j])==F&is.na(d$FastingInsulin2[j])==F){
 			d$keep1_fi[j]<-ifelse(is.na(d$FastingInsulin1[j])==F,d$keep1[j],ifelse(is.na(d$FastingInsulin1[j])==T,0,NA))
 			d$keep2_fi[j]<-ifelse(is.na(d$FastingInsulin2[j])==F,d$keep2[j],ifelse(is.na(d$FastingInsulin2[j])==T,0,NA))
+	## for building output file listing removed duplicates
+			if(d$keep1[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
+				keep_fi <- c(keep_fi,d$ID1[j])
+				cohort_ranking_fi <-c(cohort_ranking_fi, as.character(d$ID2[j]))
+			}
+			else if(d$keep2[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
+				keep_fi <- c(keep_fi,as.character(d$ID2[j]))
+				cohort_ranking_fi <-c(cohort_ranking_fi, as.character(d$ID1[j]))
+			}
+			else if(d$keep1[j]==1&d$keep2[j]==1){
+				keep_fi <- c(keep_fi,as.character(d$ID1[j]), as.character(d$ID2[j]))
+			}
+			else if(d$keep1[j]==1&d$keep2[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
+				keep_fi <- c(keep_fi, as.character(d$ID1[j]))
+				callrate_fi <-c(callrate_fi, as.character(d$ID2[j]))
+			}
+			else if(d$keep2[j]==1&d$keep1[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
+				keep_fi <- c(keep_fi,as.character(d$ID2[j]))
+				callrate_fi <-c(callrate_fi, as.character(d$ID1[j]))
+			}
 	}
 	else if(is.na(d$FastingInsulin1[j])==T&is.na(d$FastingInsulin2[j])==F)
 	{
 		d$keep1_fi[j]<-0
 		d$keep2_fi[j]<-1
+		missing_fi<-c(missing_fi,as.character(d$ID1[j]))
+		keep_fi<-c(keep_fi, as.character(d$ID2[j]))
 	} 
 	else if(is.na(d$FastingInsulin1[j])==F&is.na(d$FastingInsulin2[j])==T)
 	{
 		d$keep1_fi[j]<-1
 		d$keep2_fi[j]<-0
+		missing_fi<-c(missing_fi,as.character(d$ID2[j]))
+		keep_fi<-c(keep_fi, as.character(d$ID1[j]))
 	}
 	else if (is.na(d$FastingInsulin1[j])==T&is.na(d$FastingInsulin2[j])==T)
 	{
 		d$keep1_fi[j]<-0
 		d$keep2_fi[j]<-0
+		missing_fi<-c(missing_fi, as.character(d$ID1[j]),as.character(d$ID2[j]))
 	}
 	else{ 
 		d$keep1_fi[j]<-NA
@@ -258,6 +289,26 @@ for (j in 1:nrow(d)){
 }
 
 table(d$keep1_fi,d$keep2_fi,useNA='always')
+
+names <- c("ID","reason")
+
+missing_fi.df <- data.frame(missing_fi)
+missing_fi.df$reason<-"missing trait data"
+colnames(missing_fi.df) <-names
+
+cohort_ranking_fi.df <-data.frame(cohort_ranking_fi)
+cohort_ranking_fi.df$reason<-"used duplicate from older study"
+colnames(cohort_ranking_fi.df) <-names
+
+callrate_fi.df <-data.frame(callrate_fi)
+callrate_fi.df$reason <-"used duplicate with higher call rate" 
+colnames(callrate_fi.df) <-names
+
+not_keep_fi <- rbind(missing_fi.df,cohort_ranking_fi.df,callrate_fi.df)
+colnames(not_keep_fi) <-names
+
+#this output file lists ID and reason for removed duplicates
+write.table(not_keep_fi,"/data4/dloesch/Duplicates/Test/not_keep_fi.txt",row.names=F,col.names=T,quote=F,sep='\t')
 
 
 write.table(d,"/restricted/projectnb/glycemic/peitao/phenotype_harmonization/pooled_analysis/duplicates.txt",row.names=F,col.names=F,quote=F,sep='\t')
