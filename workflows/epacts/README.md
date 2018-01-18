@@ -139,7 +139,7 @@ Inputs:
         images identifiers are 'ubuntu:16.04', 'quay.io/ucsc_cgl/samtools'.
 
 Outputs:
-	Output files: [out (array:file)]
+  Output files: [out (array:file)]
 ```
 
 So we need three things to run our job:
@@ -410,7 +410,6 @@ Make sure to end your session when everything is finished.
 For more information on the cloud-workstation app, see [this page](https://wiki.dnanexus.com/developer-tutorials/cloud-workstations).
 
 For information on running docker commands, see [this page](https://docs.docker.com/)
-
 
 
 
