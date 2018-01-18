@@ -145,6 +145,10 @@ p<-read.table("/restricted/projectnb/glycemic/peitao/phenotype_harmonization/poo
 
 
 ####FG
+##This adds keep column for fasting glucose and creates an output listing removed duplicates
+
+
+
 p1<-p[,c("TOPMEDID","FastingGlucose")]
 names(p1)<-c("TOPMEDID","FastingGlucose1")
 d<-merge(d,p1,by.x = 'ID1',by.y = 'TOPMEDID',all.x=T)
@@ -156,22 +160,87 @@ d<-merge(d,p1,by.x = 'ID2',by.y = 'TOPMEDID',all.x=T)
 d$keep1_fg<-d$keep1
 d$keep2_fg<-d$keep2
 
-for (j in 1:nrow(d)){
-  if (is.na(d$keep1[j])==T&is.na(d$keep2[j])==T) {
-d$keep1_fg[j]<-ifelse(is.na(d$FastingGlucose1[j])==F&is.na(d$FastingGlucose2[j])==T,1,ifelse(is.na(d$FastingGlucose1[j])==T&is.na(d$FastingGlucose2[j])==F,0,NA))
-d$keep2_fg[j]<-1-d$keep1_fg[j]
-}
-}
+missing_fg <-c()
+keep_fg <- c()
+cohort_ranking_fg <-c()
+callrate_fg <-c()
 
 for (j in 1:nrow(d)){
-  if (is.na(d$keep1[j])==T&is.na(d$keep2[j])==T) {
-    if(is.na(d$FastingGlucose1[j])==T&is.na(d$FastingGlucose2[j])==T){
-      d$keep1_fg[j]<-0
-      d$keep2_fg[j]<-0
-    }
-  }
+	
+		
+	if(is.na(d$FastingGlucose1[j])==F&is.na(d$FastingGlucose2[j])==F){
+			d$keep1_fg[j]<-ifelse(is.na(d$FastingGlucose1[j])==F,d$keep1[j],ifelse(is.na(d$FastingGlucose1[j])==T,0,NA))
+			d$keep2_fg[j]<-ifelse(is.na(d$FastingGlucose2[j])==F,d$keep2[j],ifelse(is.na(d$FastingGlucose2[j])==T,0,NA))
+		##for additional output fgles
+			if(d$keep1[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
+				keep_fg <- c(keep_fg,d$ID1[j])
+				cohort_ranking_fg <-c(cohort_ranking_fg, as.character(d$ID2[j]))
+			}
+			else if(d$keep2[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
+				keep_fg <- c(keep_fg,as.character(d$ID2[j]))
+				cohort_ranking_fg <-c(cohort_ranking_fg, as.character(d$ID1[j]))
+			}
+			else if(d$keep1[j]==1&d$keep2[j]==1){
+				keep_fg <- c(keep_fg,as.character(d$ID1[j]), as.character(d$ID2[j]))
+			}
+			else if(d$keep1[j]==1&d$keep2[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
+				keep_fg <- c(keep_fg, as.character(d$ID1[j]))
+				callrate_fg <-c(callrate_fg, as.character(d$ID2[j]))
+			}
+			else if(d$keep2[j]==1&d$keep1[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
+				keep_fg <- c(keep_fg,as.character(d$ID2[j]))
+				callrate_fg <-c(callrate_fg, as.character(d$ID1[j]))
+			}
+	}
+	else if(is.na(d$FastingGlucose1[j])==T&is.na(d$FastingGlucose2[j])==F)
+	{
+		d$keep1_fg[j]<-0
+		d$keep2_fg[j]<-1
+		missing_fg<-c(missing_fg,as.character(d$ID1[j]))
+		keep_fg<-c(keep_fg, as.character(d$ID2[j]))
+	} 
+	else if(is.na(d$FastingGlucose1[j])==F&is.na(d$FastingGlucose2[j])==T)
+	{
+		d$keep1_fg[j]<-1
+		d$keep2_fg[j]<-0
+		missing_fg<-c(missing_fg,as.character(d$ID2[j]))
+		keep_fg<-c(keep_fg, as.character(d$ID1[j]))
+	}
+	else if (is.na(d$FastingGlucose1[j])==T&is.na(d$FastingGlucose2[j])==T)
+	{
+		d$keep1_fg[j]<-0
+		d$keep2_fg[j]<-0
+		missing_fg<-c(missing_fg, as.character(d$ID1[j]),as.character(d$ID2[j]))
+	}
+	else{ 
+		d$keep1_fg[j]<-NA
+		d$keep2_fg[j]<-NA
+	}
 }
-#d_fg<-d[which(is.na(d$keep1)==T&is.na(d$keep2)==T),]
+
+table(d$keep1_fg,d$keep2_fg,useNA='always')
+
+
+names <- c("ID","reason")
+
+missing_fg.df <- data.frame(missing_fg)
+missing_fg.df$reason<-"missing trait data"
+colnames(missing_fg.df) <-names
+
+cohort_ranking_fg.df <-data.frame(cohort_ranking_fg)
+cohort_ranking_fg.df$reason<-"used duplicate from older study"
+colnames(cohort_ranking_fg.df) <-names
+
+callrate_fg.df <-data.frame(callrate_fg)
+callrate_fg.df$reason <-"used duplicate with higher call rate" 
+colnames(callrate_fg.df) <-names
+
+not_keep_fg <- rbind(missing_fg.df,cohort_ranking_fg.df, callrate_fg.df)
+colnames(not_keep_fg) <-names
+
+
+
+write.table(not_keep_fg,"/data4/dloesch/Duplicates/Test/not_keep_fg.txt",row.names=F,col.names=T,quote=F,sep='\t')
 
 
 
