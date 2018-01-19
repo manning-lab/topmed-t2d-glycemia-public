@@ -13,15 +13,15 @@ Inputs:
 
 Algorithm
 - Within Study
- - Keep monozygotic twins
- - If duplicates are at different sequencing centers, choose NWD by sequencing center for cohort
- - Choose duplicate with highest sequencing call rate
+  - Keep monozygotic twins
+  - If duplicates are at different sequencing centers, choose NWD by sequencing center for cohort
+  - Choose duplicate with highest sequencing call rate
 - Across Studies
- - Remove missing trait data, and identify remaining duplicates
- - Choose duplicates according to cohort type:
- - Population cohort > ascertained cohort
- - Choose duplicate from cohort with longest follow-up period (# years follow-up for entire cohort;  not by individual)
- - If there are any remaining duplicates, add a rule to the algorithm
+  - Remove missing trait data, and identify remaining duplicates
+  - Choose duplicates according to cohort type:
+  - Population cohort > ascertained cohort
+  - Choose duplicate from cohort with longest follow-up period (# years follow-up for entire cohort;  not by individual)
+  - If there are any remaining duplicates, add a rule to the algorithm
 
 iii)     Remove intentional duplicates
 
