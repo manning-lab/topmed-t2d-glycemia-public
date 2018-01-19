@@ -51,41 +51,41 @@ for (j in 1:nrow(d))
        d$keep2[j]<-1-d$keep1[j]
      }###Choose duplicate with highest sequencing call rate
   }
- 
+
   #else {d$keep1[j]<-NA;d$keep2[j]<-NA} 
-  #ARIC>     DHS, GOLDN, GENOA, HyperGEN, Mayo_VTE
+  #ARIC>     DHS, GOLDN, GENOA, HyperGEN, Mayo_VTE
    else if ((as.character(d$study1[j])=='ARIC'&as.character(d$study2[j])%in%c("DHS","GOLDN","GENOA","HyperGEN","Mayo_VTE"))|
             (as.character(d$study2[j])=='ARIC'&as.character(d$study1[j])%in%c("DHS","GOLDN","GENOA","HyperGEN","Mayo_VTE")))
    {
      d$keep1[j]<-ifelse(as.character(d$study1[j])=='ARIC',1,0)
      d$keep2[j]<-1-d$keep1[j]
-   }#FHS>       COPDGene, MGH_AF, WHI
+   }#FHS>       COPDGene, MGH_AF, WHI
     else if ((as.character(d$study1[j])=='FHS'&as.character(d$study2[j])%in%c("COPDGene","MGH_AF","WHI"))|
              (as.character(d$study2[j])=='FHS'&as.character(d$study1[j])%in%c("COPDGene","MGH_AF","WHI")))
     {
       d$keep1[j]<-ifelse(as.character(d$study1[j])=='FHS',1,0)
       d$keep2[j]<-1-d$keep1[j]
-    }#GeneSTAR>          COPDGene
+    }#GeneSTAR>          COPDGene
    else if ((as.character(d$study1[j])=='GeneSTAR'&as.character(d$study2[j])%in%c("COPDGene"))|
             (as.character(d$study2[j])=='GeneSTAR'&as.character(d$study1[j])%in%c("COPDGene")))
    {
      d$keep1[j]<-ifelse(as.character(d$study1[j])=='GeneSTAR',1,0)
      d$keep2[j]<-1-d$keep1[j]
-   }#HyperGEN>          COPDGene
+   }#HyperGEN>          COPDGene
   else if ((as.character(d$study1[j])=='HyperGEN'&as.character(d$study2[j])%in%c("COPDGene"))|
            (as.character(d$study2[j])=='HyperGEN'&as.character(d$study1[j])%in%c("COPDGene")))
   {
     d$keep1[j]<-ifelse(as.character(d$study1[j])=='HyperGEN',1,0)
     d$keep2[j]<-1-d$keep1[j]
   }
-  ##JHS>       GENOA
+  ##JHS>       GENOA
    else if ((as.character(d$study1[j])=='JHS'&as.character(d$study2[j])%in%c("GENOA"))|
             (as.character(d$study2[j])=='JHS'&as.character(d$study1[j])%in%c("GENOA")))
    {
      d$keep1[j]<-ifelse(as.character(d$study1[j])=='JHS',1,0)
      d$keep2[j]<-1-d$keep1[j]
    }
-  ##MESA>   COPDGene, DHS, GENOA, HyperGEN
+  ##MESA>   COPDGene, DHS, GENOA, HyperGEN
   else if ((as.character(d$study1[j])=='MESA'&as.character(d$study2[j])%in%c("COPDGene", "DHS", "GENOA", "HyperGEN"))|
            (as.character(d$study2[j])=='MESA'&as.character(d$study1[j])%in%c("COPDGene", "DHS", "GENOA", "HyperGEN")))
   {
@@ -99,6 +99,7 @@ for (j in 1:nrow(d))
     d$keep1[j]<-ifelse(as.character(d$study1[j])=='VU_AF',1,0)
     d$keep2[j]<-1-d$keep1[j]
   }
+
    ###WHI>     COPDGene, HyperGEN, Mayo_VTE, MESA ######Added in MESA######
   else if ((as.character(d$study1[j])=='WHI'&as.character(d$study2[j])%in%c("COPDGene", "HyperGEN", "Mayo_VTE", "MESA"))|
            (as.character(d$study2[j])=='WHI'&as.character(d$study1[j])%in%c("COPDGene", "HyperGEN", "Mayo_VTE", "MESA")))
