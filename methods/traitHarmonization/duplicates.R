@@ -161,10 +161,7 @@ d<-merge(d,p1,by.x = 'ID2',by.y = 'TOPMEDID',all.x=T)
 d$keep1_fg<-d$keep1
 d$keep2_fg<-d$keep2
 
-missing_fg <-c()
-keep_fg <- c()
-cohort_ranking_fg <-c()
-callrate_fg <-c()
+d$reason_fg <- NA
 
 for (j in 1:nrow(d)){
 	
@@ -172,46 +169,40 @@ for (j in 1:nrow(d)){
 	if(is.na(d$FastingGlucose1[j])==F&is.na(d$FastingGlucose2[j])==F){
 			d$keep1_fg[j]<-ifelse(is.na(d$FastingGlucose1[j])==F,d$keep1[j],ifelse(is.na(d$FastingGlucose1[j])==T,0,NA))
 			d$keep2_fg[j]<-ifelse(is.na(d$FastingGlucose2[j])==F,d$keep2[j],ifelse(is.na(d$FastingGlucose2[j])==T,0,NA))
-		##for additional output fgles
+		##for additional output files
 			if(d$keep1[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
-				keep_fg <- c(keep_fg,d$ID1[j])
-				cohort_ranking_fg <-c(cohort_ranking_fg, as.character(d$ID2[j]))
+				d$reason_fg[j] <- "used duplicate from older study"
 			}
 			else if(d$keep2[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
-				keep_fg <- c(keep_fg,as.character(d$ID2[j]))
-				cohort_ranking_fg <-c(cohort_ranking_fg, as.character(d$ID1[j]))
+				d$reason_fg[j] <- "used duplicate from older study"
 			}
 			else if(d$keep1[j]==1&d$keep2[j]==1){
-				keep_fg <- c(keep_fg,as.character(d$ID1[j]), as.character(d$ID2[j]))
+				d$reason_fg[j] <- "kept both; monozygotic twins" 
 			}
 			else if(d$keep1[j]==1&d$keep2[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
-				keep_fg <- c(keep_fg, as.character(d$ID1[j]))
-				callrate_fg <-c(callrate_fg, as.character(d$ID2[j]))
+				d$reason_fg[j] <- "kept duplicate with higher callrate"
 			}
 			else if(d$keep2[j]==1&d$keep1[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
-				keep_fg <- c(keep_fg,as.character(d$ID2[j]))
-				callrate_fg <-c(callrate_fg, as.character(d$ID1[j]))
+				d$reason_fg[j] <- "kept duplicate with higher callrate"
 			}
 	}
 	else if(is.na(d$FastingGlucose1[j])==T&is.na(d$FastingGlucose2[j])==F)
 	{
 		d$keep1_fg[j]<-0
 		d$keep2_fg[j]<-1
-		missing_fg<-c(missing_fg,as.character(d$ID1[j]))
-		keep_fg<-c(keep_fg, as.character(d$ID2[j]))
+		d$reason_fg[j] <- "missing trait data"
 	} 
 	else if(is.na(d$FastingGlucose1[j])==F&is.na(d$FastingGlucose2[j])==T)
 	{
 		d$keep1_fg[j]<-1
 		d$keep2_fg[j]<-0
-		missing_fg<-c(missing_fg,as.character(d$ID2[j]))
-		keep_fg<-c(keep_fg, as.character(d$ID1[j]))
+		d$reason_fg[j] <- "missing trait data"
 	}
 	else if (is.na(d$FastingGlucose1[j])==T&is.na(d$FastingGlucose2[j])==T)
 	{
 		d$keep1_fg[j]<-0
 		d$keep2_fg[j]<-0
-		missing_fg<-c(missing_fg, as.character(d$ID1[j]),as.character(d$ID2[j]))
+		d$reason_fg[j] <- "missing trait data"
 	}
 	else{ 
 		d$keep1_fg[j]<-NA
@@ -220,31 +211,6 @@ for (j in 1:nrow(d)){
 }
 
 table(d$keep1_fg,d$keep2_fg,useNA='always')
-
-
-names <- c("ID","reason")
-
-missing_fg.df <- data.frame(missing_fg)
-missing_fg.df$reason<-"missing trait data"
-colnames(missing_fg.df) <-names
-
-cohort_ranking_fg.df <-data.frame(cohort_ranking_fg)
-cohort_ranking_fg.df$reason<-"used duplicate from older study"
-colnames(cohort_ranking_fg.df) <-names
-
-callrate_fg.df <-data.frame(callrate_fg)
-callrate_fg.df$reason <-"used duplicate with higher call rate" 
-colnames(callrate_fg.df) <-names
-
-not_keep_fg <- rbind(missing_fg.df,cohort_ranking_fg.df, callrate_fg.df)
-colnames(not_keep_fg) <-names
-
-
-
-write.table(not_keep_fg,"/data4/dloesch/Duplicates/Test/not_keep_fg.txt",row.names=F,col.names=T,quote=F,sep='\t')
-
-
-
 
 
 
@@ -263,11 +229,7 @@ d<-merge(d,p2,by.x = 'ID2',by.y = 'TOPMEDID',all.x=T)
 d$keep1_a1c<-d$keep1
 d$keep2_a1c<-d$keep2
 
-#for building output file for listing removed duplicates
-missing_a1c <-c()
-keep_a1c <- c()
-cohort_ranking_a1c <-c()
-callrate_a1c <-c()
+d$reason_a1c <- NA
 
 for (j in 1:nrow(d)){
 	
@@ -275,46 +237,40 @@ for (j in 1:nrow(d)){
 	if(is.na(d$HbA1c1[j])==F&is.na(d$HbA1c2[j])==F){
 			d$keep1_a1c[j]<-ifelse(is.na(d$HbA1c1[j])==F,d$keep1[j],ifelse(is.na(d$HbA1c1[j])==T,0,NA))
 			d$keep2_a1c[j]<-ifelse(is.na(d$HbA1c2[j])==F,d$keep2[j],ifelse(is.na(d$HbA1c2[j])==T,0,NA))
-		##for additional output a1cles
+		##for additional output files
 			if(d$keep1[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
-				keep_a1c <- c(keep_a1c,d$ID1[j])
-				cohort_ranking_a1c <-c(cohort_ranking_a1c, as.character(d$ID2[j]))
+				d$reason_a1c[j] <- "used duplicate from older study"
 			}
 			else if(d$keep2[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
-				keep_a1c <- c(keep_a1c,as.character(d$ID2[j]))
-				cohort_ranking_a1c <-c(cohort_ranking_a1c, as.character(d$ID1[j]))
+				d$reason_a1c[j] <- "used duplicate from older study"
 			}
 			else if(d$keep1[j]==1&d$keep2[j]==1){
-				keep_a1c <- c(keep_a1c,as.character(d$ID1[j]), as.character(d$ID2[j]))
+				d$reason_a1c[j] <- "kept both; monozygotic twins" 
 			}
 			else if(d$keep1[j]==1&d$keep2[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
-				keep_a1c <- c(keep_a1c, as.character(d$ID1[j]))
-				callrate_a1c <-c(callrate_a1c, as.character(d$ID2[j]))
+				d$reason_a1c[j] <- "kept duplicate with higher callrate"
 			}
 			else if(d$keep2[j]==1&d$keep1[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
-				keep_a1c <- c(keep_a1c,as.character(d$ID2[j]))
-				callrate_a1c <-c(callrate_a1c, as.character(d$ID1[j]))
+				d$reason_a1c[j] <- "kept duplicate with higher callrate"
 			}
 	}
 	else if(is.na(d$HbA1c1[j])==T&is.na(d$HbA1c2[j])==F)
 	{
 		d$keep1_a1c[j]<-0
 		d$keep2_a1c[j]<-1
-		missing_a1c<-c(missing_a1c,as.character(d$ID1[j]))
-		keep_a1c<-c(keep_a1c, as.character(d$ID2[j]))
+		d$reason_a1c[j] <- "missing trait data"
 	} 
 	else if(is.na(d$HbA1c1[j])==F&is.na(d$HbA1c2[j])==T)
 	{
 		d$keep1_a1c[j]<-1
 		d$keep2_a1c[j]<-0
-		missing_a1c<-c(missing_a1c,as.character(d$ID2[j]))
-		keep_a1c<-c(keep_a1c, as.character(d$ID1[j]))
+		d$reason_a1c[j] <- "missing trait data"
 	}
 	else if (is.na(d$HbA1c1[j])==T&is.na(d$HbA1c2[j])==T)
 	{
 		d$keep1_a1c[j]<-0
 		d$keep2_a1c[j]<-0
-		missing_a1c<-c(missing_a1c, as.character(d$ID1[j]),as.character(d$ID2[j]))
+		d$reason_a1c[j] <- "missing trait data"
 	}
 	else{ 
 		d$keep1_a1c[j]<-NA
@@ -323,29 +279,6 @@ for (j in 1:nrow(d)){
 }
 
 table(d$keep1_a1c,d$keep2_a1c,useNA='always')
-
-names <- c("ID","reason")
-
-missing_a1c.df <- data.frame(missing_a1c)
-missing_a1c.df$reason<-"missing trait data"
-colnames(missing_a1c.df) <-names
-
-cohort_ranking_a1c.df <-data.frame(cohort_ranking_a1c)
-cohort_ranking_a1c.df$reason<-"used duplicate from older study"
-colnames(cohort_ranking_a1c.df) <-names
-
-callrate_a1c.df <-data.frame(callrate_a1c)
-callrate_a1c.df$reason <-"used duplicate with higher call rate" 
-colnames(callrate_a1c.df) <-names
-
-not_keep_a1c <- rbind(missing_a1c.df,cohort_ranking_a1c.df, callrate_a1c.df)
-colnames(not_keep_a1c) <-names
-
-#for building output file for listing removed duplicates
-write.table(not_keep_a1c,"/data4/dloesch/Test/Duplicates/not_keep_a1c.txt",row.names=F,col.names=T,quote=F,sep='\t')
-
-
-
 
 
 ####Insulin
@@ -360,11 +293,7 @@ d<-merge(d,p3,by.x = 'ID2',by.y = 'TOPMEDID',all.x=T)
 d$keep1_fi<-d$keep1
 d$keep2_fi<-d$keep2
 
-#for building output file for listing removed duplicates
-missing_fi <-c()
-keep_fi <- c()
-cohort_ranking_fi <-c()
-callrate_fi <-c()
+d$reason_fi <- NA
 
 for (j in 1:nrow(d)){
 	
@@ -372,46 +301,40 @@ for (j in 1:nrow(d)){
 	if(is.na(d$FastingInsulin1[j])==F&is.na(d$FastingInsulin2[j])==F){
 			d$keep1_fi[j]<-ifelse(is.na(d$FastingInsulin1[j])==F,d$keep1[j],ifelse(is.na(d$FastingInsulin1[j])==T,0,NA))
 			d$keep2_fi[j]<-ifelse(is.na(d$FastingInsulin2[j])==F,d$keep2[j],ifelse(is.na(d$FastingInsulin2[j])==T,0,NA))
-	## for building output file listing removed duplicates
+		##for additional output files
 			if(d$keep1[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
-				keep_fi <- c(keep_fi,d$ID1[j])
-				cohort_ranking_fi <-c(cohort_ranking_fi, as.character(d$ID2[j]))
+				d$reason_fi[j] <- "used duplicate from older study"
 			}
 			else if(d$keep2[j]==1&as.character(d$study1[j])!=as.character(d$study2[j])){
-				keep_fi <- c(keep_fi,as.character(d$ID2[j]))
-				cohort_ranking_fi <-c(cohort_ranking_fi, as.character(d$ID1[j]))
+				d$reason_fi[j] <- "used duplicate from older study"
 			}
 			else if(d$keep1[j]==1&d$keep2[j]==1){
-				keep_fi <- c(keep_fi,as.character(d$ID1[j]), as.character(d$ID2[j]))
+				d$reason_fi[j] <- "kept both; monozygotic twins" 
 			}
 			else if(d$keep1[j]==1&d$keep2[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
-				keep_fi <- c(keep_fi, as.character(d$ID1[j]))
-				callrate_fi <-c(callrate_fi, as.character(d$ID2[j]))
+				d$reason_fi[j] <- "kept duplicate with higher callrate"
 			}
 			else if(d$keep2[j]==1&d$keep1[j]==0&as.character(d$study1[j])==as.character(d$study2[j])){
-				keep_fi <- c(keep_fi,as.character(d$ID2[j]))
-				callrate_fi <-c(callrate_fi, as.character(d$ID1[j]))
+				d$reason_fi[j] <- "kept duplicate with higher callrate"
 			}
 	}
 	else if(is.na(d$FastingInsulin1[j])==T&is.na(d$FastingInsulin2[j])==F)
 	{
 		d$keep1_fi[j]<-0
 		d$keep2_fi[j]<-1
-		missing_fi<-c(missing_fi,as.character(d$ID1[j]))
-		keep_fi<-c(keep_fi, as.character(d$ID2[j]))
+		d$reason_fi[j] <- "missing trait data"
 	} 
 	else if(is.na(d$FastingInsulin1[j])==F&is.na(d$FastingInsulin2[j])==T)
 	{
 		d$keep1_fi[j]<-1
 		d$keep2_fi[j]<-0
-		missing_fi<-c(missing_fi,as.character(d$ID2[j]))
-		keep_fi<-c(keep_fi, as.character(d$ID1[j]))
+		d$reason_fi[j] <- "missing trait data"
 	}
 	else if (is.na(d$FastingInsulin1[j])==T&is.na(d$FastingInsulin2[j])==T)
 	{
 		d$keep1_fi[j]<-0
 		d$keep2_fi[j]<-0
-		missing_fi<-c(missing_fi, as.character(d$ID1[j]),as.character(d$ID2[j]))
+		d$reason_fi[j] <- "missing trait data"
 	}
 	else{ 
 		d$keep1_fi[j]<-NA
@@ -421,62 +344,33 @@ for (j in 1:nrow(d)){
 
 table(d$keep1_fi,d$keep2_fi,useNA='always')
 
-names <- c("ID","reason")
-
-missing_fi.df <- data.frame(missing_fi)
-missing_fi.df$reason<-"missing trait data"
-colnames(missing_fi.df) <-names
-
-cohort_ranking_fi.df <-data.frame(cohort_ranking_fi)
-cohort_ranking_fi.df$reason<-"used duplicate from older study"
-colnames(cohort_ranking_fi.df) <-names
-
-callrate_fi.df <-data.frame(callrate_fi)
-callrate_fi.df$reason <-"used duplicate with higher call rate" 
-colnames(callrate_fi.df) <-names
-
-not_keep_fi <- rbind(missing_fi.df,cohort_ranking_fi.df,callrate_fi.df)
-colnames(not_keep_fi) <-names
-
-#this output file lists ID and reason for removed duplicates
-write.table(not_keep_fi,"/data4/dloesch/Duplicates/Test/not_keep_fi.txt",row.names=F,col.names=T,quote=F,sep='\t')
-
-
-
 #### for subsetting phenotype data for fasting glucose (and removing duplicates)
-
-
-fg <- subset(p, (!is.na(p$FastingGlucose)))
-
 
 not_keep1<-subset(d, keep1_fg==0)
 not_keep1<-not_keep1[c("ID1","keep1_fg")]
 
-
 not_keep2<-subset(d, keep2_fg==0)
 not_keep2<-not_keep2[c("ID2","keep2_fg")]
 
-names<-c("ID","KEEP")
+names<-c("ID","KEEP_fg")
 not_keep<-data.frame()
 colnames(not_keep1)<-names
 colnames(not_keep2)<-names
 not_keep <-rbind(not_keep1, not_keep2)
 
 
-fg<-merge(fg,not_keep,by.x="TOPMEDID",by.y="ID",all.x=T)
+p<-merge(p,not_keep,by.x="TOPMEDID",by.y="ID",all.x=T)
+
+p$KEEP_fg[is.na(p$KEEP_fg)&is.na(p$FastingGlucose)] <- 0
+p$KEEP_fg[is.na(p$KEEP_fg)&!is.na(p$FastingGlucose)] <- 1
+
+fg <- subset(p, (!is.na(p$FastingGlucose)))
+fg <-subset(fg, KEEP_fg==1)
 
 
-fg$KEEP[is.na(fg$KEEP)] <- 1
-
-fg <-subset(fg, KEEP==1)
-
-
-write.table(fg,"/data4/dloesch/Duplicates/Test/removed_duplicates_fg.ped",row.names=F,col.names=T,quote=F,sep='\t')
+write.table(fg,"/data4/dloesch/Duplicates/Test2/removed_duplicates_fg.ped",row.names=F,col.names=T,quote=F,sep='\t')
 
 ### for subsetting phenotype data for HbA1c (and removing duplicates)
-
-HbA1c <- subset(p, (!is.na(p$HbA1c)))
-
 
 not_keep1<-subset(d, keep1_a1c==0)
 not_keep1<-not_keep1[c("ID1","keep1_a1c")]
@@ -485,62 +379,103 @@ not_keep1<-not_keep1[c("ID1","keep1_a1c")]
 not_keep2<-subset(d, keep2_a1c==0)
 not_keep2<-not_keep2[c("ID2","keep2_a1c")]
 
-names<-c("ID","KEEP")
+names<-c("ID","KEEP_a1c")
 not_keep<-data.frame()
 colnames(not_keep1)<-names
 colnames(not_keep2)<-names
 not_keep <-rbind(not_keep1, not_keep2)
 
 
-HbA1c<-merge(HbA1c,not_keep,by.x="TOPMEDID",by.y="ID",all.x=T)
+p<-merge(p,not_keep,by.x="TOPMEDID",by.y="ID",all.x=T)
+
+p$KEEP_a1c[is.na(p$KEEP_a1c)&is.na(p$HbA1c)] <- 0
+p$KEEP_a1c[is.na(p$KEEP_a1c)&!is.na(p$HbA1c)] <- 1
+
+HbA1c <- subset(p, (!is.na(p$HbA1c)))
+HbA1c <-subset(HbA1c, KEEP_a1c==1)
 
 
-HbA1c$KEEP[is.na(HbA1c$KEEP)] <- 1
-
-HbA1c <-subset(HbA1c, KEEP==1)
-
-
-write.table(HbA1c,"/data4/dloesch/Duplicates/Test/removed_duplicates_HbA1c.ped",row.names=F,col.names=T,quote=F,sep='\t')
-
+write.table(HbA1c,"/data4/dloesch/Duplicates/Test2/removed_duplicates_HbA1c5.ped",row.names=F,col.names=T,quote=F,sep='\t')
 
 
 ####to subset for fasting insulin and to remove duplicates from phenotype file 
 
-fi <- subset(p, (!is.na(p$FastingInsulin)))
-
-
 not_keep1<-subset(d, keep1_fi==0)
 not_keep1<-not_keep1[c("ID1","keep1_fi")]
-
 
 not_keep2<-subset(d, keep2_fi==0)
 not_keep2<-not_keep2[c("ID2","keep2_fi")]
 
-names<-c("ID","KEEP")
+names<-c("ID","KEEP_fi")
 not_keep<-data.frame()
 colnames(not_keep1)<-names
 colnames(not_keep2)<-names
 not_keep <-rbind(not_keep1, not_keep2)
 
 
-fi<-merge(fi,not_keep,by.x="TOPMEDID",by.y="ID",all.x=T)
+p<-merge(p,not_keep,by.x="TOPMEDID",by.y="ID",all.x=T)
+
+p$KEEP_fi[is.na(p$KEEP_fi)&is.na(p$FastingInsulin)] <- 0
+p$KEEP_fi[is.na(p$KEEP_fi)&!is.na(p$FastingInsulin)] <- 1
+
+fi <- subset(p, (!is.na(p$FastingInsulin)))
+fi <-subset(fi, KEEP_fi==1)
+
+write.table(fi,"/data4/dloesch/Duplicates/Test2/removed_duplicates_fi.ped",row.names=F,col.names=T,quote=F,sep='\t')
 
 
-fi$KEEP[is.na(fi$KEEP)] <- 1
+## for pooled phenotypes file with additional columns (for inspection purposes)
 
-fi <-subset(fi, KEEP==1)
-
-
-write.table(fi,"/data4/dloesch/Duplicates/Test/removed_duplicates_fi.ped",row.names=F,col.names=T,quote=F,sep='\t')
-
-
-
-
-### for reordering so ID1 and ID2 are no longer flipped (ID2 was listed before ID1, but everything else was in the correct order). 
-
-d <- d[c("ID1", "ID2", "study1", "study2", "MZtwinID", "center1", "center2", "cr1", "cr2", "p1", "p2", "keep1", "keep2","FastingGlucose1", "FastingGlucose2","keep1_fg",
-"keep2_fg","HbA1c1","HbA1c2","keep1_a1c", "keep2_a1c","FastingInsulin1", "FastingInsulin2", "keep1_fi", "keep2_fi")]
-
+write.table(p,"/data4/dloesch/Duplicates/Test2/pooled_phenotypes_all.ped",row.names=F,col.names=T,quote=F,sep='\t')
 
 ###for the duplicates.txt file with keep columns
+
+d <- d[c("ID1", "ID2", "study1", "study2", "MZtwinID", "center1", "center2", "cr1", "cr2", "p1", "p2", "keep1", "keep2","FastingGlucose1", "FastingGlucose2","keep1_fg",
+"keep2_fg", "reason_fg","HbA1c1","HbA1c2","keep1_a1c", "keep2_a1c", "reason_a1c", "FastingInsulin1", "FastingInsulin2", "keep1_fi", "keep2_fi", "reason_fi")]
+### for reordering ID1 and ID2. Used column names for clarity but can use column numbers for simplicity. Have to change this for any additional trait
+
+
 write.table(d,"/restricted/projectnb/glycemic/peitao/phenotype_harmonization/pooled_analysis/duplicates.txt",row.names=F,col.names=F,quote=F,sep='\t')
+
+#### for lists of duplicates that were removed
+
+names <- c("ID", "reason")
+
+## for fasting insulin
+removed1_fi <- subset(d, keep1_fi==0)
+removed1_fi <- removed1_fi[c("ID1", "reason_fi")]
+colnames(removed1_fi) <- names
+
+removed2_fi <-subset(d, keep2_fi==0)
+removed2_fi <- removed2_fi[c("ID2", "reason_fi")]
+colnames(removed2_fi) <- names
+
+removed_fi <- rbind(removed1_fi, removed2_fi)
+
+write.table(removed_fi, "/data4/dloesch/Duplicates/Test2/removed_fi.txt", row.names=F, col.names=T, quote=F, sep='\t')
+
+## for fasting glucose
+removed1_fg <- subset(d, keep1_fg==0)
+removed1_fg <- removed1_fg[c("ID1", "reason_fg")]
+colnames(removed1_fg) <- names
+
+removed2_fg <-subset(d, keep2_fg==0)
+removed2_fg <- removed2_fg[c("ID2", "reason_fg")]
+colnames(removed2_fg) <- names
+
+removed_fg <- rbind(removed1_fg, removed2_fg)
+
+write.table(removed_fg, "/data4/dloesch/Duplicates/Test2/removed_fg.txt", row.names=F, col.names=T, quote=F, sep='\t')
+
+## for HbA1c
+removed1_a1c <- subset(d, keep1_a1c==0)
+removed1_a1c <- removed1_a1c[c("ID1", "reason_a1c")]
+colnames(removed1_a1c) <- names
+
+removed2_a1c <-subset(d, keep2_a1c==0)
+removed2_a1c <- removed2_a1c[c("ID2", "reason_a1c")]
+colnames(removed2_a1c) <- names
+
+removed_a1c <- rbind(removed1_a1c, removed2_a1c)
+
+write.table(removed_a1c, "/data4/dloesch/Duplicates/Test2/removed_a1c.txt", row.names=F, col.names=T, quote=F, sep='\t')
