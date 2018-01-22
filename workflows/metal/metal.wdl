@@ -1,5 +1,5 @@
 task makeScript {
-	Array[String] result_files
+	Array[File] result_files
 	String marker_column
 	String weight_column
 	String allele_effect_column
@@ -16,10 +16,6 @@ task makeScript {
 		echo "ALLELE ${allele_effect_column} ${allele_non_effect_column}" >> ${out_file}
 		echo "FREQ ${freq_column}" >> ${out_file}
 		echo "PVAL ${pval_column}" >> ${out_file}
-		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> ${out_file}
-		echo "OUTFILE ${out_pref} .TBL" >> ${out_file}
-		echo "" >> ${out_file}
-		echo "ANALYZE" >> ${out_file}
 	}
 
 	runtime {
@@ -40,6 +36,10 @@ task runMetal {
 	Int disk
 
 	command {
+		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> ${script}
+		echo "OUTFILE ${out_pref} .TBL" >> ${script}
+		echo "" >> ${script}
+		echo "ANALYZE" >> ${script}
 		metal ${script}
 	}
 
