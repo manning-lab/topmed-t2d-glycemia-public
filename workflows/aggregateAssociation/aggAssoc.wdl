@@ -1,7 +1,7 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/aggregateAssociation.R"
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/dev/workflows/aggregateAssociation/aggregateSummary.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/agg_assoc/workflows/aggregateAssociation/aggregateAssociation.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/agg_assoc/workflows/aggregateAssociation/aggregateSummary.R"
 	}
 
 	runtime {
@@ -15,20 +15,22 @@ task getScript {
 }
 
 task aggAssocTest {
-	File gds
+	File gds_file
+	File null_file
+	File group_file
 	String label
-	String test
-	String pval
-	File groups
-	File model_file
+	String? test
+	String? pval
+	String? weights
 	
-	File assocTestScript
+	
+	File script
 
-	Int? memory = 10
-	Int? disk = 50
+	Int memory
+	Int disk
 
 	command {
-		R --vanilla --args ${gds} ${label} ${test} ${pval} ${groups} ${model_file} < ${assocTestScript} 
+		R --vanilla --args ${gds_file} ${null_file} ${group_file} ${label} ${default="SKAT" test} ${default="kuonen" pval} ${default="1,25" weights} < ${script} 
 	}
 
 	meta {
@@ -74,25 +76,29 @@ task summary {
 }
 
 workflow group_assoc_wf {
-	Array[Pair[File,File]] these_gds_groups
-	File this_model
+	Array[File] these_gds_files
+	File this_null_file
+	Array[File] these_group_files
 	String this_label
 	String this_test
 	String this_pval
-	Int? this_memory
-	Int? this_disk
+	String this_weights
+	Int this_memory
+	Int this_disk
 	
+	Array[Pair[File,File]] these_gds_groups = zip(these_gds_files, these_group_files)
+
 	call getScript
 
-	scatter(this_gds in these_gds_groups) {
+	scatter(this_gds_group in these_gds_groups) {
 		
 		call aggAssocTest {
-			input: gds = this_gds.left, groups = this_gds.right, model_file = this_model, label=this_label, test = this_test, pval = this_pval, memory = this_memory, disk = this_disk, assocTestScript = getScript.assoc_script
+			input: gds_file = this_gds_group.left, null_file = this_null_file, groups = this_gds_group.right, label=this_label, test = this_test, pval = this_pval, weights = this_weights, memory = this_memory, disk = this_disk, script = getScript.assoc_script
 		}
 	}
 
 	call summary {
-		input: assoc = aggAssocTest.assoc, label=this_label, memory = this_memory, disk=this_disk, summaryScript = getScript.summary_script
+		input: assoc = aggAssocTest.assoc, label=this_label, memory = this_memory, disk = this_disk, summaryScript = getScript.summary_script
 	}
 
 }
