@@ -7,6 +7,7 @@ task makeScript {
 	String freq_column
 	String pval_column
 	String out_pref
+	String? separator
 	String out_file
 
 	command {
