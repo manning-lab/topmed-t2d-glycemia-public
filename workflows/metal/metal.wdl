@@ -16,6 +16,10 @@ task makeScript {
 		echo "ALLELE ${allele_effect_column} ${allele_non_effect_column}" >> ${out_file}
 		echo "FREQ ${freq_column}" >> ${out_file}
 		echo "PVAL ${pval_column}" >> ${out_file}
+		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> ${out_file}
+		echo "OUTFILE ${out_pref} .TBL" >> ${out_file}
+		echo "SEPARATOR ${default= "COMMA" separator}" >> ${out_file}
+		echo "ANALYZE" >> ${out_file}
 	}
 
 	runtime {
@@ -29,18 +33,31 @@ task makeScript {
 
 task runMetal {
 	Array[File] result_files
+	String marker_column
+	String weight_column
+	String allele_effect_column
+	String allele_non_effect_column
+	String freq_column
+	String pval_column
 	String out_pref
-	File script
+	String? separator
+	String out_file
 
 	Int memory
 	Int disk
 
 	command {
-		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> ${script}
-		echo "OUTFILE ${out_pref} .TBL" >> ${script}
-		echo "" >> ${script}
-		echo "ANALYZE" >> ${script}
-		metal ${script}
+		echo "# this is your metal out_file" > ${out_file}
+		echo "MARKER ${marker_column}" >> ${out_file}
+		echo "WEIGHT ${weight_column}" >> ${out_file}
+		echo "ALLELE ${allele_effect_column} ${allele_non_effect_column}" >> ${out_file}
+		echo "FREQ ${freq_column}" >> ${out_file}
+		echo "PVAL ${pval_column}" >> ${out_file}
+		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> ${out_file}
+		echo "OUTFILE ${out_pref} .TBL" >> ${out_file}
+		echo "SEPARATOR ${default= "COMMA" separator}" >> ${out_file}
+		echo "ANALYZE" >> ${out_file}
+		metal ${out_file} > "${out_pref}.log"
 	}
 
 	runtime {
@@ -63,16 +80,16 @@ workflow w_metal {
 	String this_freq_column
 	String this_pval_column
 	String this_out_pref
+	String? this_separator
 	String this_out_file
 
 	Int this_memory
 	Int this_disk
 
-	call makeScript {
-		input: result_files = these_result_files, marker_column = this_marker_column, weight_column = this_weight_column, allele_effect_column = this_allele_effect_column, allele_non_effect_column = this_allele_non_effect_column, freq_column = this_freq_column, pval_column = this_pval_column, out_pref = this_out_pref, out_file = this_out_file
-	}
+	
 
 	call runMetal {
-		input: result_files = these_result_files, out_pref = this_out_pref, script = makeScript.out, memory = this_memory, disk = this_disk
+		input: result_files = these_result_files, marker_column = this_marker_column, weight_column = this_weight_column, allele_effect_column = this_allele_effect_column, allele_non_effect_column = this_allele_non_effect_column, freq_column = this_freq_column, pval_column = this_pval_column, out_pref = this_out_pref, separator = this_separator, out_file = this_out_file, memory = this_memory, disk = this_disk
+		
 	}
 }
