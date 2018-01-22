@@ -1,5 +1,5 @@
 # Check if required packages are installed (sourced from https://stackoverflow.com/questions/4090169/elegant-way-to-check-for-missing-packages-and-install-them)
-packages <- c("qqman","data.table")
+packages <- c("qqman","data.table","stringr")
 to_install <- packages[!(packages %in% installed.packages()[,"Package"])]
 if(length(to_install)) install.packages(to_install,repos='http://cran.us.r-project.org')
 
@@ -36,8 +36,10 @@ if (length(assoc.files) == 0){
       
       # Write the results out to a master file
       if (i == 1) {
+        assoc[,c("ref","alt")] <- str_split_fixed(assoc$allele, ",", 2)
         write.table(assoc,paste(label, ".assoc.csv", sep=""),sep=",",row.names=F)
       } else {
+        assoc[,c("ref","alt")] <- str_split_fixed(assoc$allele, ",", 2)
         write.table(assoc,paste(label, ".assoc.csv", sep=""),col.names=FALSE,sep=",",row.names=F, append=TRUE)
       }	
     }
