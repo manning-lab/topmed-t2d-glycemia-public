@@ -49,7 +49,7 @@ if (outcome.type == "continuous"){
 
 # Make sure other continuous variables have numeric columns
 for (cur_cov in covariates){
-  if (cur_cov %in% c("age_FG", "age", "FG", "FI","PC","age_T2D","age_FI","last_exam_age")){
+  if (length(unique(phenotype.data[,cur_cov])) >= length(phenotype.data[,1])/2){
     phenotype.data[,cur_cov] <- as.numeric(phenotype.data[,cur_cov])
   }
 }
