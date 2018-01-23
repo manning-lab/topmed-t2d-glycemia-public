@@ -12,8 +12,8 @@ input_args <- commandArgs(trailingOnly=T)
 marker.column <- input_args[1]
 freq.column <- input_args[2]
 pval.column <- input_args[3]
-cols.tokeep <- unlist(strsplit(input_args[4]))
-assoc.names <- unlist(strsplit(input_args[5]))
+cols.tokeep <- unlist(strsplit(input_args[4],","))
+assoc.names <- unlist(strsplit(input_args[5],","))
 out.pref <- input_args[6]
 metal.file <- input_args[7]
 assoc.files <- unlist(strsplit(input_args[8],","))
