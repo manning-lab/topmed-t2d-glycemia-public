@@ -55,6 +55,7 @@ if(sum(gds.mac.filt)==0) {
 	print("Finished Association Step")
 	print(dim(assoc))
 	assoc <- cbind(snps.pos, assoc)
+	assoc = subset(assoc, select=c(1,3:length(colnames(assoc)),2))
 
 }
 ## save assoc object
