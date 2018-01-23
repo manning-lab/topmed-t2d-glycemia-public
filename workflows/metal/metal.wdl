@@ -1,35 +1,45 @@
-task makeScript {
-	Array[File] result_files
-	String marker_column
-	String weight_column
-	String allele_effect_column
-	String allele_non_effect_column
-	String freq_column
-	String pval_column
-	String out_pref
-	String? separator
-	String out_file
-
+task getScript {
 	command {
-		echo "# this is your metal script" > ${out_file}
-		echo "MARKER ${marker_column}" >> ${out_file}
-		echo "WEIGHT ${weight_column}" >> ${out_file}
-		echo "ALLELE ${allele_effect_column} ${allele_non_effect_column}" >> ${out_file}
-		echo "FREQ ${freq_column}" >> ${out_file}
-		echo "PVAL ${pval_column}" >> ${out_file}
-		echo "COLUMNCOUNTING LENIENT " >> ${out_file}
-		echo "SEPARATOR ${default= "COMMA" separator}" >> ${out_file}
-		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> ${out_file}
-		echo "OUTFILE ${out_pref} .TBL" >> ${out_file}
-		echo "ANALYZE" >> ${out_file}
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/metal/workflows/metal/metal_summary.R"
 	}
 
 	runtime {
-		docker: "ubuntu@sha256:d3fdf5b1f8e8a155c17d5786280af1f5a04c10e95145a515279cf17abdf0191f"
+		docker: "tmajarian/alpine_wget@sha256:f3402d7cb7c5ea864044b91cfbdea20ebe98fc1536292be657e05056dbe5e3a4"
 	}
 
 	output {
-		File out = out_file
+		File script = "metal_summary.R"
+	}
+}
+
+task metalSummary {
+	String marker_column 
+	String freq_column 
+	String pval_column 
+	String cols_tokeep 
+	String assoc_names 
+	String out_pref
+	File metal_file 
+	Array[File] assoc_files
+
+	Int disk
+	Int memory
+
+	File script
+	
+	command {
+		R --vanilla --args ${marker_column} ${freq_column} ${pval_column} ${cols_tokeep} ${assoc_names} ${out_pref} ${metal_file} ${sep="," assoc_files} > ${script}
+	}
+
+	runtime {
+		docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
+		disks: "local-disk ${disk} SSD"
+		memory: "${memory}G"
+	}
+
+	output {
+		File csv = "${out_pref}_all.csv"
+		File plots = "${out_pref}_all_plots.png"
 	}
 }
 
@@ -43,24 +53,23 @@ task runMetal {
 	String pval_column
 	String out_pref
 	String? separator
-	String out_file
 
 	Int memory
 	Int disk
 
 	command {
-		echo "# this is your metal out_file" > ${out_file}
-		echo "MARKER ${marker_column}" >> ${out_file}
-		echo "WEIGHT ${weight_column}" >> ${out_file}
-		echo "ALLELE ${allele_effect_column} ${allele_non_effect_column}" >> ${out_file}
-		echo "FREQ ${freq_column}" >> ${out_file}
-		echo "PVAL ${pval_column}" >> ${out_file}
-		echo "SEPARATOR ${default= "COMMA" separator}" >> ${out_file}
-		echo "COLUMNCOUNTING LENIENT " >> ${out_file}
-		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> ${out_file}
-		echo "OUTFILE ${out_pref} .TBL" >> ${out_file}
-		echo "ANALYZE" >> ${out_file}
-		metal ${out_file} > "${out_pref}.log"
+		echo "# this is your metal out_file" > script.txt
+		echo "MARKER ${marker_column}" >> script.txt
+		echo "WEIGHT ${weight_column}" >> script.txt
+		echo "ALLELE ${allele_effect_column} ${allele_non_effect_column}" >> script.txt
+		echo "FREQ ${freq_column}" >> script.txt
+		echo "PVAL ${pval_column}" >> script.txt
+		echo "SEPARATOR ${default= "COMMA" separator}" >> script.txt
+		echo "COLUMNCOUNTING LENIENT " >> script.txt
+		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> script.txt
+		echo "OUTFILE ${out_pref} .TBL" >> script.txt
+		echo "ANALYZE" >> script.txt
+		metal script.txt > "${out_pref}.log"
 	}
 
 	runtime {
@@ -70,7 +79,9 @@ task runMetal {
 	}
 
 	output {
-		Array[File] out_files = glob("${out_pref}*")
+		File result_file = "${out_pref}1.TBL"
+		File metal_script = "script.txt"
+		File log_file = "${out_pref}.log"
 	}
 }
 
@@ -84,15 +95,18 @@ workflow w_metal {
 	String this_pval_column
 	String this_out_pref
 	String? this_separator
-	String this_out_file
 
 	Int this_memory
 	Int this_disk
 
-	
+	call getScript 
 
 	call runMetal {
 		input: result_files = these_result_files, marker_column = this_marker_column, weight_column = this_weight_column, allele_effect_column = this_allele_effect_column, allele_non_effect_column = this_allele_non_effect_column, freq_column = this_freq_column, pval_column = this_pval_column, out_pref = this_out_pref, separator = this_separator, out_file = this_out_file, memory = this_memory, disk = this_disk
 		
+	}
+
+	call metalSummary {
+		input: marker_column = this_marker_column, freq_column = this_freq_column, pval_column = this_pval_column, cols_tokeep = this_cols_tokeep, assoc_names = this_assoc_names, out_pref = this_out_pref, metal_file = runMetal.result_file, assoc_files = these_result_files, disk = this_disk, memory = this_memory, script = getScript.script
 	}
 }
