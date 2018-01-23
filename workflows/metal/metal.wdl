@@ -17,9 +17,10 @@ task makeScript {
 		echo "ALLELE ${allele_effect_column} ${allele_non_effect_column}" >> ${out_file}
 		echo "FREQ ${freq_column}" >> ${out_file}
 		echo "PVAL ${pval_column}" >> ${out_file}
+		echo "COLUMNCOUNTING LENIENT " >> ${out_file}
+		echo "SEPARATOR ${default= "COMMA" separator}" >> ${out_file}
 		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> ${out_file}
 		echo "OUTFILE ${out_pref} .TBL" >> ${out_file}
-		echo "SEPARATOR ${default= "COMMA" separator}" >> ${out_file}
 		echo "ANALYZE" >> ${out_file}
 	}
 
