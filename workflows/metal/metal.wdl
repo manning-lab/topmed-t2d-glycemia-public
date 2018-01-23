@@ -17,7 +17,7 @@ task metalSummary {
 	String freq_column 
 	String pval_column 
 	String cols_tokeep 
-	String assoc_names 
+	String assoc_names
 	String out_pref
 	File metal_file 
 	Array[File] assoc_files
@@ -87,6 +87,7 @@ task runMetal {
 }
 
 workflow w_metal {
+	# runMetal inputs
 	Array[File] these_result_files
 	String this_marker_column
 	String this_weight_column
@@ -98,13 +99,18 @@ workflow w_metal {
 	String? this_separator
 	String? this_analyze_arg
 
+	# metalSummary inputs
+	String this_cols_tokeep 
+	String this_assoc_names	
+
+	# other inputs
 	Int this_memory
 	Int this_disk
 
 	call getScript 
 
 	call runMetal {
-		input: result_files = these_result_files, marker_column = this_marker_column, weight_column = this_weight_column, allele_effect_column = this_allele_effect_column, allele_non_effect_column = this_allele_non_effect_column, freq_column = this_freq_column, pval_column = this_pval_column, out_pref = this_out_pref, separator = this_separator, analyze_arg = this_analyze_arg, out_file = this_out_file, memory = this_memory, disk = this_disk
+		input: result_files = these_result_files, marker_column = this_marker_column, weight_column = this_weight_column, allele_effect_column = this_allele_effect_column, allele_non_effect_column = this_allele_non_effect_column, freq_column = this_freq_column, pval_column = this_pval_column, out_pref = this_out_pref, separator = this_separator, analyze_arg = this_analyze_arg, memory = this_memory, disk = this_disk
 		
 	}
 
