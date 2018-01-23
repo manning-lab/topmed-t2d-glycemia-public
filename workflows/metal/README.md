@@ -1,4 +1,3 @@
-METAL readme
 # METAL -- Meta analysis
 
 ## Description 
