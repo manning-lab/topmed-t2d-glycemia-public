@@ -27,7 +27,7 @@ if (length(assoc.names) < length(assoc.files)){
 metal.data <- fread(metal.file,data.table=F)
 
 # loop through results
-for (f in seq(1,length(assoc.files)){
+for (f in seq(1,length(assoc.files))) {
   assoc.data <- fread(assoc.files[f],data.table=F)
   assoc.data = assoc.data[,c(marker.column, freq.column, pval.column, cols.tokeep)]
   colnames(f.data)[2:length(f.data[1,])] <- sub("^",paste(assoc.names[f],"_",sep=""),colnames(assoc.data)[2:length(f.data[1,])])
