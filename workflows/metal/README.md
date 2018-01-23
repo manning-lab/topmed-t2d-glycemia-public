@@ -62,6 +62,7 @@ This function generates the metal input script, processes each input results fil
 * marker_column : column name in results_files with variant identifiers (string)
 * freq_column : column in results_files with variant frequency (string)
 * pval_column : column in results_files with variant p-value (string)
+* sample_column : column in results_files with number of samples (string)
 * cols_tokeep : comma separated list of columns in each association results file (string)
 * assoc_names : comma separated list of association analysis names, one corresponding to each input result file (string)
 * out_pref : prefix for output filename (string)

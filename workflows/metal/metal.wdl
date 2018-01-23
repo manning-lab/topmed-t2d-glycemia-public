@@ -16,6 +16,7 @@ task metalSummary {
 	String marker_column 
 	String freq_column 
 	String pval_column 
+	String sample_column
 	String cols_tokeep 
 	String assoc_names
 	String out_pref
@@ -28,7 +29,7 @@ task metalSummary {
 	File script
 	
 	command {
-		R --vanilla --args ${marker_column} ${freq_column} ${pval_column} ${cols_tokeep} ${assoc_names} ${out_pref} ${metal_file} ${sep="," result_files} < ${script}
+		R --vanilla --args ${marker_column} ${freq_column} ${pval_column} ${sample_column} ${cols_tokeep} ${assoc_names} ${out_pref} ${metal_file} ${sep="," result_files} < ${script}
 	}
 
 	runtime {
