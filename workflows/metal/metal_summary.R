@@ -29,9 +29,16 @@ metal.data <- fread(metal.file,data.table=F)
 # loop through results
 for (f in seq(1,length(assoc.files))) {
   assoc.data <- fread(assoc.files[f],data.table=F)
-  assoc.data = assoc.data[,c(marker.column, freq.column, pval.column, cols.tokeep)]
-  colnames(f.data)[2:length(f.data[1,])] <- sub("^",paste(assoc.names[f],"_",sep=""),colnames(assoc.data)[2:length(f.data[1,])])
-  metal.data <- merge(metal.data, f.data[,cols.tokeep], by.x=c("MarkerName"), by.y=c(marker.column))
+  if (f == 1){
+    assoc.data = assoc.data[,c(marker.column, cols.tokeep, freq.column, pval.column)]
+    n <- NCOL(assoc.data)
+    colnames(assoc.data)[(n-1):n] <- sub("^",paste(assoc.names[f],"_",sep=""),colnames(assoc.data)[(n-1):n])
+  } else {
+    assoc.data = assoc.data[,c(marker.column, freq.column, pval.column)]
+    n <- NCOL(assoc.data)
+    colnames(assoc.data)[2:n] <- sub("^",paste(assoc.names[f],"_",sep=""),colnames(assoc.data)[2:n])
+  }
+  metal.data <- merge(metal.data, assoc.data, by.x=c("MarkerName"), by.y=c(marker.column))
 }
 
 # order based on meta pvalue
