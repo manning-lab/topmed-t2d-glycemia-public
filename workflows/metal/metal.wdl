@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/metal/workflows/metal/metal_summary.R"
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/metal/workflows/metal/metal_summary.R
 	}
 
 	runtime {
@@ -28,7 +28,7 @@ task metalSummary {
 	File script
 	
 	command {
-		R --vanilla --args ${marker_column} ${freq_column} ${pval_column} ${cols_tokeep} ${assoc_names} ${out_pref} ${metal_file} ${sep="," assoc_files} > ${script}
+		R --vanilla --args ${marker_column} ${freq_column} ${pval_column} ${cols_tokeep} ${assoc_names} ${out_pref} ${metal_file} ${sep="," assoc_files} < ${script}
 	}
 
 	runtime {
