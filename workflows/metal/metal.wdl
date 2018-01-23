@@ -20,7 +20,7 @@ task metalSummary {
 	String assoc_names
 	String out_pref
 	File metal_file 
-	Array[File] assoc_files
+	Array[File] result_files
 
 	Int disk
 	Int memory
@@ -28,7 +28,7 @@ task metalSummary {
 	File script
 	
 	command {
-		R --vanilla --args ${marker_column} ${freq_column} ${pval_column} ${cols_tokeep} ${assoc_names} ${out_pref} ${metal_file} ${sep="," assoc_files} < ${script}
+		R --vanilla --args ${marker_column} ${freq_column} ${pval_column} ${cols_tokeep} ${assoc_names} ${out_pref} ${metal_file} ${sep="," result_files} < ${script}
 	}
 
 	runtime {
@@ -115,6 +115,6 @@ workflow w_metal {
 	}
 
 	call metalSummary {
-		input: marker_column = this_marker_column, freq_column = this_freq_column, pval_column = this_pval_column, cols_tokeep = this_cols_tokeep, assoc_names = this_assoc_names, out_pref = this_out_pref, metal_file = runMetal.result_file, assoc_files = these_result_files, disk = this_disk, memory = this_memory, script = getScript.script
+		input: marker_column = this_marker_column, freq_column = this_freq_column, pval_column = this_pval_column, cols_tokeep = this_cols_tokeep, assoc_names = this_assoc_names, out_pref = this_out_pref, metal_file = runMetal.result_file, result_files = these_result_files, disk = this_disk, memory = this_memory, script = getScript.script
 	}
 }
