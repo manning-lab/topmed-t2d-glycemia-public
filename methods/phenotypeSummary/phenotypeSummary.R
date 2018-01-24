@@ -353,22 +353,35 @@ pdf(paste(label,"_plots.pdf",sep=""),width=11)
 #   layout(matrix(seq(1,6*(length(quant_covars))),nrow=length(quant_covars),ncol=6,byrow=T))
 # }
 
+
 # For each continuous covariate
 for (i in quant_covars){
   print(i)
-  
+
+  ## plot boxplots of  i distribution in cases/controls split by ancestry & sex
+  plot_title <- paste(i," By Ancestry (Boxplot)", sep="")
+  plot <- ggplot(plot_pheno, aes_string(study_ancestry_val, i)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1))
+  print(plot + geom_boxplot(aes(fill=factor(sex))) + scale_fill_discrete(name = "", labels=c("Female", "Male")) + labs(title = plot_title, x="") + facet_grid(outcome ~ .))
+
+  ## plot violin plots of same data
+  plot_title <- paste(i," By Ancestry (violin plot)", sep="")
+  plot <- ggplot(plot_pheno, aes_string(study_ancestry_val, i)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1))
+  print(plot + geom_violin(aes(fill=factor(sex))) + scale_fill_discrete(name = "", labels=c("Female", "Male")) + labs(title = plot_title, x="") + facet_grid(outcome ~ .))
+
   # Plot all samples
-  plot <- ggplot(ped.data, aes_string(cohort_column, i)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) 
-  print(plot + geom_boxplot() + labs(title = "All samples",x="Cohort",y=i))
-  
-  if (!(is.continuous)){
-  # Plot samples devided by outcome    
-  plot <- ggplot(ped.data, aes_string(cohort_column, i)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1))
-  print(plot + geom_boxplot(aes(fill=factor(get(outcome)))) + labs(title = "All samples by outcome",x="Cohort",y=i,fill=aes_string(outcome)))
-  }
+  #plot <- ggplot(ped.data, aes_string(cohort_column, i)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1))
+  #print(plot + geom_boxplot() + labs(title = "All samples",x="Cohort",y=i))
+
+  #if (!(is.continuous)){
+  #Plot samples devided by outcome
+  #plot <- ggplot(ped.data, aes_string(cohort_column, i)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1))
+  #print(plot + geom_boxplot(aes(fill=factor(get(outcome)))) + labs(title = "All samples by outcome",x="Cohort",y=i,fill=aes_string(outcome)))
+  #}
   # Plot samples devided by sex
-  plot <- ggplot(ped.data, aes_string(cohort_column, i)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) 
-  print(plot + geom_boxplot(aes(fill=factor(sex))) + labs(title = "All samples by sex",x="Cohort",y=i,fill="sex"))
+  #plot <- ggplot(ped.data, aes_string(cohort_column, i)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1))
+  #print(plot + geom_boxplot(aes(fill=factor(sex))) + labs(title = "All samples by sex",x="Cohort",y=i,fill="sex"))
+
+
 }
 
 dev.off()
