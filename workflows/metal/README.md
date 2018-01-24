@@ -46,6 +46,7 @@ Inputs:
 * allele_non_effect_column : column name in results_files with non effect allele (string)
 * freq_column : column in results_files with variant frequency (string)
 * pval_column : column in results_files with variant p-value (string)
+* effect_column : column in results_files with variant effect (string)
 * out_pref : prefix for output filename (string)
 * separator : character that separates each input result file (default: COMMA; WHITESPACE, TAB)
 * analyze_arg : optional argument for other types of analyses (default: ZSCORE)
