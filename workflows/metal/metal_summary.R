@@ -48,9 +48,9 @@ metal.data = metal.data[order(metal.data[,"P-value"]),]
 # calculate full sample mac for each variant
 all_mac <- c()
 for (n in assoc.names){
-  all_mac <- cbind(all_mac, 2 * metal.data[,paste(n,"_",freq.column,sep="")] * (1-metal.data[,paste(n,"_",freq.column,sep="")]) * metal.data[,paste(n,"_",sample.column,sep="")] )
+  all_mac <- cbind(all_mac, 2 * metal.data[,paste(n,"_",sample.column,sep="")] * metal.data[,paste(n,"_",freq.column,sep="")] )
 }
-metal.data$total_maf <- rowSums(all_mac)/metal.data$Weight 
+metal.data$total_maf <- rowSums(all_mac)/(2*metal.data$Weight)
 
 # subset back to only the cols we want
 cols_to_save <- colnames(metal.data)[! (colnames(metal.data) %in% sub("$", paste("_", sample.column, sep=""), assoc.names))]
