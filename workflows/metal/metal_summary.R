@@ -1,4 +1,20 @@
-# metal summary
+### metal_summary.R
+# Description: This function generates the metal input script, processes each input results file, and runs the meta analysis
+# Inputs:
+# marker.column : column name in results_files with variant identifiers (string)
+# freq.column : column in results_files with variant frequency (string)
+# pval.column : column in results_files with variant p-value (string)
+# sample.column : column in results_files with number of samples (string)
+# cols.tokeep : comma separated list of columns in each association results file (string)
+# assoc.names : comma separated list of association analysis names, one corresponding to each input result file (string)
+# out.pref : prefix for output filename (string)
+# metal.file : output of runMetal task (File)
+# result.files : comma separated list of result files to summarize, these are the csv outputs of the single variant association pipeline (string)
+
+# Outputs:
+# csv : a comma separated file of results including METAL results and "cols_tokeep" from each input results file (.csv)
+# plots : quantile-quantile and manhattan plots subset by MAF (all, <5%, >=5%) for meta-analysis p-values (.png)
+
 # Check if required packages are installed (sourced from https://stackoverflow.com/questions/4090169/elegant-way-to-check-for-missing-packages-and-install-them)
 packages <- c("qqman","data.table")
 to_install <- packages[!(packages %in% installed.packages()[,"Package"])]

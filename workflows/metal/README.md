@@ -60,6 +60,7 @@ Outputs:
 
 This function generates the metal input script, processes each input results file, and runs the meta analysis
 
+Inputs:
 * marker_column : column name in results_files with variant identifiers (string)
 * freq_column : column in results_files with variant frequency (string)
 * pval_column : column in results_files with variant p-value (string)
