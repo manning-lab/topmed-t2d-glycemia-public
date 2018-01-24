@@ -104,6 +104,7 @@ workflow w_metal {
 	String? this_analyze_arg
 
 	# metalSummary inputs
+	String this_sample_column
 	String this_cols_tokeep 
 	String this_assoc_names	
 
@@ -119,6 +120,6 @@ workflow w_metal {
 	}
 
 	call metalSummary {
-		input: marker_column = this_marker_column, freq_column = this_freq_column, pval_column = this_pval_column, cols_tokeep = this_cols_tokeep, assoc_names = this_assoc_names, out_pref = this_out_pref, metal_file = runMetal.result_file, result_files = these_result_files, disk = this_disk, memory = this_memory, script = getScript.script
+		input: marker_column = this_marker_column, freq_column = this_freq_column, pval_column = this_pval_column, sample_column = this_sample_column, cols_tokeep = this_cols_tokeep, assoc_names = this_assoc_names, out_pref = this_out_pref, metal_file = runMetal.result_file, result_files = these_result_files, disk = this_disk, memory = this_memory, script = getScript.script
 	}
 }
