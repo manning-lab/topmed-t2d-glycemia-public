@@ -1,4 +1,13 @@
-# association.R
+### association.R
+# Description: This function performs an association test to generate p-values for each variant included.
+# Inputs:
+# gds.file : a genotype file containing data for all samples are variants to be tested (.gds)
+# null.file : output of the function *fitNull* or a pregenerated null model (.RDa)
+# label : prefix for output filename (string)
+# test : statistical test (Score or Wald, default = Score)
+# mac : minimum minor allele count for variants to be included in analysis (int, default = 5)
+# Outputs:
+# assoc : an RData file of associations results (.RData)
 
 # Load packages
 library(GENESIS)
