@@ -49,8 +49,9 @@ if(sum(gds.mac.filt)==0) {
 
 	# Organize data for output
 	pos <- seqGetData(gds.data,"position")
-	allele <- seqGetData(gds.data, "allele")
-	snps.pos <- cbind(pos,allele)
+	ref <- as.character(ref(gds.data))
+	alt <- as.character(unlist(alt(gds.data)))
+	snps.pos <- cbind(pos,ref,alt)
 	
 	# Print the number of snps were working with
 	print("Filtered SNPs")

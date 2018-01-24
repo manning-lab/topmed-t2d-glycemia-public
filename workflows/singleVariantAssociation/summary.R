@@ -44,10 +44,8 @@ if (length(assoc.files) == 0){
       
       # Write the results out to a master file
       if (i == 1) {
-        assoc[,c("ref","alt")] <- str_split_fixed(assoc$allele, ",", 2)
         write.table(assoc,paste(label, ".assoc.csv", sep=""),sep=",",row.names=F)
       } else {
-        assoc[,c("ref","alt")] <- str_split_fixed(assoc$allele, ",", 2)
         write.table(assoc,paste(label, ".assoc.csv", sep=""),col.names=FALSE,sep=",",row.names=F, append=TRUE)
       }	
     }
