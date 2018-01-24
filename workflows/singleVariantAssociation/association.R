@@ -51,8 +51,6 @@ if(sum(gds.mac.filt)==0) {
 	pos <- seqGetData(gds.data,"position")
 	ref <- as.character(ref(gds.data))
 	alt <- as.character(unlist(alt(gds.data)))
-	# allele <- seqGetData(gds.data, "allele")
-	# snps.pos <- cbind(pos,allele)
 	snps.pos <- cbind(pos,ref,alt)
 	
 	# Print the number of snps were working with
