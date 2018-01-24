@@ -52,8 +52,11 @@ for (n in assoc.names){
 }
 metal.data$total_maf <- rowSums(all_mac)/metal.data$Weight 
 
+# subset back to only the cols we want
+cols_to_save <- colnames(metal.data)[! (colnames(metal.data) %in% sub("$", paste("_", sample.column, sep=""), assoc.names))]
+
 # write results out to file
-fwrite(metal.data, file = paste(out.pref,"_all.csv",sep=""), sep=",")
+fwrite(metal.data[,cols_to_save], file = paste(out.pref,"_all.csv",sep=""), sep=",")
 
 png(filename = paste(out.pref,"_all_plots.png",sep=""),width = 11, height = 11, units = "in", res=400, type = "cairo")
 par(mfrow=c(3,3))
