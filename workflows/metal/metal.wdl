@@ -52,6 +52,7 @@ task runMetal {
 	String allele_non_effect_column
 	String freq_column
 	String pval_column
+	String effect_column
 	String out_pref
 	String? separator
 	String? analyze_arg
@@ -66,6 +67,7 @@ task runMetal {
 		echo "ALLELE ${allele_effect_column} ${allele_non_effect_column}" >> script.txt
 		echo "FREQ ${freq_column}" >> script.txt
 		echo "PVAL ${pval_column}" >> script.txt
+		echo "EFFECT ${effect_column}" >> script.txt
 		echo "SEPARATOR ${default= "COMMA" separator}" >> script.txt
 		echo "COLUMNCOUNTING LENIENT " >> script.txt
 		echo "PROCESS ${sep = "\nPROCESS " result_files}" >> script.txt
@@ -96,6 +98,7 @@ workflow w_metal {
 	String this_allele_non_effect_column
 	String this_freq_column
 	String this_pval_column
+	String this_effect_column
 	String this_out_pref
 	String? this_separator
 	String? this_analyze_arg
@@ -111,7 +114,7 @@ workflow w_metal {
 	call getScript 
 
 	call runMetal {
-		input: result_files = these_result_files, marker_column = this_marker_column, weight_column = this_weight_column, allele_effect_column = this_allele_effect_column, allele_non_effect_column = this_allele_non_effect_column, freq_column = this_freq_column, pval_column = this_pval_column, out_pref = this_out_pref, separator = this_separator, analyze_arg = this_analyze_arg, memory = this_memory, disk = this_disk
+		input: result_files = these_result_files, marker_column = this_marker_column, weight_column = this_weight_column, allele_effect_column = this_allele_effect_column, allele_non_effect_column = this_allele_non_effect_column, freq_column = this_freq_column, pval_column = this_pval_column, effect_column = this_effect_column, out_pref = this_out_pref, separator = this_separator, analyze_arg = this_analyze_arg, memory = this_memory, disk = this_disk
 		
 	}
 
