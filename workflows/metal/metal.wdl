@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/metal/workflows/metal/metal_summary.R
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/metal/metal_summary.R
 	}
 
 	runtime {
