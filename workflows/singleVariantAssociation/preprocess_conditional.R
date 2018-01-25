@@ -24,11 +24,11 @@ snps <- unlist(strsplit(input_args[5],","))
 label <- input_args[6]
 
 #### testing inputs
-# gds.files <- c("/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/chunk1.freeze4.chrALL.pass.gtonly.minDP10.genotypes.gds")
-# phenotype.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_AFEU_WesselJ_25AUG2017_T2D.csv"
-# id.col <- "topmedid"
-# sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_AFEU_WesselJ_25AUG2017_T2D.txt"
-# snps <- unlist(strsplit("1:10485,1:10488",","))
+gds.files <- c("/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr10.pass_and_fail.gtonly.minDP10.chunk1.gds")
+phenotype.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_AFEU_WesselJ_25AUG2017_T2D.csv"
+id.col <- "topmedid"
+sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/method_testing_sample_ids.txt"
+snps <- unlist(strsplit("1:10485,1:10488",","))
 ####
 
 # get the snps into a dataframe
@@ -60,7 +60,7 @@ for (f in gds.files){
 	f.snps <- merge(snp.df, f.var, by.x = c("chr","pos"), by.y = c("chr","pos"))
 	
 	# if no snps are in this gds file, continue to next file
-	if (length(f.snps) == 0) {
+	if (NROW(f.snps) == 0) {
 	  seqClose(f.data)
 	  next
 	}
