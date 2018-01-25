@@ -37,7 +37,7 @@ gds.maf <- pmin(gds.freq, 1-gds.freq)
 gds.mac.filt <- 2 * gds.maf * (1-gds.maf) * length(nullmod$scanID) >= mac
 
 # If no snps remain, return empty
-if(sum(gds.mac.filt)==0) {
+if(sum(gds.mac.filt, na.rm = TRUE)==0) {
 	print("No SNPs pass MAC filter. Finished Association Step")
 	assoc <- NA
 
