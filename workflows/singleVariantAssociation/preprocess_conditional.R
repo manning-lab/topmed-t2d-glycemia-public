@@ -5,6 +5,9 @@
 # phenotype.file : phenotype file to be edited (file, CSV/TSV)
 # sample.file : text file with list of sample ids to include, one per line
 # snps : comma separated list with the form <chr_number>:<position>,<chr_number>:<position> (string)
+# Outputs :
+# new_phenotype_file : phenotype.data input with appended dosage columns for snps of interest (.csv)
+# alt_ref : text file with alternate and reference alleles for each snp of interest (.txt)
 
 # make sure that the right packages are installed
 packages <- c("data.table","SeqArray", "SeqVarTools")
