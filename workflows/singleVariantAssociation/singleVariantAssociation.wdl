@@ -168,6 +168,8 @@ workflow w_assocTest {
 
 	File null_genotype_file = these_genotype_files[0]
 
+	Boolean need_null = defined(this_null_file)
+
 	if(defined(these_snps)) {
 
 		call conditionalPhenotype {
@@ -192,7 +194,7 @@ workflow w_assocTest {
 
 	if (!defined(these_snps)) {
 	
-		if(!defined(this_null_file)) {
+		if(!need_null) {
 			
 			call fitNull {
 				input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
@@ -211,7 +213,7 @@ workflow w_assocTest {
 
 		} 
 
-		if(defined(this_null_file)) {
+		if(need_null) {
 
 			scatter(this_genotype_file in these_genotype_files) {
 			
