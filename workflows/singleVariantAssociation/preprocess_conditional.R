@@ -32,6 +32,7 @@ label <- input_args[6]
 # id.col <- "topmedid"
 # sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/method_testing_sample_ids.txt"
 # snps <- unlist(strsplit("1:10485,1:10488",","))
+# label <- "testing"
 ####
 
 # get the snps into a dataframe
@@ -108,4 +109,4 @@ phenotype.data <- merge(phenotype.data, dosage, by.x = id.col, by.y = "sample.id
 fwrite(phenotype.data, file = paste(label, ".csv", sep=""), sep=",")
 
 # save the alleles
-fwrite(alt_ref, file = paste(label, "_alleles.txt", sep=""), sep=" ")
+fwrite(as.data.frame(alt_ref), file = paste(label, "_alleles.txt", sep=""), sep=" ")
