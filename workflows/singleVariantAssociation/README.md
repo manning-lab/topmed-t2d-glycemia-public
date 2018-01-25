@@ -30,6 +30,19 @@ This workflow is produced and maintained by the [Manning Lab](https://manning-la
 
 ## Main Functions
 
+### preprocessConditional
+This function preprocesses the phenotype file for a conditional analysis on some snps, extracting the genotype information and adding to the phenotypes for each sample.
+
+Inputs:
+* genotype_files : comma separated list of gds file paths, this list must contain gds files for every snp
+* phenotype_file : phenotype file to be edited (file, CSV/TSV)
+* sample_file : text file with list of sample ids to include, one per line
+* snps : comma separated list with the form chr_number:position,chr_number:position (string)
+
+Outputs :
+* new_phenotype_file : phenotype.data input with appended dosage columns for snps of interest (.csv)
+* alt_ref : text file with alternate and reference alleles for each snp of interest (.txt)
+
 ### fitNull
 
 This function generates a null model to be used in association testing in Genesis
