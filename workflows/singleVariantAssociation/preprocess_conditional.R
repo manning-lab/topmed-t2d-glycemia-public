@@ -106,7 +106,7 @@ phenotype.data <- phenotype.data[phenotype.data$topmedid %in% sample.ids,]
 phenotype.data <- merge(phenotype.data, dosage, by.x = id.col, by.y = "sample.id")
 
 # save new phenotype file
-fwrite(phenotype.data, file = paste(label, ".csv", sep=""), sep=",")
+fwrite(phenotype.data, file = paste(label, "_phenotypes.csv", sep=""), sep=",")
 
 # save the alleles
 fwrite(as.data.frame(alt_ref), file = paste(label, "_alleles.txt", sep=""), sep=" ")
