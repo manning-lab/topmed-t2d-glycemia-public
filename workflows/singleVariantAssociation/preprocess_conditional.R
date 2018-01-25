@@ -18,15 +18,15 @@ lapply(packages, library, character.only = TRUE)
 input_args <- commandArgs(trailingOnly=T)
 gds.files <- unlist(strsplit(input_args[1],","))
 phenotype.file <- input_args[2]
-sample.column <- input_args[3]
+id.col <- input_args[3]
 sample.file <- input_args[4]
 snps <- unlist(strsplit(input_args[5],","))
-out.pref <- input_args[6]
+label <- input_args[6]
 
 #### testing inputs
 gds.files <- c("/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/chunk1.freeze4.chrALL.pass.gtonly.minDP10.genotypes.gds")
 phenotype.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_AFEU_WesselJ_25AUG2017_T2D.csv"
-sample.column <- "topmedid"
+id.col <- "topmedid"
 sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_AFEU_WesselJ_25AUG2017_T2D.txt"
 snps <- unlist(strsplit("1:10485,1:10488",","))
 ####
@@ -99,10 +99,10 @@ phenotype.data <- fread(phenotype.file, data.table=F)
 
 # subset by sample ids
 phenotype.data <- phenotype.data[phenotype.data$topmedid %in% sample.ids,]
-phenotype.data <- merge(phenotype.data, dosage, by.x = sample.column, by.y = "sample.id")
+phenotype.data <- merge(phenotype.data, dosage, by.x = id.col, by.y = "sample.id")
 
 # save new phenotype file
-fwrite(phenotype.data, file = paste(out.pref, ".csv", sep=""), sep=",")
+fwrite(phenotype.data, file = paste(label, ".csv", sep=""), sep=",")
 
 # save the alleles
-fwrite(alt_ref, file = paste(out.pref, "_alleles.txt", sep=""), sep=" ")
+fwrite(alt_ref, file = paste(label, "_alleles.txt", sep=""), sep=" ")
