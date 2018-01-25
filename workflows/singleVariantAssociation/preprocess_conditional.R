@@ -7,7 +7,7 @@
 # snps : comma separated list with the form <chr_number>:<position>,<chr_number>:<position> (string)
 
 # make sure that the right packages are installed
-packages <- c("data.table","SeqArray")#, "SeqVarTools")
+packages <- c("data.table","SeqArray", "SeqVarTools")
 to_install <- packages[!(packages %in% installed.packages()[,"Package"])]
 if(length(to_install)) install.packages(to_install,repos='http://cran.us.r-project.org')
 
