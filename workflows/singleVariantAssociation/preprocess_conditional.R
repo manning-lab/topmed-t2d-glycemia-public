@@ -24,7 +24,7 @@ snps <- unlist(strsplit(input_args[5],","))
 label <- input_args[6]
 
 #### testing inputs
-# gds.files <- c("/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr10.pass_and_fail.gtonly.minDP10.chunk1.gds")
+# gds.files <- c("/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/chunk1.freeze4.chrALL.pass.gtonly.minDP10.genotypes.gds")
 # phenotype.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_AFEU_WesselJ_25AUG2017_T2D.csv"
 # id.col <- "topmedid"
 # sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/method_testing_sample_ids.txt"
@@ -86,13 +86,13 @@ if (NCOL(dosage) < length(snps)) {
   stop("Not all of your snps were in the GDS files provided, exiting.")
 }
 
-# Fix dosage so that sample ids are in their own column
-dosage$sample.id <- row.names(dosage)
-
 # combine alt and ref info for each snp
 alt_ref = do.call(rbind, alt_ref)
 colnames(alt_ref) <- c("alt","ref")
 row.names(alt_ref) <- colnames(dosage)
+
+# Fix dosage so that sample ids are in their own column
+dosage$sample.id <- row.names(dosage)
 
 # Load the phenotype file 
 phenotype.data <- fread(phenotype.file, data.table=F)
