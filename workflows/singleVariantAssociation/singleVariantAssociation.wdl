@@ -3,6 +3,7 @@ task getScript {
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/association.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/fitNull/genesis_nullmodel.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/summary.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/issue_33/workflows/singleVariantAssociation/preprocess_conditional.R"
 	}
 
 	runtime {
@@ -13,6 +14,35 @@ task getScript {
 		File assoc_script = "association.R"
 		File null_script = "genesis_nullmodel.R"
 		File summary_script = "summary.R"
+		File conditional_script = "preprocess_conditional.R"
+	}
+}
+
+task conditionalPhenotype {
+	Array[File] genotype_files
+	File? phenotype_file
+	String? id_col
+	File? sample_file
+	String? snps
+	String label
+
+	File script
+
+	Int disk
+
+	command {
+		R --vanilla --args ${sep="," genotype_files} ${phenotype_file} ${id_col} ${sample_file} ${snps} ${sample_file} ${label} < ${script}
+	}
+
+	runtime {
+		docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
+		disks: "local-disk ${disk} SSD"
+		memory: "10G"
+	}
+
+	output {
+		File new_phenotype_file = "${label}_phenotypes.csv"
+		File alt_ref = "${label}_alleles.txt"
 	}
 }
 
@@ -106,6 +136,10 @@ task summary {
 }
 
 workflow w_assocTest {
+	# conditionalPhenotype inputs
+	String? these_snps
+
+
 	# fitNull inputs
 	Array[File] these_genotype_files
 	File? this_phenotype_file
@@ -131,39 +165,64 @@ workflow w_assocTest {
 	Int this_disk
 
 	call getScript
+
+	File null_genotype_file = these_genotype_files[0]
+
+	if(defined(these_snps)) {
+
+		call conditionalPhenotype {
+			input: genotype_files = these_genotype_files, phenotype_file = this_phenotype_file, id_col = this_id_col, sample_file = this_sample_file, snps = these_snps, label = this_label, script = getScript.conditional_script, disk = this_disk
+		}
+		
+		call fitNull as fitNullConditional {
+			input: genotype_file = null_genotype_file, phenotype_file = conditionalPhenotype.new_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
+		}
+
+		scatter(this_genotype_file in these_genotype_files) {
+		
+			call assocTest as assocTestConditional {
+				input: gds_file = this_genotype_file, null_file = fitNullConditional.model, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+			}
+		}
+
+		call summary as summaryConditional {
+			input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocTestConditional.assoc, script = getScript.summary_script, memory = this_memory, disk = this_disk
+		}
+	}
+
+	if (!defined(these_snps)) {
 	
-	if(!defined(this_null_file)) {
-
-		File null_genotype_file = these_genotype_files[0]
-		
-		call fitNull {
-			input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
-		}
-
-		scatter(this_genotype_file in these_genotype_files) {
-		
-			call assocTest {
-				input: gds_file = this_genotype_file, null_file = fitNull.model, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+		if(!defined(this_null_file)) {
+			
+			call fitNull {
+				input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
 			}
-		}
 
-		call summary {
-			input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocTest.assoc, script = getScript.summary_script, memory = this_memory, disk = this_disk
-		}
-
-	} 
-
-	if(defined(this_null_file)) {
-
-		scatter(this_genotype_file in these_genotype_files) {
-		
-			call assocTest as assocNull {
-				input: gds_file = this_genotype_file, null_file = this_null_file, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+			scatter(this_genotype_file in these_genotype_files) {
+			
+				call assocTest {
+					input: gds_file = this_genotype_file, null_file = fitNull.model, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+				}
 			}
-		}
 
-		call summary as summaryNull {
-			input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocNull.assoc, script = getScript.summary_script, memory = this_memory, disk = this_disk
+			call summary {
+				input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocTest.assoc, script = getScript.summary_script, memory = this_memory, disk = this_disk
+			}
+
+		} 
+
+		if(defined(this_null_file)) {
+
+			scatter(this_genotype_file in these_genotype_files) {
+			
+				call assocTest as assocNull {
+					input: gds_file = this_genotype_file, null_file = this_null_file, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+				}
+			}
+
+			call summary as summaryNull {
+				input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocNull.assoc, script = getScript.summary_script, memory = this_memory, disk = this_disk
+			}
 		}
 	}
 }
