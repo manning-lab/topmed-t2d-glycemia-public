@@ -31,7 +31,7 @@ task conditionalPhenotype {
 	Int disk
 
 	command {
-		R --vanilla --args ${sep="," genotype_files} ${phenotype_file} ${id_col} ${sample_file} ${snps} ${sample_file} ${label} < ${script}
+		R --vanilla --args ${sep="," genotype_files} ${phenotype_file} ${id_col} ${sample_file} ${snps} ${label} < ${script}
 	}
 
 	runtime {
