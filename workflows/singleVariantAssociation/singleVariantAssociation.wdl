@@ -101,7 +101,7 @@ task summary {
 	output {
 		File allassoccsv = "${label}.assoc.csv"
 		File topassoccsv = "${label}.topassoc.csv"
-		File plots = "${label}_association_plots.pdf"
+		File plots = "${label}_association_plots.png"
 	}
 }
 
