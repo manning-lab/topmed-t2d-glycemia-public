@@ -63,13 +63,14 @@ if (length(assoc.files) == 0){
   fwrite(assoc.compilation[assoc.compilation[,pval] < pval.threshold, ], paste(label, ".topassoc.csv", sep=""), sep=",", row.names = F)
   
   # QQ plots by maf
-  pdf(paste(label,"_association_plots.pdf",sep=""),width=8,height = 8)
+  png(filename = paste(label,"_association_plots.png",sep=""),width = 11, height = 11, units = "in", res=400, type = "cairo")
+  par(mfrow=c(3,3))
   
   # All variants
   qq(assoc.compilation$P,main="All variants")
   
   # Common variants
-  qq(assoc.compilation$P[assoc.compilation$MAF>=0.05],main="Variants with MAF>=0.05")
+  qq(assoc.compilation$P[assoc.compilation$MAF>0.05],main="Variants with MAF>0.05")
   
   # Rare/Low frequency variants
   qq(assoc.compilation$P[assoc.compilation$MAF<=0.05],main="Variants with MAF<=0.05")
@@ -79,7 +80,7 @@ if (length(assoc.files) == 0){
   manhattan(assoc.compilation,chr="chr",bp="pos",p="P", main="All variants")
   
   # Common variants
-  manhattan(assoc.compilation[assoc.compilation$MAF>=0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF>=0.05")
+  manhattan(assoc.compilation[assoc.compilation$MAF>0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF>0.05")
   
   # Rare/Low frequency variants
   manhattan(assoc.compilation[assoc.compilation$MAF<=0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF<=0.05")
