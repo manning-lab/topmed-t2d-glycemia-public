@@ -124,6 +124,12 @@ sample.data.for.annotated <- data.frame(sample.id = phenotype.slim[,id.col],
 # This is the final format
 annotated.frame <- AnnotatedDataFrame(sample.data.for.annotated)
 
+# Sometimes an X will be added to the beginning of a numeric column header, make sure that this didnt happen
+if (!(is.na(conditional.string))){
+  conditional = sub("^","X",conditional)
+  covariates[(length(covariates)-length(conditional)+1):length(covariates)] = conditional
+}
+
 # Fit the null model
 nullmod <- fitNullMM(scanData = scan.annotated.frame,
                      outcome = outcome.name,
