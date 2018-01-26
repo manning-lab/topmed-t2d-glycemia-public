@@ -24,10 +24,11 @@ phenotype.file <- input_args[2]
 outcome.name <- input_args[3]
 outcome.type <-  input_args[4]
 covariate.string <- input_args[5]
-sample.file <- input_args[6]
-label <- input_args[7]
-kinship.matrix <- input_args[8]
-id.col <- input_args[9]
+conditonal.string <- input_args[6]
+sample.file <- input_args[7]
+label <- input_args[8]
+kinship.matrix <- input_args[9]
+id.col <- input_args[10]
 
 # Load required libraries
 suppressMessages(library(SeqArray))
@@ -38,6 +39,12 @@ suppressMessages(library(GWASTools))
 
 # Parse the covariate string
 covariates <- unlist(strsplit(covariate.string,","))
+
+# If this is conditional, combine with covariates
+if (!(is.na(conditional.string))){
+  conditional = unlist(strsplit(conditonal.string,","))
+  covariates = c(covariates,conditional)
+}
 
 ## Load phenotype data
 phenotype.data <- fread(phenotype.file,header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
