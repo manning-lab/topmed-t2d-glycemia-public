@@ -48,21 +48,22 @@ task conditionalPhenotype {
 
 task fitNull {
 	File genotype_file
-	File? phenotype_file
-	String? outcome_name
-	String? outcome_type
-	String? covariates_string
-	File? sample_file
+	File phenotype_file
+	String outcome_name
+	String outcome_type
+	String covariates_string
+	String? conditional_string
+	File sample_file
 	String label
-	File? kinship_matrix
-	String? id_col
+	File kinship_matrix
+	String id_col
 	File script
 
 	Int memory
 	Int disk
 
 	command {
-		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${covariates_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
+		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${covariates_string} ${default="NA" conditional_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
 	}
 
 	runtime {
@@ -177,7 +178,7 @@ workflow w_assocTest {
 		}
 		
 		call fitNull as fitNullConditional {
-			input: genotype_file = null_genotype_file, phenotype_file = conditionalPhenotype.new_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
+			input: genotype_file = null_genotype_file, phenotype_file = conditionalPhenotype.new_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, conditional_string = these_snps, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
 		}
 
 		scatter(this_genotype_file in these_genotype_files) {
