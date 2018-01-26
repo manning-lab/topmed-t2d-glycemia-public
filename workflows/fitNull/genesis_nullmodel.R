@@ -24,7 +24,7 @@ phenotype.file <- input_args[2]
 outcome.name <- input_args[3]
 outcome.type <-  input_args[4]
 covariate.string <- input_args[5]
-conditonal.string <- input_args[6]
+conditional.string <- input_args[6]
 sample.file <- input_args[7]
 label <- input_args[8]
 kinship.matrix <- input_args[9]
@@ -42,7 +42,7 @@ covariates <- unlist(strsplit(covariate.string,","))
 
 # If this is conditional, combine with covariates
 if (!(is.na(conditional.string))){
-  conditional = unlist(strsplit(conditonal.string,","))
+  conditional = unlist(strsplit(conditional.string,","))
   covariates = c(covariates,conditional)
 }
 
