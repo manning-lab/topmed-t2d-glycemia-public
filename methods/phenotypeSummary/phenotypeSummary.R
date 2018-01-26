@@ -2,8 +2,15 @@ input_args <- commandArgs(trailingOnly=T)
 ped.file <- input_args[1]
 outcome <- input_args[2]
 covars <- unlist(strsplit(input_args[3],","))
-label <- input_args[4]
-cohort_column <- input_args[5]
+conditional.string <- input_args[4]
+label <- input_args[5]
+cohort_column <- input_args[6]
+
+# If this is conditional, combine with covariates
+if (!(is.na(conditional.string))){
+  conditional = unlist(strsplit(conditonal.string,","))
+  covars = c(covars,conditional)
+}
 
 # Load phenotype data
 library(data.table)
