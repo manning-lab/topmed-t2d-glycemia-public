@@ -43,7 +43,19 @@ covariates <- unlist(strsplit(covariate.string,","))
 # If this is conditional, combine with covariates
 if (!(is.na(conditional.string))){
   conditional = unlist(strsplit(conditional.string,","))
-  covariates = c(covariates,conditional)
+  
+  # check that the conditional covars start with a letter, if not, add chr
+  conditional.edited <- c()
+  for (c in conditional){
+    if(grepl("[[:digit:]]", substr(c, 1, 1))){
+      conditional.edited <- c(conditional.edited, sub(":","\\.",paste("chr",c,sep="")))
+    } else {
+      conditional.edited <- c(conditional.edited, sub(":","\\.",c))
+    }
+  }
+  
+  # combine with covariates
+  covariates = c(covariates,conditional.edited)
 }
 
 ## Load phenotype data
@@ -52,6 +64,11 @@ phenotype.data <- fread(phenotype.file,header=T,stringsAsFactors=FALSE,showProgr
 # Correct the outcome column if we have a continuous variable
 if (outcome.type == "continuous"){
   phenotype.data[,outcome.name] <- as.numeric(phenotype.data[,outcome.name])
+}
+
+# If we had to change the conditional names, change the fields of the phenotype file
+if (!(is.na(conditional.string))){
+  colnames(phenotype.data)[match(conditional,colnames(phenotype.data))] <- conditional.edited
 }
 
 # Make sure other continuous variables have numeric columns
@@ -123,12 +140,6 @@ sample.data.for.annotated <- data.frame(sample.id = phenotype.slim[,id.col],
 
 # This is the final format
 annotated.frame <- AnnotatedDataFrame(sample.data.for.annotated)
-
-# Sometimes an X will be added to the beginning of a numeric column header, make sure that this didnt happen
-if (!(is.na(conditional.string))){
-  conditional = sub("^","X",conditional)
-  covariates[(length(covariates)-length(conditional)+1):length(covariates)] = conditional
-}
 
 # Fit the null model
 nullmod <- fitNullMM(scanData = scan.annotated.frame,
