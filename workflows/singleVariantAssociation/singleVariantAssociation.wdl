@@ -48,15 +48,15 @@ task conditionalPhenotype {
 
 task fitNull {
 	File genotype_file
-	File phenotype_file
-	String outcome_name
-	String outcome_type
-	String covariates_string
+	File? phenotype_file
+	String? outcome_name
+	String? outcome_type
+	String? covariates_string
 	String? conditional_string
-	File sample_file
+	File? sample_file
 	String label
-	File kinship_matrix
-	String id_col
+	File? kinship_matrix
+	String? id_col
 	File script
 
 	Int memory
