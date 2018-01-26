@@ -1,7 +1,7 @@
 task getScript {
 	command {
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/issue_33/workflows/singleVariantAssociation/association.R"
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/fitNull/genesis_nullmodel.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/issue_33/workflows/fitNull/genesis_nullmodel.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/summary.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/issue_33/workflows/singleVariantAssociation/preprocess_conditional.R"
 	}
@@ -198,7 +198,7 @@ workflow w_assocTest {
 		if(!need_null) {
 			
 			call fitNull {
-				input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
+				input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, conditional_string = these_snps, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
 			}
 
 			scatter(this_genotype_file in these_genotype_files) {
