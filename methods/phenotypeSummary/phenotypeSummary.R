@@ -27,6 +27,7 @@ if (!(conditional.string == "NA")){
        conditional[c] <- paste("chr",conditional[c],sep="")
      }
      colnames(ped.data)[ncovar+1+c] <- conditional[c]
+     covars[ncovar+c] <- conditional[c]
   }
 }
 
