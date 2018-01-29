@@ -26,15 +26,6 @@ sample.file <- input_args[4]
 snps <- unlist(strsplit(input_args[5],","))
 label <- input_args[6]
 
-#### testing inputs
-# gds.files <- c("/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/chunk1.freeze4.chrALL.pass.gtonly.minDP10.genotypes.gds")
-# phenotype.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/Pooled_AFEU_WesselJ_25AUG2017_T2D.csv"
-# id.col <- "topmedid"
-# sample.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/phenotypes/method_testing_sample_ids.txt"
-# snps <- unlist(strsplit("1:10485,1:10488",","))
-# label <- "testing"
-####
-
 # get the snps into a dataframe
 snp.df <- data.frame()
 for (s in snps){
