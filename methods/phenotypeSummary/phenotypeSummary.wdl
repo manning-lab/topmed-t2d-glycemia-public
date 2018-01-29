@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/issue_33/methods/phenotypeSummary/phenotypeSummary.R
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/methods/phenotypeSummary/phenotypeSummary.R
 	}
 
 	runtime {
