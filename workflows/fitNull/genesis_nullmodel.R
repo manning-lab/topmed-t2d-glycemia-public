@@ -67,7 +67,7 @@ if (outcome.type == "continuous"){
 }
 
 # If we had to change the conditional names, change the fields of the phenotype file
-if (!(is.na(conditional.string))){
+if (!(conditional.string == "NA")) {
   colnames(phenotype.data)[match(conditional,colnames(phenotype.data))] <- conditional.edited
 }
 
