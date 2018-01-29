@@ -41,7 +41,7 @@ suppressMessages(library(GWASTools))
 covariates <- unlist(strsplit(covariate.string,","))
 
 # If this is conditional, combine with covariates
-if (!(conditional.string == "NA"))
+if (!(conditional.string == "NA")) {
   conditional = unlist(strsplit(conditional.string,","))
   
   # check that the conditional covars start with a letter, if not, add chr
