@@ -6,6 +6,8 @@ conditional.string <- input_args[4]
 label <- input_args[5]
 cohort_column <- input_args[6]
 
+ncovar <- length(covars)
+
 # If this is conditional, combine with covariates
 if (!(conditional.string == "NA")){
   conditional = unlist(strsplit(conditional.string,","))
@@ -16,6 +18,17 @@ if (!(conditional.string == "NA")){
 library(data.table)
 ped.data <- fread(ped.file,header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 ped.data = na.omit(as.data.frame(ped.data[,unique(c(cohort_column,outcome,covars)),drop=F]))
+
+# Change phenotype names
+if (!(conditional.string == "NA")){
+  for (c in seq(1,length(conditional))){
+     conditional[c] = sub(":","_",conditional[c])
+     if(grepl("[[:digit:]]", substr(conditional[c], 1, 1))){
+       conditional[c] <- paste("chr",conditional[c],sep="")
+     }
+     colnames(ped.data)[ncovar+1+c] <- conditional[c]
+  }
+}
 
 # Determine outcome type
 is.continuous <- ifelse(length(unique(ped.data[,outcome])) < 4 ,F,T)
