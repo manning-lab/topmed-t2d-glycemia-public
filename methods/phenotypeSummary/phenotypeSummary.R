@@ -7,8 +7,8 @@ label <- input_args[5]
 cohort_column <- input_args[6]
 
 # If this is conditional, combine with covariates
-if (!(is.na(conditional.string))){
-  conditional = unlist(strsplit(conditonal.string,","))
+if (!(conditional.string == "NA")){
+  conditional = unlist(strsplit(conditional.string,","))
   covars = c(covars,conditional)
 }
 
