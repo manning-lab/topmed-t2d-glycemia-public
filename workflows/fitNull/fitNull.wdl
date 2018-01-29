@@ -20,6 +20,7 @@ task fitNull {
 	String outcome_name
 	String outcome_type
 	String covariates_string
+	String? conditional_string
 	File sample_file
 	String label
 	File kinship_matrix
@@ -30,7 +31,7 @@ task fitNull {
 	Int disk
 
 	command {
-		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${covariates_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
+		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${covariates_string} ${default="NA" conditional_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
 	}
 
 	runtime {
@@ -48,6 +49,7 @@ task summary {
 	File phenotype_file
 	String outcome_name
 	String covariates_string
+	String? conditional_string
 	String label
 	String cohort_column
 
@@ -56,7 +58,7 @@ task summary {
 	Int disk
 
 	command {
-		R --vanilla --args ${phenotype_file} ${outcome_name} ${covariates_string} ${label} ${cohort_column} < ${script}
+		R --vanilla --args ${phenotype_file} ${outcome_name} ${covariates_string} ${default="NA" conditional_string} ${label} ${cohort_column} < ${script}
 	}
 
 	runtime {
@@ -78,6 +80,7 @@ workflow nullModel {
 	String this_outcome_name
 	String this_outcome_type
 	String this_covariates_string
+	String? this_conditional_string
 	File this_sample_file
 	String this_label
 	File this_kinship_matrix
@@ -95,11 +98,11 @@ workflow nullModel {
 	call getScript
 	
 	call fitNull {
-            input: genotype_file = this_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.script, memory = this_memory, disk = this_disk
+            input: genotype_file = this_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, conditional_string = this_conditional_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.script, memory = this_memory, disk = this_disk
 	}
 
 	call summary {
-		input: phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, covariates_string = this_covariates_string, label = this_label, cohort_column = this_cohort_column, script = getScript.summary_script, memory = this_memory, disk = this_disk
+		input: phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, covariates_string = this_covariates_string, conditional_string = this_conditional_string, label = this_label, cohort_column = this_cohort_column, script = getScript.summary_script, memory = this_memory, disk = this_disk
 	}
 
 	output {

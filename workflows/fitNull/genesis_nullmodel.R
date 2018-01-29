@@ -24,10 +24,11 @@ phenotype.file <- input_args[2]
 outcome.name <- input_args[3]
 outcome.type <-  input_args[4]
 covariate.string <- input_args[5]
-sample.file <- input_args[6]
-label <- input_args[7]
-kinship.matrix <- input_args[8]
-id.col <- input_args[9]
+conditional.string <- input_args[6]
+sample.file <- input_args[7]
+label <- input_args[8]
+kinship.matrix <- input_args[9]
+id.col <- input_args[10]
 
 # Load required libraries
 suppressMessages(library(SeqArray))
@@ -39,12 +40,35 @@ suppressMessages(library(GWASTools))
 # Parse the covariate string
 covariates <- unlist(strsplit(covariate.string,","))
 
+# If this is conditional, combine with covariates
+if (!(conditional.string == "NA")) {
+  conditional = unlist(strsplit(conditional.string,","))
+  
+  # check that the conditional covars start with a letter, if not, add chr
+  conditional.edited <- c()
+  for (c in conditional){
+    if(grepl("[[:digit:]]", substr(c, 1, 1))){
+      conditional.edited <- c(conditional.edited, sub(":","\\.",paste("chr",c,sep="")))
+    } else {
+      conditional.edited <- c(conditional.edited, sub(":","\\.",c))
+    }
+  }
+  
+  # combine with covariates
+  covariates = c(covariates,conditional.edited)
+}
+
 ## Load phenotype data
 phenotype.data <- fread(phenotype.file,header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
 
 # Correct the outcome column if we have a continuous variable
 if (outcome.type == "continuous"){
   phenotype.data[,outcome.name] <- as.numeric(phenotype.data[,outcome.name])
+}
+
+# If we had to change the conditional names, change the fields of the phenotype file
+if (!(conditional.string == "NA")) {
+  colnames(phenotype.data)[match(conditional,colnames(phenotype.data))] <- conditional.edited
 }
 
 # Make sure other continuous variables have numeric columns
