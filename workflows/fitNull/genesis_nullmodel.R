@@ -145,7 +145,7 @@ annotated.frame <- AnnotatedDataFrame(sample.data.for.annotated)
 nullmod <- fitNullMM(scanData = scan.annotated.frame,
                      outcome = outcome.name,
                      covars = covariates,
-                     family = ifelse(tolower(outcome.type) == "dichotomous", "binomial"),
+                     family = ifelse(tolower(outcome.type) == "dichotomous", "binomial", "gaussian"),
                      covMatList = kinship)
 
 # Save the null model to the output file
