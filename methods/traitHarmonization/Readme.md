@@ -28,5 +28,36 @@ Output:
 - A subject_id -> NWD mapping file for each trait file
 
 ## Cohort Rules:
-[[ FILL THIS IN ]]
+
+•	ARIC > DHS, GOLDN, GENOA, HyperGEN, Mayo_VTE, MESA, WHI, JHS, GeneSTAR
+•	FHS > COPDGene, MGH_AF, WHI
+•	GeneSTAR > COPDGene
+•	HyperGEN > COPDGene, DHS
+•	JHS > GENOA
+•	MESA >COPDGene, DHS, GENOA, HyperGEN, GeneSTAR
+•	VU_AF > WGHS
+•	WH I> COPDGene, HyperGEN, Mayo_VTE, MESA
+•	CHS > MESA, WHI 
+•	MGH_AF > VU_AF, CCAF, Partners
+
+Name		Type				Year started
+ARIC		Population-based	1988
+FHS			Population-based	1948
+GeneSTAR	Family-based (heart disease and stroke)	1982
+HyperGEN	2000 subjects enriched for hypertension, 800 random subjects	1995
+JHS			Population-based and family-based	1998
+MESA		Population-based	2000
+VU_AF		Case-ascertained 	2010
+WHI			Population-based	1991
+CHS			Population-based	1989
+MGH_AF		Case-ascertained	2001
+DHS			Family-based, diabetes enriched	2007
+GOLDN		Population based	~2010
+GENOA		Family-based	1995
+Mayo_VTE	cases with VTE from other studies, i.e. ARIC	2013
+COPDGene	Only smokers 	1994
+WGHS		Case-ascertained	1992
+Partners	Biorepository for Case-ascertained cohorts	
+CCAF		Case-ascertained	2005
+
 
