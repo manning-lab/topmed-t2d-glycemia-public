@@ -20,6 +20,9 @@ ped.data <- fread(ped.file,header=T,stringsAsFactors=FALSE,showProgress=TRUE,dat
 print(head(ped.data))
 print(summary(ped.data))
 
+print(cohort_column)
+print(outcome)
+print(covars)
 ped.data = na.omit(as.data.frame(ped.data[,unique(c(cohort_column,outcome,covars)),drop=F]))
 print(summary(ped.data))
 
