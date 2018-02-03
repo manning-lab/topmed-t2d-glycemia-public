@@ -17,7 +17,11 @@ if (!(conditional.string == "NA")){
 # Load phenotype data
 library(data.table)
 ped.data <- fread(ped.file,header=T,stringsAsFactors=FALSE,showProgress=TRUE,data.table=FALSE)
+print(head(ped.data))
+print(summary(ped.data))
+
 ped.data = na.omit(as.data.frame(ped.data[,unique(c(cohort_column,outcome,covars)),drop=F]))
+print(summary(ped.data))
 
 # Change phenotype names
 if (!(conditional.string == "NA")){
