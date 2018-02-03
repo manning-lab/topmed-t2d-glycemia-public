@@ -11,7 +11,7 @@ task getScript {
 	}
 
 	output {
-		File assoc_script = "association.R"
+		File assoc_script = "association_gxe.R"
 		File null_script = "genesis_nullmodel.R"
 		File summary_script = "summary.R"
 		File conditional_script = "preprocess_conditional.R"
@@ -206,7 +206,7 @@ workflow w_assocTest {
 			scatter(this_genotype_file in these_genotype_files) {
 
 				call assocTest {
-					input: gds_file = this_genotype_file, null_file = fitNull.model, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+					input: gds_file = this_genotype_file, null_file = fitNull.model, label = this_label, test = this_test, mac = this_mac, ivars_string = this_ivars_string, script = getScript.assoc_script, memory = this_memory, disk = this_disk
 				}
 			}
 
@@ -221,7 +221,7 @@ workflow w_assocTest {
 			scatter(this_genotype_file in these_genotype_files) {
 
 				call assocTest as assocNull {
-					input: gds_file = this_genotype_file, null_file = this_null_file, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+					input: gds_file = this_genotype_file, null_file = this_null_file, label = this_label, test = this_test, mac = this_mac, ivars_string = this_ivars_string, script = getScript.assoc_script, memory = this_memory, disk = this_disk
 				}
 			}
 
