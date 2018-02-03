@@ -1,5 +1,13 @@
+# summary.R
+# Description: Generate a summary of association results including quantile-quantile and manhattan plots for variants subseted by minor allele frequency (all variants, maf < 5%, maf >= 5%). Also generates CSV files of all and the top associated variants.
+# Inputs:
+# pval : the p-value column in the output of assocTest, this should be the statistical test with ".pval" appended (string, Score -> Score.pval, Wald -> Wald.pval)
+# pval.threshold : p-value threshold for the returning top associations, top association output will include only variants with a p-value less than the threshold (float, default = 0.0001)
+# label : prefix for output filename (string)
+# assoc.files : comma separated list of association results, output of assocTest (string)
+
 # Check if required packages are installed (sourced from https://stackoverflow.com/questions/4090169/elegant-way-to-check-for-missing-packages-and-install-them)
-packages <- c("qqman","data.table")
+packages <- c("qqman","data.table","stringr")
 to_install <- packages[!(packages %in% installed.packages()[,"Package"])]
 if(length(to_install)) install.packages(to_install,repos='http://cran.us.r-project.org')
 
@@ -55,13 +63,14 @@ if (length(assoc.files) == 0){
   fwrite(assoc.compilation[assoc.compilation[,pval] < pval.threshold, ], paste(label, ".topassoc.csv", sep=""), sep=",", row.names = F)
   
   # QQ plots by maf
-  pdf(paste(label,"_association_plots.pdf",sep=""),width=8,height = 8)
+  png(filename = paste(label,"_association_plots.png",sep=""),width = 11, height = 11, units = "in", res=400, type = "cairo")
+  par(mfrow=c(3,3))
   
   # All variants
   qq(assoc.compilation$P,main="All variants")
   
   # Common variants
-  qq(assoc.compilation$P[assoc.compilation$MAF>=0.05],main="Variants with MAF>=0.05")
+  qq(assoc.compilation$P[assoc.compilation$MAF>0.05],main="Variants with MAF>0.05")
   
   # Rare/Low frequency variants
   qq(assoc.compilation$P[assoc.compilation$MAF<=0.05],main="Variants with MAF<=0.05")
@@ -71,7 +80,7 @@ if (length(assoc.files) == 0){
   manhattan(assoc.compilation,chr="chr",bp="pos",p="P", main="All variants")
   
   # Common variants
-  manhattan(assoc.compilation[assoc.compilation$MAF>=0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF>=0.05")
+  manhattan(assoc.compilation[assoc.compilation$MAF>0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF>0.05")
   
   # Rare/Low frequency variants
   manhattan(assoc.compilation[assoc.compilation$MAF<=0.05,],chr="chr",bp="pos",p="P", main="Variants with MAF<=0.05")
