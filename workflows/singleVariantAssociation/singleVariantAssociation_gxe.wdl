@@ -210,9 +210,9 @@ workflow w_assocTest {
 				}
 			}
 
-#			call summary {
-#				input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocTest.assoc, script = getScript.summary_script, memory = this_memory, disk = this_disk
-#			}
+			call summary {
+				input: pval = this_pval, pval_threshold = this_pval_threshold, label = this_label, assoc = assocTest.assoc, script = getScript.summary_script, memory = this_memory, disk = this_disk
+			}
 
 		}
 
