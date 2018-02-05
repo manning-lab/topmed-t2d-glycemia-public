@@ -23,6 +23,19 @@ null.file <- input_args[2]
 label <- input_args[3]
 test <- input_args[4]
 mac <- as.numeric(input_args[5])
+ivars.string <- input_args[6]
+
+# Print input arguments
+print_ <- function(to_print) {
+	print(paste(to_print, collapse=" "))
+}
+
+print_(c("gds.file", gds.file))
+print_(c("null.file", null.file))
+print_(c("test", test))
+print_(c("mac", mac))
+print_(c("ivars.string", ivars.string))
+
 
 # Load nullfile
 load(null.file)
@@ -61,7 +74,11 @@ if(sum(gds.mac.filt, na.rm = TRUE)==0) {
 	gds.geno.data <- SeqVarData(gds.data)
 
 	# Run association test
-	assoc <- assocTestMM(genoData = gds.geno.data, nullMMobj = nullmod, test = test)
+	if (ivars.string == "NA"){
+		assoc <- assocTestMM(genoData = gds.geno.data, nullMMobj = nullmod, test = test)
+	} else {
+		assoc <- assocTestMM(genoData = gds.geno.data, nullMMobj = nullmod, test = test, ivars=unlist(strsplit(ivars.string, ",")))
+	}
 	print("Finished Association Step")
 	print(dim(assoc))
 	assoc <- cbind(snps.pos, assoc)
@@ -69,3 +86,4 @@ if(sum(gds.mac.filt, na.rm = TRUE)==0) {
 }
 ## save assoc object
 save(assoc, file=paste(label, ".assoc.RData", sep=""))
+

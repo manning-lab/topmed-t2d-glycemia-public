@@ -25,10 +25,11 @@ outcome.name <- input_args[3]
 outcome.type <-  input_args[4]
 covariate.string <- input_args[5]
 conditional.string <- input_args[6]
-sample.file <- input_args[7]
-label <- input_args[8]
-kinship.matrix <- input_args[9]
-id.col <- input_args[10]
+ivars.string <- input_args[7]
+sample.file <- input_args[8]
+label <- input_args[9]
+kinship.matrix <- input_args[10]
+id.col <- input_args[11]
 
 # Load required libraries
 suppressMessages(library(SeqArray))
@@ -39,6 +40,12 @@ suppressMessages(library(GWASTools))
 
 # Parse the covariate string
 covariates <- unlist(strsplit(covariate.string,","))
+
+# Check if we have ivars input, add to covars
+if (!ivars.string == "NA") {
+  ivars <- unlist(strsplit(ivars.string, ","))
+  covariates = c(covariates,ivars.string)
+}
 
 # If this is conditional, combine with covariates
 if (!(conditional.string == "NA")) {
