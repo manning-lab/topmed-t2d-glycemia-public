@@ -26,15 +26,15 @@ mac <- as.numeric(input_args[5])
 ivars.string <- input_args[6]
 
 # Print input arguments
-_print <- function(to_print) {
+print_ <- function(to_print) {
 	print(paste(to_print, collapse=" "))
 }
 
-_print(c("gds.file", gds.file))
-_print(c("null.file", null.file))
-_print(c("test", test))
-_print(c("mac", mac))
-_print(c("ivars.string", ivars.string))
+print_(c("gds.file", gds.file))
+print_(c("null.file", null.file))
+print_(c("test", test))
+print_(c("mac", mac))
+print_(c("ivars.string", ivars.string))
 
 
 # Load nullfile
@@ -86,3 +86,4 @@ if(sum(gds.mac.filt, na.rm = TRUE)==0) {
 }
 ## save assoc object
 save(assoc, file=paste(label, ".assoc.RData", sep=""))
+
