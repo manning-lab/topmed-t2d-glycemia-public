@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/association.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/gxe_pilot/workflows/singleVariantAssociation/association.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/fitNull/genesis_nullmodel.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/summary.R"
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/singleVariantAssociation/preprocess_conditional.R"
@@ -53,6 +53,7 @@ task fitNull {
 	String? outcome_type
 	String? covariates_string
 	String? conditional_string
+	String? ivars_string
 	File? sample_file
 	String label
 	File? kinship_matrix
@@ -63,7 +64,7 @@ task fitNull {
 	Int disk
 
 	command {
-		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${covariates_string} ${default="NA" conditional_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
+		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${default="NA" covariates_string} ${default="NA" conditional_string} ${default="NA" ivars_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
 	}
 
 	runtime {
@@ -83,6 +84,7 @@ task assocTest {
 	File? null_file
 	String label
 	String? test
+	String? ivars_string
 	Int? mac
 	File script
 
@@ -90,7 +92,7 @@ task assocTest {
 	Int disk
 
 	command {
-		R --vanilla --args ${gds_file} ${null_file} ${label} ${default="Score" test} ${default="5" mac} < ${script} 
+		R --vanilla --args ${gds_file} ${null_file} ${label} ${default="Score" test} ${default="5" mac} ${default="NA" ivars_string} < ${script} 
 	}
 
 	meta {
@@ -147,6 +149,7 @@ workflow w_assocTest {
 	String? this_outcome_name
 	String? this_outcome_type
 	String? this_covariates_string
+	String? this_ivars_string
 	File? this_sample_file
 	String this_label
 	File? this_kinship_matrix
@@ -178,13 +181,13 @@ workflow w_assocTest {
 		}
 		
 		call fitNull as fitNullConditional {
-			input: genotype_file = null_genotype_file, phenotype_file = conditionalPhenotype.new_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, conditional_string = these_snps, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
+			input: genotype_file = null_genotype_file, phenotype_file = conditionalPhenotype.new_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, conditional_string = these_snps, ivars_string = this_ivars_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
 		}
 
 		scatter(this_genotype_file in these_genotype_files) {
 		
 			call assocTest as assocTestConditional {
-				input: gds_file = this_genotype_file, null_file = fitNullConditional.model, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+				input: gds_file = this_genotype_file, null_file = fitNullConditional.model, label = this_label, test = this_test, mac = this_mac, ivars_string = this_ivars_string, script = getScript.assoc_script, memory = this_memory, disk = this_disk
 			}
 		}
 
@@ -198,13 +201,13 @@ workflow w_assocTest {
 		if(!need_null) {
 			
 			call fitNull {
-				input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, conditional_string = these_snps, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
+				input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, conditional_string = these_snps, ivars_string = this_ivars_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
 			}
 
 			scatter(this_genotype_file in these_genotype_files) {
 			
 				call assocTest {
-					input: gds_file = this_genotype_file, null_file = fitNull.model, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+					input: gds_file = this_genotype_file, null_file = fitNull.model, label = this_label, test = this_test, mac = this_mac, ivars_string = this_ivars_string, script = getScript.assoc_script, memory = this_memory, disk = this_disk
 				}
 			}
 
@@ -219,7 +222,7 @@ workflow w_assocTest {
 			scatter(this_genotype_file in these_genotype_files) {
 			
 				call assocTest as assocNull {
-					input: gds_file = this_genotype_file, null_file = this_null_file, label = this_label, test = this_test, mac = this_mac, script = getScript.assoc_script, memory = this_memory, disk = this_disk
+					input: gds_file = this_genotype_file, null_file = this_null_file, label = this_label, test = this_test, mac = this_mac, ivars_string = this_ivars_string, script = getScript.assoc_script, memory = this_memory, disk = this_disk
 				}
 			}
 
