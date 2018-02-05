@@ -70,6 +70,8 @@ if(test=="SKAT"){
   assoc <- assocTestSeq(gds.geno.data, nullmod, groups, test=test, pval.method=pval, weight.beta = weights)
   assoc$results = assoc$results[order(assoc$results$pval_0),]
   save(assoc, file=paste(label, ".assoc.RData", sep=""))
+} else {
+  fwrite(list(), file=paste(label, ".assoc.RData", sep=""))
 }
 
 seqClose(gds.data)
