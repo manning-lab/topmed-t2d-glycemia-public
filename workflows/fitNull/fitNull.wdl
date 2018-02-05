@@ -19,7 +19,7 @@ task fitNull {
 	File phenotype_file
 	String outcome_name
 	String outcome_type
-	String covariates_string
+	String? covariates_string
 	String? conditional_string
 	String? ivars_string
 	File sample_file
@@ -32,7 +32,7 @@ task fitNull {
 	Int disk
 
 	command {
-		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${covariates_string} ${default="NA" conditional_string} ${default="NA" ivars_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
+		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${default="NA" covariates_string} ${default="NA" conditional_string} ${default="NA" ivars_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
 	}
 
 	runtime {
@@ -49,7 +49,7 @@ task fitNull {
 task summary {
 	File phenotype_file
 	String outcome_name
-	String covariates_string
+	String? covariates_string
 	String? conditional_string
 	String label
 	String cohort_column
@@ -59,7 +59,7 @@ task summary {
 	Int disk
 
 	command {
-		R --vanilla --args ${phenotype_file} ${outcome_name} ${covariates_string} ${default="NA" conditional_string} ${label} ${cohort_column} < ${script}
+		R --vanilla --args ${phenotype_file} ${outcome_name} ${default="NA" covariates_string} ${default="NA" conditional_string} ${label} ${cohort_column} < ${script}
 	}
 
 	runtime {
@@ -80,7 +80,7 @@ workflow nullModel {
 	File this_phenotype_file
 	String this_outcome_name
 	String this_outcome_type
-	String this_covariates_string
+	String? this_covariates_string
 	String? this_conditional_string
 	String? this_ivars_string
 	File this_sample_file

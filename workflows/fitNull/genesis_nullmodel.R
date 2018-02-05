@@ -39,7 +39,11 @@ suppressMessages(library(data.table))
 suppressMessages(library(GWASTools))
 
 # Parse the covariate string
-covariates <- unlist(strsplit(covariate.string,","))
+if (covariate.string == "NA"){
+  covariates = c()
+} else {
+  covariates <- unlist(strsplit(covariate.string,","))
+}
 
 # Check if we have ivars input, add to covars
 if (!ivars.string == "NA") {
