@@ -8,13 +8,13 @@ library(SeqVarTools)
 library(data.table)
 
 ##### testing inputs
-# gds.file <- "/Users/tmajaria/Documents/projects/topmed/results/varshney/genomewide_v1/group_check/freeze4.chr21.pass.gtonly.minDP10.genotypes.gds"
-# null.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/null_models/Model15_Sing_F4_sampAFEU_kinsGRM_ALL_cov.age.sex.study_pcNONE.Rda"
+# gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr10.pass_and_fail.gtonly.minDP10.chunk1.gds"
+# null.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/null_models/group_method_testing_null.RDa"
 # label <- "group_test"
 # test <- "SKAT"
 # pval <- "kuonen"
-# group.file <- "/Users/tmajaria/Documents/projects/topmed/results/varshney/genomewide_v2/groups/groups_16.RData"
-# weights <- as.numeric(unlist(strsplit("1,50",",")))
+# group.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/groups/testing_groups.RData"
+# weights <- as.numeric(unlist(strsplit("1,25",",")))
 #####
 
 # Parse input args
