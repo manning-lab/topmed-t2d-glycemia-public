@@ -92,7 +92,7 @@ task summary {
 	Int disk
 
 	command {
-		R --vanilla --args ${label} ${sep = ' ' assoc} < ${summaryScript}	
+		R --vanilla --args ${label} ${sep = ',' assoc} < ${summaryScript}	
 	}
 	
 	runtime {
@@ -102,8 +102,7 @@ task summary {
 	}
 
 	output {
-		File mhplot = "${label}.mhplot.pdf"
-		File qqplot = "${label}.qqplot.pdf"
+		File mhplot = "${label}_association_plots.png"
 		File assoc_res = "${label}.groupAssoc.csv"
 	}
 }
