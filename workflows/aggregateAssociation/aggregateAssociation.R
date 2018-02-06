@@ -3,9 +3,11 @@
 # Inputs:
 # gds.file : a genotype file containing data for all samples are variants to be tested (.gds)
 # null.file : output of the function *fitNull* or a pregenerated null model (.RDa)
+# group.file : RData or csv with aggregation groups. Must contain at least variant id and group id (csv or RData)
 # label : prefix for output filename (string)
-# test : statistical test (Score or Wald, default = Score)
-# mac : minimum minor allele count for variants to be included in analysis (int, default = 5)
+# test : SKAT or Burden (string)
+# pval : if SKAT: davies, kuonen, or liu; if Burden: Score, Wald, or Firth (string)
+# weights : parameters of beta distribution for variant weights (comma separated string in form: "1,25")
 # Outputs:
 # assoc : an RData file of associations results (.RData)
 
@@ -15,16 +17,6 @@ library(GWASTools)
 library(SeqArray)
 library(SeqVarTools)
 library(data.table)
-
-##### testing inputs
-# gds.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/gds_files/freeze.5b.chr10.pass_and_fail.gtonly.minDP10.chunk1.gds"
-# null.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/null_models/group_method_testing_null.RDa"
-# label <- "group_test"
-# test <- "SKAT"
-# pval <- "kuonen"
-# group.file <- "/Users/tmajaria/Documents/projects/topmed/data/test_inputs/groups/testing_groups.RData"
-# weights <- as.numeric(unlist(strsplit("1,25",",")))
-#####
 
 # Parse input args
 input_args <- commandArgs(trailingOnly=T)

@@ -2,9 +2,9 @@
 # Description: Generate a summary of association results including quantile-quantile and manhattan plots for all groups. Also generates CSV files of all associations.
 # Inputs:
 # label : prefix for output filename (string)
-# assoc.files : comma separated list of association results, output of assocTest (string)
+# assoc.files : comma separated list of association results, output of aggAssocTest (string)
 
-# Check if required packages are installed (sourced from https://stackoverflow.com/questions/4090169/elegant-way-to-check-for-missing-packages-and-install-them)
+# Check if required packages are installed
 packages <- c("qqman","data.table","stringr")
 to_install <- packages[!(packages %in% installed.packages()[,"Package"])]
 if(length(to_install)) install.packages(to_install,repos='http://cran.us.r-project.org')

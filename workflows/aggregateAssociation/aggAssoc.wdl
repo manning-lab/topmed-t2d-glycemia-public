@@ -127,9 +127,11 @@ workflow group_assoc_wf {
 	String? this_pval
 	String? this_weights
 	
+	# other inputs
 	Int this_memory
 	Int this_disk
 	
+	# gds and group files must be in the same order, one group file per gds file
 	Array[Pair[File,File]] these_gds_groups = zip(these_gds_files, these_group_files)
 
 	call getScript
