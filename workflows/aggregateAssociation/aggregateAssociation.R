@@ -1,4 +1,13 @@
-# aggAssociation.R
+### aggAssociation.R
+# Description: This function performs an aggregate association test using the skat or burden methods.
+# Inputs:
+# gds.file : a genotype file containing data for all samples are variants to be tested (.gds)
+# null.file : output of the function *fitNull* or a pregenerated null model (.RDa)
+# label : prefix for output filename (string)
+# test : statistical test (Score or Wald, default = Score)
+# mac : minimum minor allele count for variants to be included in analysis (int, default = 5)
+# Outputs:
+# assoc : an RData file of associations results (.RData)
 
 # Load packages
 library(GENESIS)
@@ -66,13 +75,22 @@ if (group_ext == 'RData'){
 groups = groups[!duplicated(names(groups))]
 
 #### run association test
-if(test=="SKAT"){
-  assoc <- assocTestSeq(gds.geno.data, nullmod, groups, test=test, pval.method=pval, weight.beta = weights)
+if(tolower(test)=="skat"){
+  assoc <- assocTestSeq(gds.geno.data, nullmod, groups, test="SKAT", pval.method=pval, weight.beta = weights)
   assoc$results = assoc$results[order(assoc$results$pval_0),]
   for (group_name in names(assoc$variantInfo)){
     assoc$results[group_name,"MAF"] <- mean(assoc$variantInfo[[group_name]]$freq)
   }
   save(assoc, file=paste(label, ".assoc.RData", sep=""))
+} else if (tolower(test) == "burden") {
+  assoc <- assocTestSeq(gds.geno.data, nullmod, groups, test="Burden", burden.test=pval, weight.beta = weights)
+  assoc$results = assoc$results[order(assoc$results[,paste(pval,".pval",sep="")]),]
+  for (group_name in names(assoc$variantInfo)){
+    assoc$results[group_name,"MAF"] <- mean(assoc$variantInfo[[group_name]]$freq)
+  }
+  names(assoc$results)[names(assoc$results) == paste(pval,".pval",sep="")] = "pval_0"
+  save(assoc, file=paste(label, ".assoc.RData", sep=""))
+  
 } else {
   fwrite(list(), file=paste(label, ".assoc.RData", sep=""))
 }
