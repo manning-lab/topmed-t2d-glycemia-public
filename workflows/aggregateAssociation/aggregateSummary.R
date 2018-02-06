@@ -1,8 +1,6 @@
 # summary.R
-# Description: Generate a summary of association results including quantile-quantile and manhattan plots for variants subseted by minor allele frequency (all variants, maf < 5%, maf >= 5%). Also generates CSV files of all and the top associated variants.
+# Description: Generate a summary of association results including quantile-quantile and manhattan plots for all groups. Also generates CSV files of all associations.
 # Inputs:
-# pval : the p-value column in the output of assocTest, this should be the statistical test with ".pval" appended (string, Score -> Score.pval, Wald -> Wald.pval)
-# pval.threshold : p-value threshold for the returning top associations, top association output will include only variants with a p-value less than the threshold (float, default = 0.0001)
 # label : prefix for output filename (string)
 # assoc.files : comma separated list of association results, output of assocTest (string)
 
