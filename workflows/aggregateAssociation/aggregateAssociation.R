@@ -72,7 +72,7 @@ if(test=="SKAT"){
   for (group_name in names(assoc$variantInfo)){
     assoc$results[group_name,"MAF"] <- mean(assoc$variantInfo[[group_name]]$freq)
   }
-  save(assoc$results, file=paste(label, ".assoc.RData", sep=""))
+  save(assoc, file=paste(label, ".assoc.RData", sep=""))
 } else {
   fwrite(list(), file=paste(label, ".assoc.RData", sep=""))
 }
