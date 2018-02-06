@@ -99,7 +99,11 @@ all_vals <- c(id.col,outcome.name,covariates)
 phenotype.slim <- na.omit(as.data.frame(phenotype.data[,all_vals,drop=F]))
 
 # Read in the list of sample ids to be used in analysis
-sample.ids <- unique(readLines(sample.file))
+if (!(sample.file == "NA")){
+  sample.ids <- unique(readLines(sample.file))
+} else {
+  sample.ids = phenotype.slim[,id.col]
+}
 
 # Only keep phenotypes from these samples
 phenotype.slim <- phenotype.slim[phenotype.slim[,id.col] %in% sample.ids,na.omit(all_vals,drop=F)]
