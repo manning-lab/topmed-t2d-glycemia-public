@@ -53,13 +53,14 @@ task summary {
 	String? conditional_string
 	String label
 	String cohort_column
+	String sex_column
 
 	File script
 	Int memory
 	Int disk
 
 	command {
-		R --vanilla --args ${phenotype_file} ${outcome_name} ${default="NA" covariates_string} ${default="NA" conditional_string} ${label} ${cohort_column} < ${script}
+		R --vanilla --args ${phenotype_file} ${outcome_name} ${default="NA" covariates_string} ${default="NA" conditional_string} ${label} ${cohort_column} ${sex_column} < ${script}
 	}
 
 	runtime {
@@ -90,6 +91,7 @@ workflow nullModel {
 	
 	# summary inputs
 	String this_cohort_column
+	String this_sex_column
 
 	# other workflow inputs
 	Int this_memory
@@ -104,7 +106,7 @@ workflow nullModel {
 	}
 
 	call summary {
-		input: phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, covariates_string = this_covariates_string, conditional_string = this_conditional_string, label = this_label, cohort_column = this_cohort_column, script = getScript.summary_script, memory = this_memory, disk = this_disk
+		input: phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, covariates_string = this_covariates_string, conditional_string = this_conditional_string, label = this_label, cohort_column = this_cohort_column, sex_column = this_sex_column, script = getScript.summary_script, memory = this_memory, disk = this_disk
 	}
 
 	output {
