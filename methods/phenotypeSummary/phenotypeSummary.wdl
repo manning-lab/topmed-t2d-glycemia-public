@@ -18,14 +18,15 @@ task summary {
 	String covars
 	String? conditional_string
 	String label 
-	String cohort_column 
+	String cohort_column
+	String sex_column
 
 	File script
 	Int memory
 	Int disk
 
 	command {
-		R --vanilla --args ${ped_file} ${outcome} ${covars} ${default="NA" conditional_string} ${label} ${cohort_column} < ${script}
+		R --vanilla --args ${ped_file} ${outcome} ${covars} ${default="NA" conditional_string} ${label} ${cohort_column} ${sex_column} < ${script}
 	}
 
 	runtime {
@@ -48,6 +49,7 @@ workflow phenotypeSummary {
 	String? this_conditional_string
 	String this_label
 	String this_cohort_column
+	String this_sex_column
 
 	Int this_memory
 	Int this_disk
@@ -55,6 +57,6 @@ workflow phenotypeSummary {
 	call getScript
 	
 	call summary {
-            input: ped_file = this_ped_file, outcome = this_outcome, covars = this_covars, conditional_string = this_conditional_string, label = this_label, cohort_column = this_cohort_column, script = getScript.script, memory = this_memory, disk = this_disk
+            input: ped_file = this_ped_file, outcome = this_outcome, covars = this_covars, conditional_string = this_conditional_string, label = this_label, cohort_column = this_cohort_column, sex_column = this_sex_column, script = getScript.script, memory = this_memory, disk = this_disk
 	}
 }
