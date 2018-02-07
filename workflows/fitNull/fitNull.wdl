@@ -1,7 +1,7 @@
 task getScript {
 	command {
-		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/fitNull/genesis_nullmodel.R
-		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/methods/phenotypeSummary/phenotypeSummary.R
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/issue_46/workflows/fitNull/genesis_nullmodel.R
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/issue_46/methods/phenotypeSummary/phenotypeSummary.R
 	}
 
 	runtime {
@@ -22,7 +22,7 @@ task fitNull {
 	String? covariates_string
 	String? conditional_string
 	String? ivars_string
-	File sample_file
+	File? sample_file
 	String label
 	File kinship_matrix
 	String id_col
@@ -32,7 +32,7 @@ task fitNull {
 	Int disk
 
 	command {
-		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${default="NA" covariates_string} ${default="NA" conditional_string} ${default="NA" ivars_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
+		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${default="NA" covariates_string} ${default="NA" conditional_string} ${default="NA" ivars_string} ${default="NA" sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
 	}
 
 	runtime {
@@ -84,7 +84,7 @@ workflow nullModel {
 	String? this_covariates_string
 	String? this_conditional_string
 	String? this_ivars_string
-	File this_sample_file
+	File? this_sample_file
 	String this_label
 	File this_kinship_matrix
 	String this_id_col

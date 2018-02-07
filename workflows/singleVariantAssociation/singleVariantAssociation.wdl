@@ -31,7 +31,7 @@ task conditionalPhenotype {
 	Int disk
 
 	command {
-		R --vanilla --args ${sep="," genotype_files} ${phenotype_file} ${id_col} ${sample_file} ${snps} ${label} < ${script}
+		R --vanilla --args ${sep="," genotype_files} ${phenotype_file} ${id_col} ${default="NA" sample_file} ${snps} ${label} < ${script}
 	}
 
 	runtime {
@@ -64,7 +64,7 @@ task fitNull {
 	Int disk
 
 	command {
-		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${default="NA" covariates_string} ${default="NA" conditional_string} ${default="NA" ivars_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
+		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${default="NA" covariates_string} ${default="NA" conditional_string} ${default="NA" ivars_string} ${default="NA" sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
 	}
 
 	runtime {

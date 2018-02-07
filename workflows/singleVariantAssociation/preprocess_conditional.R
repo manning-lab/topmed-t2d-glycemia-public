@@ -34,7 +34,12 @@ for (s in snps){
 colnames(snp.df) <- c("chr","pos")
 
 # First get the sample ids
-sample.ids <- unique(readLines(sample.file))
+if (!(sample.file == "NA")){
+  sample.ids <- unique(readLines(sample.file))
+} else {
+  sample.ids = c()
+}
+
 
 # Assign an array to hold the dosage info for each snp
 dosage <- list()
@@ -46,7 +51,11 @@ for (f in gds.files){
 	f.data <- seqOpen(f)
 
 	# subset by the samples 
-	seqSetFilter(f.data, sample.id=sample.ids)
+	if (!(sample.file == "NA")){
+		seqSetFilter(f.data, sample.id=sample.ids)
+	} else {
+		sample.ids = seqGetData(f.data,"sample.id")
+	}
 
 	# Collect some info on the variants so we can see which are in this gds file
 	f.var <- data.frame(id=seqGetData(f.data,"variant.id"), chr=seqGetData(f.data,"chromosome"), pos=seqGetData(f.data,"position"))
