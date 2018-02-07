@@ -9,7 +9,6 @@ This workflow performs an aggregate association analysis of genotype data with a
 This workflow is produced and maintained by the [Manning Lab](https://manning-lab.github.io/). Contributing authors include:
 
 * Tim Majarian (tmajaria@broadinstitute.org)
-* Jasen Jackson (jasenjackson97@gmail.com)
 * Alisa Manning (amanning@broadinstitute.org).
 
 ## Dependencies
@@ -64,7 +63,7 @@ This function performs an association test to generate p-values for each variant
 Inputs:
 * gds_file : a genotype file containing data for all samples are variants to be tested (.gds)
 * null_file : output of the function *fitNull* or a pregenerated null model (.RDa)
-* group_file : RData or csv file with groups to include in analysis, if RData, must be saved as a list with unique names, each entry as a data frame with at least variant ids and allele. If csv, must have at least columns for group id, variant id, and allele (csv or RData)
+* group_file : RData or csv file with groups to include in analysis, if RData, must be saved as a list with unique names, each entry as a data frame with at least variant ids and allele. If csv, must have at least columns for group_id, position, alt, ref (csv or RData)
 * label : prefix for output filename (string)
 * test : SKAT or Burden (string)
 * pval : if SKAT: davies, kuonen, or liu; if Burden: Score, Wald, or Firth (string)
