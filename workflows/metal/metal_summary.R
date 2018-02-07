@@ -43,20 +43,19 @@ if (length(assoc.names) < length(assoc.files)){
 # load metal results
 metal.data <- fread(metal.file,data.table=F)
 
-# loop through results
 for (f in seq(1,length(assoc.files))) {
   assoc.data <- fread(assoc.files[f],data.table=F)
   if (f == 1){
-    assoc.data = assoc.data[,c(marker.column, cols.tokeep, freq.column, pval.column, sample.column)]
-    n <- NCOL(assoc.data)
-    colnames(assoc.data)[(n-2):n] <- sub("^",paste(assoc.names[f],"_",sep=""),colnames(assoc.data)[(n-2):n])
+    assoc.data.all = assoc.data[,c(marker.column, cols.tokeep, freq.column, pval.column, sample.column)]
+    colnames(assoc.data.all)[which(colnames(assoc.data.all) %in% c(freq.column, pval.column, sample.column))] <- paste(c(freq.column, pval.column, sample.column),assoc.names[f],sep=".")
   } else {
-    assoc.data = assoc.data[,c(marker.column, freq.column, pval.column, sample.column)]
-    n <- NCOL(assoc.data)
-    colnames(assoc.data)[2:n] <- sub("^",paste(assoc.names[f],"_",sep=""),colnames(assoc.data)[2:n])
+
+  assoc.data.all <- merge(assoc.data.all, assoc.data, by=c(marker.column,cols.tokeep),suffixes = c("",paste(".",assoc.names[f],sep="")),all=T)
   }
-  metal.data <- merge(metal.data, assoc.data, by.x=c("MarkerName"), by.y=c(marker.column))
 }
+
+metal.data <- merge(metal.data,assoc.data.all,by.x=c("MarkerName"), by.y=marker.column,all.x=T)
+
 
 # order based on meta pvalue
 metal.data = metal.data[order(metal.data[,"P-value"]),]
