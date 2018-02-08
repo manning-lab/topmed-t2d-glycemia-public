@@ -1,7 +1,7 @@
 task getScript {
 	command {
-		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/issue_50/workflows/fitNull/genesis_nullmodel.R
-		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/issue_50/methods/phenotypeSummary/phenotypeSummary.R
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/workflows/fitNull/genesis_nullmodel.R
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/methods/phenotypeSummary/phenotypeSummary.R
 	}
 
 	runtime {
