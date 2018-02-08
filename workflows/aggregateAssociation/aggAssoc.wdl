@@ -22,7 +22,6 @@ task fitNull {
 	String? outcome_name
 	String? outcome_type
 	String? covariates_string
-	String? ivars_string
 	File? sample_file
 	String label
 	File? kinship_matrix
@@ -33,7 +32,7 @@ task fitNull {
 	Int disk
 
 	command {
-		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${default="NA" covariates_string} "NA" ${default="NA" ivars_string} ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
+		R --vanilla --args ${genotype_file} ${phenotype_file} ${outcome_name} ${outcome_type} ${default="NA" covariates_string} "NA" "NA" ${sample_file} ${label} ${kinship_matrix} ${id_col} < ${script}
 	}
 
 	runtime {
@@ -113,7 +112,6 @@ workflow group_assoc_wf {
 	String? this_outcome_name
 	String? this_outcome_type
 	String? this_covariates_string
-	String? this_ivars_string
 	File? this_sample_file
 	String this_label
 	File? this_kinship_matrix
@@ -142,7 +140,7 @@ workflow group_assoc_wf {
 	if (!have_null) {
 
 		call fitNull {
-				input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, ivars_string = this_ivars_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
+				input: genotype_file = null_genotype_file, phenotype_file = this_phenotype_file, outcome_name = this_outcome_name, outcome_type = this_outcome_type, covariates_string = this_covariates_string, sample_file = this_sample_file, label = this_label, kinship_matrix = this_kinship_matrix, id_col = this_id_col, script = getScript.null_script, memory = this_memory, disk = this_disk
 			}
 
 		scatter(this_gds_group in these_gds_groups) {
