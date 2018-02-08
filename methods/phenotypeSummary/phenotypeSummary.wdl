@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/phenotype_summary/methods/phenotypeSummary/phenotypeSummary.R
+		wget https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/methods/phenotypeSummary/phenotypeSummary.R
 	}
 
 	runtime {
@@ -15,7 +15,8 @@ task getScript {
 task summary {
 	File ped_file
 	String outcome 
-	String covars 
+	String covars
+	String? conditional_string
 	String label 
 	String cohort_column 
 
@@ -24,7 +25,7 @@ task summary {
 	Int disk
 
 	command {
-		R --vanilla --args ${ped_file} ${outcome} ${covars} ${label} ${cohort_column} < ${script}
+		R --vanilla --args ${ped_file} ${outcome} ${covars} ${default="NA" conditional_string} ${label} ${cohort_column} < ${script}
 	}
 
 	runtime {
@@ -44,6 +45,7 @@ workflow phenotypeSummary {
 	File this_ped_file
 	String this_outcome
 	String this_covars
+	String? this_conditional_string
 	String this_label
 	String this_cohort_column
 
@@ -53,6 +55,6 @@ workflow phenotypeSummary {
 	call getScript
 	
 	call summary {
-            input: ped_file = this_ped_file, outcome = this_outcome, covars = this_covars, label = this_label, cohort_column = this_cohort_column, script = getScript.script, memory = this_memory, disk = this_disk
+            input: ped_file = this_ped_file, outcome = this_outcome, covars = this_covars, conditional_string = this_conditional_string, label = this_label, cohort_column = this_cohort_column, script = getScript.script, memory = this_memory, disk = this_disk
 	}
 }
