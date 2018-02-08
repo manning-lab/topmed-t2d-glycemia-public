@@ -3,9 +3,15 @@ ped.file <- input_args[1]
 outcome <- input_args[2]
 covars <- unlist(strsplit(input_args[3],","))
 conditional.string <- input_args[4]
-label <- input_args[5]
-cohort_column <- input_args[6]
-sex_column <- input_args[7]
+ivar.string <- input_args[5]
+label <- input_args[6]
+cohort_column <- input_args[7]
+sex_column <- input_args[8]
+
+# add ivars
+if (!(ivar.string == "NA")){
+  covars <- c(covars,unlist(strsplit(ivar.string,",")))
+}
 
 # get the length of covars
 ncovar <- length(covars)
