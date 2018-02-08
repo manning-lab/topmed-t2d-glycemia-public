@@ -4,19 +4,13 @@ outcome <- input_args[2]
 covars <- unlist(strsplit(input_args[3],","))
 conditional.string <- input_args[4]
 ivar.string <- input_args[5]
-group.var <- input_args[6]
-label <- input_args[7]
-cohort_column <- input_args[8]
-sex_column <- input_args[9]
+label <- input_args[6]
+cohort_column <- input_args[7]
+sex_column <- input_args[8]
 
 # add ivars
 if (!(ivar.string == "NA")){
   covars <- c(covars,unlist(strsplit(ivar.string,",")))
-}
-
-# add het var
-if (!(group.var == "NA")){
-  covars <- c(covars,group.var)
 }
 
 # get the length of covars
