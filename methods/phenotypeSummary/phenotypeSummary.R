@@ -3,9 +3,17 @@ ped.file <- input_args[1]
 outcome <- input_args[2]
 covars <- unlist(strsplit(input_args[3],","))
 conditional.string <- input_args[4]
-label <- input_args[5]
-cohort_column <- input_args[6]
+ivar.string <- input_args[5]
+label <- input_args[6]
+cohort_column <- input_args[7]
+sex_column <- input_args[8]
 
+# add ivars
+if (!(ivar.string == "NA")){
+  covars <- c(covars,unlist(strsplit(ivar.string,",")))
+}
+
+# get the length of covars
 ncovar <- length(covars)
 
 # If this is conditional, combine with covariates
@@ -23,7 +31,7 @@ print(summary(ped.data))
 print(cohort_column)
 print(outcome)
 print(covars)
-ped.data = na.omit(as.data.frame(ped.data[,unique(c(cohort_column,outcome,covars)),drop=F]))
+ped.data = na.omit(as.data.frame(ped.data[,unique(c(cohort_column,sex_column,outcome,covars)),drop=F]))
 print(summary(ped.data))
 
 # Change phenotype names
@@ -375,11 +383,6 @@ quant_covars = quant_covars[quant_covars != cohort_column]
 
 # Initialize the pdf
 pdf(paste(label,"_plots.pdf",sep=""),width=11)
-# if (length(quant_covars) > 1){
-#   layout(matrix(seq(1,6*(length(quant_covars)-1)),nrow=length(quant_covars)-1,ncol=6,byrow=T))
-# }else{
-#   layout(matrix(seq(1,6*(length(quant_covars))),nrow=length(quant_covars),ncol=6,byrow=T))
-# }
 
 # For each continuous covariate
 for (i in quant_covars){
@@ -396,7 +399,7 @@ for (i in quant_covars){
   }
   # Plot samples devided by sex
   plot <- ggplot(ped.data, aes_string(cohort_column, i)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) 
-  print(plot + geom_boxplot(aes(fill=factor(sex))) + labs(title = "All samples by sex",x="Cohort",y=i,fill="sex"))
+  print(plot + geom_boxplot(aes(fill=factor(get(sex_column)))) + labs(title = "All samples by sex",x="Cohort",y=i,fill=sex_column))
 }
 
 dev.off()
