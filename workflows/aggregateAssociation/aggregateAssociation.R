@@ -64,7 +64,14 @@ if (group_ext == 'RData'){
   stop("Group file does not have the required extension")
 }
 
+# make sure we have no duplicates
 groups = groups[!duplicated(names(groups))]
+
+# make sure all groups are in the gds file
+groups.var_id <- do.call(rbind, groups)$variant.id
+if (any(!(groups.var_id %in% gds.geno.data@variantData@data$variant.id))){
+  stop("One or more groups contain variants that are not in the genotype file")
+}
 
 #### run association test
 if(tolower(test)=="skat"){
