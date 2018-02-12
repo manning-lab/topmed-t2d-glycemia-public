@@ -352,6 +352,14 @@ pdf(paste(label,"_plots.pdf",sep=""),width=11)
 # }else{
 #   layout(matrix(seq(1,6*(length(quant_covars))),nrow=length(quant_covars),ncol=6,byrow=T))
 # }
+                  
+## prepare a copy of pheno dataframe called "plot_pheno" for facetting
+plot_pheno <- pheno
+colnames(plot_pheno)[which(names(plot_pheno) == outcome.name)]  <- "outcome"## rename outcome column for generic use in for-loop
+
+## change the datatype of the "outcome" column to factor, and rename the levels to "controls and cases" (0 - Controls, 1 - Cases)
+plot_pheno[,"outcome"] <- as.factor(plot_pheno[,"outcome"])
+levels(plot_pheno[,"outcome"]) <- c("Controls", "Cases")
 
 
 # For each continuous covariate
