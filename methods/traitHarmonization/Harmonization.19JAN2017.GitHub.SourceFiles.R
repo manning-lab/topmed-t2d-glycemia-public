@@ -1,4 +1,46 @@
 ## T2D Harmonization  Source Files
+# list of files:
+# sample_annotation.file <- "freeze5b_sample_annot_2017-12-01.txt"
+# MGH.file <- "MGH_Parent_dbGaP_SubjectPhenotypesDS_v3.txt"
+# VU.file <- "phs001032.v3.pht005675.v3.p2.c1.TOPMed_WGS_VUH_AF_Subject_Phenotypes.GRU-IRB.txt"
+# afp.file <- "phs001024.v2.pht005693.v1.p1.c1.TOPMed_WGS_Partners_AFGen_Subject_Phenotypes.HMB.txt"
+# afvub.file <- "VUH_Ablation_dbGaP_SubjectPhenotypesDS_v2.txt'"
+# afccaf.file <- "CCAF_dbGaP_SubjectPhenotypesDS_v5.txt"
+# HVH.file <- "HVH_FLOYD_20170818_T2DPhenotype.PED"
+# ARIC.AF.file <- "ARIC_AA_NMAYA_20161220_T2D.ped"
+# ARIC.EU.file <- "ARIC_EU_NMAYA_20161220_T2D.ped"
+# copd.1.file <- "phs000179.v5.pht002239.v4.p2.c1.COPDGene_Subject_Phenotypes.HMB.txt"
+# copd.2.file <- "phs000179.v5.pht002239.v4.p2.c2.COPDGene_Subject_Phenotypes.DS"
+# amish.file <- "Amish_HuichunXu_May152017_T2D.ped"
+# cfs.file <- "CFS_12May17_T2D_Freeze4.ped"
+# sas.file <- "SAS_LIULIN_20170212_T2D.ped"
+# jhs.file <- "JHS_T2Dincidence_16Aug2017.ped"
+# fhs.file <- "FHS_T2D_20170214_CS.ped"
+# whi.EU.file <- "WHI_EU_MP_20170726_T2D.ped"
+# whi.AF.file <- "WHI_AA_MP_20170726_T2D.ped"
+# whi.AS.file <- "WHI_AS_MP_20170726_T2D.ped"
+# whi.HS.file <- "WHI_HA_MP_20170726_T2D.ped"
+# gensalt.EU.file <- "GenSalt_EA_XuenanMi_20170614_T2D.ped"
+# genestar.AF.file <- "GeneSTAR_AA_YANEK_20170720_T2D.ped"
+# genestar.EU.file <- "GeneSTAR_EU_YANEK_20170720_T2D.ped"
+# mesa.AF.file <- "MESA_AA_ABIGAILBALDRIDGE_04JAN17_T2D_sidno.csv"
+# mesa.EU.file <- "MESA_EU_ABIGAILBALDRIDGE_04JAN17_T2D_sidno.csv"
+# mesa.HS.file <- "MESA_HA_ABIGAILBALDRIDGE_04JAN17_T2D_sidno.csv"
+# mesa.AS.file <- "MESA_SA_ABIGAILBALDRIDGE_04JAN17_T2D_sidno.csv"
+# mesa.fam.file <- "MESA_Family_AA_YAO_20171031_T2D_sidno.txt"
+# chs.file <- "CHS_FLOYD_201708018_T2DPhenotype.PED"
+# genoa.file <- "GENOA_AA_BIELAK_20171030_T2D.ped"
+# dhs.file <- "2a_dbGaP_SubjectPhenotypesDS_AACAC.txt"
+
+##### Questions for Wessel
+# 2 amish files, only using one (not using Amish_HuichunXu_May152017_T2D.DD.ncbi_enc)
+# what AACAC file to use? need 2a and 6a
+# MESA files dont match, does the new file have all of the MESA ancestry groups?
+# gensalt files differ?
+# difference between SA files? what does DD mean?
+# no thrv files included
+# WHI files differ
+
 
 map <- read.table("freeze5b_sample_annot_2017-12-01.txt",
                   header=TRUE, as.is=T, sep="\t") #n=54499 & 16 variables:
