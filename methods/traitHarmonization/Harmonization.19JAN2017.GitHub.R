@@ -12,8 +12,8 @@ f.dir <- args[1]
 source.file <- args[2]
 
 #### testing inputs ####
-f.dir <- "/Users/tmajaria/Documents/projects/topmed/data/freeze5b_phenotypes"
-source.file <- "/Users/tmajaria/Documents/projects/topmed/code/topmed-t2d-glycemia-public/methods/traitHarmonization/Harmonization.19JAN2017.GitHub.SourceFiles.R"
+# f.dir <- "/Users/tmajaria/Documents/projects/topmed/data/freeze5b_phenotypes"
+# source.file <- "/Users/tmajaria/Documents/projects/topmed/code/topmed-t2d-glycemia-public/methods/traitHarmonization/Harmonization.19JAN2017.GitHub.SourceFiles.R"
 ########################
 
 # load all of the phenotype info through the source file
