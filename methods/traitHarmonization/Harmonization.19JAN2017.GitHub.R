@@ -7,16 +7,56 @@
 # BMI = 703·weight(lb)/height2(in2)
 ##
 
-setwd("/N/dc2/scratch/wesselj/OriginalFiles/")
+args <- commandArgs(trailingOnly=T)
+f.dir <- args[1]
+source.file <- args[2]
 
-## MAP
-map <- read.table("freeze5b_sample_annot_2017-12-01.txt",
-                  header=TRUE, as.is=T, sep="\t") #n=54499 & 16 variables:
+#### testing inputs ####
+f.dir <- "/Users/tmajaria/Documents/projects/topmed/data/freeze5b_phenotypes"
+source.file <- "/Users/tmajaria/Documents/projects/topmed/code/topmed-t2d-glycemia-public/methods/traitHarmonization/Harmonization.19JAN2017.GitHub.SourceFiles.R"
+########################
+
+# load all of the phenotype info through the source file
+source(source.file)
+dat <- get_pheno_data(f.dir)
+
+map <- dat$map
+raw.MGH <- dat$raw.MGH
+raw.MGHPed <- dat$raw.MGHPed
+raw.VUdaw <- dat$raw.VUdaw
+raw.VUdawPed <- dat$raw.VUdawPed
+afp <- dat$afp
+afvub <- dat$afvub
+afccaf <- dat$afccaf
+raw.HVH <- dat$raw.HVH
+aric <- dat$aric
+copd.c1 <- dat$copd.c1
+copd.c2 <- dat$copd.c2
+copd <- dat$copd
+amish <- dat$amish
+cfs <- dat$cfs
+sas <- dat$sas
+jhs <- dat$jhs
+fhs <- dat$fhs
+whi <- dat$whi
+gensalt <- dat$gensalt
+genestar <- dat$genestar
+mesa <- dat$mesa
+mesafam <- dat$mesafam
+chs <- dat$chs
+genoa <- dat$genoa
+dhs <- dat$dhs
+dhsPed <- dat$dhsPed
+
+rm(dat)
+
 names(map)
-# "sample.id"            "unique_subject_key"   "submitted_subject_id" "consent"             
-# "sex"                  "sexchr.kary"          "topmed_phs"           "study"               
-# "topmed_project"       "CENTER"               "geno.cntl"            "TRIO.dups"           
-# "MZtwinID"             "keep"                 "unique.geno"          "unique.subj" 
+#  [1] "sample.id"            "unique_subject_key"   "submitted_subject_id"
+#  [4] "consent"              "sex"                  "sexchr.kary"
+#  [7] "topmed_phs"           "study"                "topmed_project"
+# [10] "CENTER"               "geno.cntl"            "TRIO.dups"
+# [13] "MZtwinID"             "keep"                 "unique.geno"
+# [16] "unique.subj"
 
 # n=289 have study unique identifier=NA but have a NWD id assigned, dropping these for now
 #map<-subset(map, (!is.na(map$unique_subject_key))) 
@@ -32,65 +72,168 @@ names(map)
 #n=54124 exclude n=375
 
 table(map$study)
-# Amish        ARIC        BAGS        CCAF         CFS         CHS    COPDGene         CRA         DHS 
-# 1028        3602         962         329         920          69        8640        1041         337 
-# EOCOPD         FHS      GALAII    GeneSTAR       GENOA     GenSalt       GOLDN         HVH    HyperGEN 
-# 66        3749         913        1634        1141        1684         902          66        1774 
-# JHS    Mayo_VTE        MESA      MGH_AF    Partners        SAFS        SAGE Sarcoidosis         SAS 
-# 3128        1250        4814         918         111        1502         451         601        1208 
-# VAFAR       VU_AF        WGHS         WHI 
-# 154        1018          98       10024 
+#       Amish        ARIC        BAGS        CCAF         CFS         CHS
+#        1030        3616         968         329         923          70
+#    COPDGene         CRA         DHS      EOCOPD         FHS      GALAII
+#        8742        1043         339          66        3758         914
+#    GeneSTAR       GENOA     GenSalt       GOLDN         HVH    HyperGEN
+#        1639        1144        1695         904          66        1777
+#         JHS    Mayo_VTE        MESA      MGH_AF    Partners        SAFS
+#        3136        1251        4880         918         111        1509
+#        SAGE Sarcoidosis         SAS       VAFAR       VU_AF        WGHS
+#         452         608        1208         157        1024          99
+#         WHI
+#       10047
 
-## Create variables
+## Create variables for final pooled file
 map$individual_id = map$submitted_subject_id
 map$topmedid = map$sample.id
 map$study_topmedid <- paste(map$study,map$sample.id, sep = "_")
 
-map <- subset(map, select=c("study_topmedid","topmedid","individual_id","sample.id", "unique_subject_key",
-                            "submitted_subject_id", "consent", "sexchr.kary",  "topmed_phs", "study", 
-                            "topmed_project", "CENTER", "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", 
-                            "unique.geno",  "unique.subj" ))
+# remove some columns
+map <- subset(map,
+ select=c("study_topmedid",
+    "topmedid",
+    "individual_id",
+    "sample.id",
+    "unique_subject_key",
+    "submitted_subject_id",
+    "consent", "sexchr.kary",
+    "topmed_phs", "study",
+    "topmed_project",
+    "CENTER",
+    "geno.cntl",
+    "TRIO.dups",
+    "MZtwinID",
+    "keep",
+    "unique.geno",
+    "unique.subj" )
+ )
 
-##
-# AFib MGH
+head(map)
+
+#       study_topmedid  topmedid   individual_id sample.id
+# 1      JHS_NWD100014 NWD100014             306 NWD100014
+# 2 COPDGene_NWD100018 NWD100018 COPDGene_P46085 NWD100018
+# 3 GeneSTAR_NWD100027 NWD100027      GS86970684 NWD100027
+# 4   EOCOPD_NWD100047 NWD100047       EO8057436 NWD100047
+# 5    VU_AF_NWD100048 NWD100048     AF1353-0001 NWD100048
+# 6    VU_AF_NWD100057 NWD100057     AF1903-0001 NWD100057
+#         unique_subject_key submitted_subject_id            consent sexchr.kary
+# 1                  JHS_306                  306        HMB-IRB-NPU        <NA>
+# 2 COPDGene_COPDGene_P46085      COPDGene_P46085                HMB        <NA>
+# 3      GeneSTAR_GS86970684           GS86970684 DS-CVD-IRB-NPU-MDS        <NA>
+# 4         EOCOPD_EO8057436            EO8057436           DS-CS-RD        <NA>
+# 5        VU_AF_AF1353-0001          AF1353-0001            GRU-IRB        <NA>
+# 6        VU_AF_AF1903-0001          AF1903-0001            GRU-IRB        <NA>
+#   topmed_phs    study topmed_project   CENTER geno.cntl TRIO.dups MZtwinID keep
+# 1  phs000964      JHS            JHS       uw         0     FALSE       NA TRUE
+# 2  phs000951 COPDGene           COPD    broad         0     FALSE       NA TRUE
+# 3  phs001218 GeneSTAR       GeneSTAR macrogen         0     FALSE       NA TRUE
+# 4  phs000946   EOCOPD           COPD       uw         0     FALSE       NA TRUE
+# 5  phs001032    VU_AF          AFGen    broad         0     FALSE       NA TRUE
+# 6  phs001032    VU_AF          AFGen    broad         0     FALSE       NA TRUE
+#   unique.geno unique.subj
+# 1        TRUE        TRUE
+# 2        TRUE        TRUE
+# 3        TRUE        TRUE
+# 4        TRUE        TRUE
+# 5        TRUE        TRUE
+# 6        TRUE        TRUE
+
+####################### AFib MGH ##############################################
+####################### AFib MGH ##############################################
 ## new file downloaded from dbGaP 5AUG2017
 # 7DEC2017 checked for new files - none
 
 #names(raw.MGHPed)
 # "FAMILY_ID"  "SUBJECT_ID" "FATHER"     "MOTHER"     "SEX" 
+
+# combine pedigree with pheno
 raw.MGHPed <- raw.MGHPed[,c("FAMILY_ID",  "SUBJECT_ID", "FATHER", "MOTHER")]
 raw.MGH <- merge(raw.MGH,raw.MGHPed,by.x='SUBJECT_ID',by.y='SUBJECT_ID',all.x=TRUE) #n=1025 & 25 variables
+
+# remove the old variable
 rm(raw.MGHPed)
+
+# note where this file came from
 raw.MGH$JWsource = "dbGaP"
-mapMGH <- map[which(map$study == "MGH_AF"),] #n=918
-raw.MGH <- merge(mapMGH,raw.MGH,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE) #n=918
-rm(mapMGH)
+
+# merge this map data with MGH data
+raw.MGH <- merge(map[which(map$study == "MGH_AF"),],raw.MGH,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE) #n=918
 
 # recode & check variable names & distributions
 table(raw.MGH$diabetes,useNA='always')
-raw.MGH$t2d = ifelse(is.na(raw.MGH$diabetes),NA,raw.MGH$diabetes)
+# no  yes <NA>
+#  857   55    6
+
+# rename column for diabetes
+names(raw.MGH)[names(raw.MGH) == "diabetes"] <- "t2d"
+
+# recode t2d status
 raw.MGH$t2d[raw.MGH$t2d == 'yes'] = 2
 raw.MGH$t2d[raw.MGH$t2d == 'no'] = 0
-with(raw.MGH,table(diabetes,t2d,useNA='always')) 
+
+table(raw.MGH$t2d,useNA='always')
+ #   0    2 <NA>
+ # 857   55    6
+
 table(raw.MGH$race,useNA='always')
+# american_indian american_indian_black                 white
+#                     9                     1                   908
+#                  <NA>
+#                     0
 table(raw.MGH$ethnicity,useNA='always')
+ #  no  yes <NA>
+ # 905   13    0
+
+# recode ancestry
+## AMR = american indian
 raw.MGH$ancestry[raw.MGH$race == 'american_indian' & raw.MGH$ethnicity == 'no'] = "AMR"
 raw.MGH$ancestry[raw.MGH$race == 'american_indian_black' & raw.MGH$ethnicity == 'no'] = "MIXED"
 raw.MGH$ancestry[raw.MGH$race == 'white' & raw.MGH$ethnicity == 'no'] = "EU"
 raw.MGH$ancestry[raw.MGH$race == 'white' & raw.MGH$ethnicity == 'yes'] = "HS"
+
 table(raw.MGH$ancestry,useNA='always')
+  # AMR    EU    HS MIXED  <NA>
+  #   9   895    13     1     0
+
 table(raw.MGH$sex,useNA='always')
+# female   male   <NA>
+#    194    724      0
+
+# recode sex
 raw.MGH$origsex = raw.MGH$sex
 raw.MGH$sex[raw.MGH$sex == 'male'] = 'M'
 raw.MGH$sex[raw.MGH$sex == 'female'] = 'F'
 with(raw.MGH,table(origsex,sex,useNA='always'))
+#        sex
+# origsex    F   M <NA>
+#   female 194   0    0
+#   male     0 724    0
+#   <NA>     0   0    0
+
 summary(raw.MGH$age)
+  #  Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+  # 18.00   48.00   56.00   54.66   62.00   82.00
+
+# recode age
 raw.MGH$last_exam_age = raw.MGH$age
+
 #raw.MGH = subset(raw.MGH, age >= 25) #drop 11 individuals
 summary(raw.MGH$height)
+  #  Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's
+  # 54.00   68.00   71.00   70.25   73.00   82.00       8
 summary(raw.MGH$weight)
+  #  Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's
+  # 100.0   174.2   198.0   201.7   225.0   480.0       8
+
+  # calc bmi
 raw.MGH$last_exam_bmi = ((703*raw.MGH$weight)/(raw.MGH$height*raw.MGH$height))
+
 summary(raw.MGH$last_exam_bmi) # low BMI - exclude?
+
+# assign missing values for things we dont have data for
 raw.MGH$last_exam_fg = NA
 raw.MGH$last_exam_hba1c = NA
 raw.MGH$last_exam_t2d_treatment = NA
@@ -111,6 +254,12 @@ raw.MGH <- raw.MGH[,c('topmedid','individual_id','FamilyID','MaternalID','Patern
                       "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=918
 #6 missing diabetes status
+
+####################### AFib MGH ##############################################
+####################### AFib MGH ##############################################
+
+####################### AFib VU ##############################################
+####################### AFib VU ##############################################
 
 #
 ## AFib VU
@@ -170,21 +319,25 @@ raw.VUdaw <- raw.VUdaw[,c('topmedid','individual_id','FamilyID','MaternalID','Pa
                           "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=1018
 
+####################### AFib VU ##############################################
+####################### AFib VU ##############################################
+
+####################### AFib Partners ##############################################
+####################### AFib Partners ##############################################
 #
 ## AFib Partners
 # 7DEC2017 using downloaded newly released data 6OCT2017
 
 afp$JWsource = "dbGaP"
-mapP <- map[which(map$study == "Partners"),] #n=111
-afp <- merge(mapP,afp,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE)
-rm(mapP)
+afp <- merge(map[which(map$study == "Partners"),],afp,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE)
 
 # recode & check variable names & distributions
 table(afp$diabetes,useNA='always')
-afp$t2d = ifelse(is.na(afp$diabetes),NA,afp$diabetes)
-afp$t2d[afp$diabetes == 'yes'] = 2
-afp$t2d[afp$diabetes == 'no'] = 0
-with(afp,table(diabetes,t2d,useNA='always'))
+names(afp)[names(afp) == "diabetes"] <- "t2d"
+afp$t2d[afp$t2d == 'yes'] = 2
+afp$t2d[afp$t2d == 'no'] = 0
+
+# recode ancestry
 table(afp$race,useNA='always')
 table(afp$ethnicity,useNA='always')
 afp$ancestry[afp$race == 'black' & afp$ethnicity == 'no'] = "AF"
@@ -193,17 +346,24 @@ afp$ancestry[afp$race == 'white'] = "EU"
 afp$ancestry[afp$race == 'asian' & afp$ethnicity == 'no'] = "AS"
 afp$ancestry[afp$race == 'hispanic' & afp$ethnicity == 'yes'] = "HS"
 afp$ancestry[afp$race == 'other' & afp$ethnicity == 'no'] = "OTHER"
+
 table(afp$ancestry,useNA='always')
+
+# recode sex
 table(afp$sex,useNA='always')
 afp$origsex = afp$sex
 afp$sex[afp$sex == 'male'] = 'M'
 afp$sex[afp$sex == 'female'] = 'F'
 with(afp,table(origsex,sex,useNA='always'))
+
+# recode age
 summary(afp$age)
 afp$last_exam_age = afp$age
 #afp = subset(afp, last_exam_age >= 25) #drop 2 individuals
 afp = subset(afp, weight <= 401) #drop 1 individual
 ## exclude 1 individual with weight = 400+ ##
+
+# recode weight
 afp$weight <- as.numeric(afp$weight)
 class(afp$weight)
 summary(afp$height)
@@ -230,6 +390,11 @@ afp <- afp[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
               "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=111
 
+####################### AFib Partners ##############################################
+####################### AFib Partners ##############################################
+
+####################### VU_Ben ##############################################
+####################### VU_Ben ##############################################
 
 #
 ## AFib VU_Ben
@@ -285,6 +450,12 @@ afvub <- afvub[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID
                   "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=154
 
+####################### VU_Ben ##############################################
+####################### VU_Ben ##############################################
+
+####################### AFib CCAF ##############################################
+####################### AFib CCAF ##############################################
+
 #
 ## AFib CCAF
 # downlaoded new dataset 5AUG2017
@@ -338,6 +509,13 @@ afccaf <- afccaf[,c('topmedid','individual_id','FamilyID','MaternalID','Paternal
                     "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=329
 
+####################### AFib CCAF ##############################################
+####################### AFib CCAF ##############################################
+
+####################### HVH part of AFib and VTE projects ##############################################
+####################### HVH part of AFib and VTE projects ##############################################
+
+
 ## HVH part of AFib and VTE projects
 # HVH updated 18AUG2017
 
@@ -385,7 +563,11 @@ raw.HVH <- raw.HVH[,c('topmedid','individual_id','FamilyID','MaternalID','Patern
                       "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=66
 
+####################### HVH part of AFib and VTE projects ##############################################
+####################### HVH part of AFib and VTE projects ##############################################
 
+####################### ARIC ##############################################
+####################### ARIC ##############################################
 
 ## ARIC
 # NEED TO FIX CODING OF last exam t2d treatment (Y/N/U) if used in analyses
@@ -440,7 +622,12 @@ aric <- aric[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
 #n=3602
 # n=14 missing phenotype data
 
-#####################################################
+####################### ARIC ##############################################
+####################### ARIC ##############################################
+
+####################### COPD Gene Sample & C1 & C2 ##############################################
+####################### COPD Gene Sample & C1 & C2 ##############################################
+
 
 ##COPD Gene Sample & C1 & C2
 
@@ -493,6 +680,12 @@ copd <- copd[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
 #n=8742
 #n=102 with missing phenotype data
 
+####################### COPD Gene Sample & C1 & C2 ##############################################
+####################### COPD Gene Sample & C1 & C2 ##############################################
+
+####################### Amish ##############################################
+####################### Amish ##############################################
+
 ## Amish
 ## Amish has 2 pairs of twins. they left the co-twin out "were removed on our end as
 #twins caused some issues with some of our phenotypes in our in house analysis (but not lipids)"
@@ -543,7 +736,13 @@ amish <- amish[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID
                   "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=1030
 
-#####################################################
+####################### Amish ##############################################
+####################### Amish ##############################################
+
+
+####################### CFS ##############################################
+####################### CFS ##############################################
+
 ## CFS
 # imported data 5AUG2017
 # CFS has 1 MZ twin and both are included in pheno, although they end up being excluded because of age
@@ -597,7 +796,12 @@ cfs <- cfs[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
               "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=920
 
-#####################################################
+####################### CFS ##############################################
+####################### CFS ##############################################
+
+####################### SAS ##############################################
+####################### SAS ##############################################
+
 ## SAS
 
 #T2D NA=0 & -9=497
@@ -652,6 +856,11 @@ sas <- sas[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
               "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=1208
 
+####################### SAS ##############################################
+####################### SAS ##############################################
+
+####################### JHS ##############################################
+####################### JHS ##############################################
 
 ###############################################
 ##JHS
@@ -709,8 +918,13 @@ jhs <- jhs[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
               "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
               "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=3128
+####################### JHS ##############################################
+####################### JHS ##############################################
 
-###############################################
+####################### FHS ##############################################
+####################### FHS ##############################################
+
+
 ##FHS
 # #13AUG2017 currently n=4024 since 1 individual has not been WGSed
 # 15AUG2017 FHS has 6 MZ twin pairs. 
@@ -779,6 +993,11 @@ fhs <- fhs[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
 #n=3758 but 117 are missing phenotype data????
 table(fhs$t2d,useNA='always')
 
+####################### FHS ##############################################
+####################### FHS ##############################################
+
+####################### WHI ##############################################
+####################### WHI ##############################################
 
 ## WHI 
 
@@ -818,7 +1037,15 @@ whi <- whi[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
               "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=10024
 table(whi$study_ancestry,useNA='always')
-#
+
+####################### WHI ##############################################
+####################### WHI ##############################################
+
+
+####################### GenSalt Phase 2 ##############################################
+####################### GenSalt Phase 2 ##############################################
+
+
 # GenSalt Phase 2
 #
 
@@ -868,6 +1095,14 @@ gensalt <- gensalt[,c('topmedid','individual_id','FamilyID','MaternalID','Patern
                       "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=1684
 
+
+####################### GenSalt Phase 2 ##############################################
+####################### GenSalt Phase 2 ##############################################
+
+
+####################### GeneSTAR ##############################################
+####################### GeneSTAR ##############################################
+
 #
 # GeneSTAR
 #
@@ -914,7 +1149,15 @@ genestar <- genestar[,c('topmedid','individual_id','FamilyID','MaternalID','Pate
 
 #n=1634
 table(genestar$sex,useNA='always')
-#
+
+
+####################### GeneSTAR ##############################################
+####################### GeneSTAR ##############################################
+
+
+####################### MESA ##############################################
+####################### MESA ##############################################
+
 # MESA 
 # download 1NOV2017
 
@@ -960,6 +1203,12 @@ mesa <- mesa[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
 #n=4124
 table(mesa$sex,useNA='always')
 
+
+####################### MESA ##############################################
+####################### MESA ##############################################
+
+####################### MESA Family  ##############################################
+####################### MESA Family  ##############################################
 #
 # MESA Family 
 ## download 1NOV2017
@@ -1001,6 +1250,13 @@ mesafam <- mesafam[,c('topmedid','individual_id','FamilyID','MaternalID','Patern
                       "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
                       "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=690
+
+####################### MESA Family  ##############################################
+####################### MESA Family  ##############################################
+
+####################### CHS ##############################################
+####################### CHS ##############################################
+
 
 #
 # CHS
@@ -1047,6 +1303,14 @@ chs <- chs[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
               "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=69
 
+####################### CHS ##############################################
+####################### CHS ##############################################
+
+
+####################### GENOA ##############################################
+####################### GENOA ##############################################
+
+
 ## GENOA download 31OCT2017
 
 genoa$JWsource = "dbGaP_Ex"
@@ -1089,6 +1353,12 @@ genoa <- genoa[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID
                   "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=1141
 
+
+####################### GENOA ##############################################
+####################### GENOA ##############################################
+
+####################### DHS ##############################################
+####################### DHS ##############################################
 
 ## DHS download
 
@@ -1141,6 +1411,13 @@ dhs <- dhs[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
               "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
               "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
 #n=337
+
+####################### DHS ##############################################
+####################### DHS ##############################################
+
+
+####################### DHS ##############################################
+####################### DHS ##############################################
 
 
 ###### ADDED THIS RECODE OF STUDIES  13FEB2018
