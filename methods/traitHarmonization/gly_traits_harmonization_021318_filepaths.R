@@ -3,7 +3,7 @@
 get_pheno_data <- function(f.dir){
 	
 	# define file paths
-	linker.file <- paste(f.dir, "freeze5b_sample_annot_2017-10-16.txt", sep="/")
+	linker.file <- paste(f.dir, "freeze5b_sample_annot_2017-12-01.txt", sep="/")
 	fhs.file <- paste(f.dir, "FHS_glycemicTraits_20170214_CS.ped", sep="/")
 	fhs.pedigree <- paste(f.dir, "share_unrel_comb_01012017.csv", sep="/")
 	jhs.file <- paste(f.dir, "JHS_glycemictraits_29Mar2017.ped", sep="/")
