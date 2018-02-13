@@ -354,7 +354,7 @@ pdf(paste(label,"_plots.pdf",sep=""),width=11)
 # }
                   
 ## prepare a copy of pheno dataframe called "plot_pheno" for facetting
-plot_pheno <- pheno
+plot_pheno <- ped.data
 colnames(plot_pheno)[which(names(plot_pheno) == outcome.name)]  <- "outcome"## rename outcome column for generic use in for-loop
 
 ## change the datatype of the "outcome" column to factor, and rename the levels to "controls and cases" (0 - Controls, 1 - Cases)
