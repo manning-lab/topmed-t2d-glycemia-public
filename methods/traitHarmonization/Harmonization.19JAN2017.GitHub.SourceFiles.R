@@ -39,7 +39,8 @@ get_pheno_data <- function(f.dir){
   genoa.file <- paste(f.dir, "GENOA_AA_BIELAK_20171030_T2D.ped", sep="/")
   dhs.file <- paste(f.dir, "2a_dbGaP_SubjectPhenotypesDS_AACAC.txt", sep="/")
   dhs.pedigree <- paste(f.dir, "6a_dbGaP_PedigreeDS_AACAC_revised072817.txt", sep="/")
-
+  safs.file <- paste(f.dir,'SAFSCVD_HA_MAHANEY_20170807_T2D.ped.csv',sep="/")
+  
   map <- read.table(sample.file,
                     header=TRUE, as.is=T, sep="\t") #n=54499 & 16 variables:
 
@@ -136,5 +137,6 @@ get_pheno_data <- function(f.dir){
 
   dhsPed =read.table(dhs.pedigree,
                      header=T,sep='\t',as.is=T,fill = TRUE) #n=972
+  safs = read.csv(safs.file, header=T,sep=',',as.is=TRUE) #n=2457 (n=2 Sequenced=0)
   sapply(ls(),function(x)get(x),simplify=F,USE.NAMES=T)
 }

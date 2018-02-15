@@ -10,10 +10,12 @@
 args <- commandArgs(trailingOnly=T)
 f.dir <- args[1]
 source.file <- args[2]
+out.pref <- args[3]
 
 #### testing inputs ####
 # f.dir <- "/Users/tmajaria/Documents/projects/topmed/data/freeze5b_phenotypes"
 # source.file <- "/Users/tmajaria/Documents/projects/topmed/code/topmed-t2d-glycemia-public/methods/traitHarmonization/Harmonization.19JAN2017.GitHub.SourceFiles.R"
+# out.pref <- "/Users/tmajaria/Documents/projects/topmed/data/freeze5b_phenotypes/freeze5b_pooled_t2d_tmajarian_021518"
 ########################
 
 # load all of the phenotype info through the source file
@@ -1416,221 +1418,237 @@ dhs <- dhs[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
 ####################### DHS ##############################################
 
 
-####################### DHS ##############################################
-####################### DHS ##############################################
+####################### SAFSCVD ##############################################
+####################### SAFSCVD ##############################################
 
 
-###### ADDED THIS RECODE OF STUDIES  13FEB2018
-## BEGIN
+# ###### ADDED THIS RECODE OF STUDIES  13FEB2018
+# ## BEGIN
 
-# AWAITING PHENOTYPE DATA
-#
-# SAFS CVD
-## 9 SEP 2017 DOWNLOADED new dataset
-# 7DEC2017 checked for new files - none
-safs = read.csv('SAFSCVD_HA_MAHANEY_20170807_T2D.ped.csv', header=T,sep=',',as.is=TRUE) #n=2457 (n=2 Sequenced=0)
-safs$Individual_ID_pheno = safs$Individual_ID
-safs$JWsource = "dbGaP_Ex"
+# # AWAITING PHENOTYPE DATA
+# #
+# # SAFS CVD
+# ## 9 SEP 2017 DOWNLOADED new dataset
+# # 7DEC2017 checked for new files - none
+# safs = read.csv(paste(f.dir,'SAFSCVD_HA_MAHANEY_20170807_T2D.ped.csv',sep="/"), header=T,sep=',',as.is=TRUE) #n=2457 (n=2 Sequenced=0)
+head(safs)
+# safs$Individual_ID_pheno = safs$Individual_ID
+safs3$JWsource = "dbGaP_Ex"
 
-safsid = read.csv("SAFSCVD_PERALTA_09262017_nwd_mappingtable.csv", header=T,sep=',',as.is=TRUE) #n=2713
+safsid = read.csv(paste(f.dir,"SAFSCVD_PERALTA_09262017_nwd_mappingtable.csv",sep="/"), header=T,sep=',',as.is=TRUE) #n=2713
+head(safsid)
 safs2 <- merge(safsid,safs,by.x='NWD.ID',by.y='Individual_ID',all.x=TRUE) #n=2715
-write.csv(safs2,row.names=F,quote=F,file='SAFS.test2.17NOV2017.T2D.csv')
+head(safs2)
+# write.csv(safs2,row.names=F,quote=F,file='SAFS.test2.17NOV2017.T2D.csv')
 
 mapSAFS <- map[which(map$study == "SAFS"),] #n=1509
-safs3 <- merge(mapSAFS,safs,by.x='sample.id',by.y='Individual_ID',all.x=TRUE,all.y=TRUE) #n=1509
-rm(mapSAFS)
-write.csv(safs3,row.names=F,quote=F,file='SAFS.test.25JAN2018.T2D.csv')
+head(mapSAFS)
+safs3 <- merge(mapSAFS,safs2,by.x='sample.id',by.y='NWD.ID') #n=1509
+head(safs3)
+# rm(mapSAFS)
+# write.csv(safs3,row.names=F,quote=F,file=paste(f.dir,'SAFS.test.25JAN2018.T2D.csv',sep="/"))
 
-# recode & check variable names & distributions
-table(safs$Sequenced,useNA='always')
-table(safs$T2D,useNA='always')
-safs$t2d = ifelse(is.na(safs$T2D),-9,safs$T2D)
-with(safs,table(T2D,t2d,useNA='always'))
-safs$ancestry = 'HS'
-table(safs$ancestry,useNA='always')
-table(safs$Sex,useNA='always')
-safs$sex[safs$Sex == 1] = 'M'
-safs$sex[safs$Sex == 2] = 'F'
-with(safs,table(Sex,sex,useNA='always'))
-summary(safs$Last_Exam_Age,useNA='always')
-safs = subset(safs, Last_Exam_Age >= 25) #n=1903, drop 552 individuals
-summary(safs$Last_Exam_BMI) # ! low BMI
-safs$last_exam_age = safs$Last_Exam_Age
-safs$last_exam_bmi = safs$Last_Exam_BMI
-safs$last_exam_fg = safs$Last_Exam._G
-safs$last_exam_hba1c = NA
-## variables are missing contacted MM 26JUL2017
-safs$last_exam_t2d_treatment = safs$last_exam_T2D_treatment
-safs$t2d_age = safs$T2D_age
-safs$t2d_bmi = safs$T2D_BMI
-table(safs$Last_exam_visit,useNA = 'always')
-safs$FamilyID = safs$Family_ID
-safs$PaternalID = safs$Father_ID
-safs$MaternalID = safs$Mother_ID
-#safs$study_ancestry <- paste(safs$study,safs$ancestry, sep = "_")
+# # recode & check variable names & distributions
+table(safs3$Sequenced,useNA='always')
+table(safs3$T2D,useNA='always')
+safs3$t2d = ifelse(is.na(safs3$T2D),-9,safs3$T2D)
+with(safs3,table(T2D,t2d,useNA='always'))
+safs3$ancestry = 'HS'
+table(safs3$ancestry,useNA='always')
+table(safs3$Sex,useNA='always')
+safs3$sex[safs3$Sex == 1] = 'M'
+safs3$sex[safs3$Sex == 2] = 'F'
+with(safs3,table(Sex,sex,useNA='always'))
+summary(safs3$Last_Exam_Age,useNA='always')
 
-safs <- safs[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
+# remove those with NA sex
+safs3 <- safs3[!is.na(safs3$sex),]
+
+summary(safs3$last_exam_age,useNA='always')
+# safs = subset(safs, Last_Exam_Age >= 25) #n=1903, drop 552 individuals
+safs3 = subset(safs3, last_exam_age >= 25) #n=1903, drop 552 individuals
+summary(safs3$last_exam_BMI) # ! low BMI
+# summary(safs$last_exam_BMI) # ! low BMI
+# # safs$last_exam_age = safs$Last_Exam_Age
+# safs$last_exam_age = safs$last_exam_age
+# # safs$last_exam_bmi = safs$Last_Exam_BMI
+safs3$last_exam_bmi = safs3$last_exam_BMI
+safs3$last_exam_fg = safs3$last_exam_FG
+safs3$last_exam_hba1c = NA
+# ## variables are missing contacted MM 26JUL2017
+# safs$last_exam_t2d_treatment = safs$last_exam_T2D_treatment
+safs3$last_exam_t2d_treatment = NA
+safs3$t2d_age = safs3$T2D_age
+safs3$t2d_bmi = safs3$T2D_BMI
+table(safs3$last_exam_visit,useNA = 'always')
+safs3$FamilyID = safs3$Family_ID
+safs3$PaternalID = safs3$Father_ID
+safs3$MaternalID = safs3$Mother_ID
+safs3$study_ancestry <- paste(safs3$study,safs3$ancestry, sep = "_")
+
+safs3 <- safs3[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
                 'sex','t2d','last_exam_age','last_exam_bmi','last_exam_fg',
                 'last_exam_hba1c','last_exam_t2d_treatment','t2d_age','t2d_bmi','study',
                 'study_topmedid','study_ancestry','JWsource','ancestry',
-                "sample.id", "unique_subject_key", "submitted_subject_id", "consent", 
-                "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
+                "sample.id", "unique_subject_key", "submitted_subject_id", "consent",
+                "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER",
                 "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
-#n=????
+# #n=????
 
-### AWAITING GENOTYPE DATA
-##
-# AFib Australia
-## new file downloaded from dbGaP 30OCT2017
-Aus =read.table('Fatkin_Australia_dbGaP_SubjectPhenotypesDS_v1.txt',
-                header=T,sep='\t',as.is=T,fill = TRUE) #n=120 & 17 variables
-Aus$JWsource = "dbGaP"
-mapAus <- map[map$study == "",] #n=
-Aus2 <- merge(mapAus,Aus,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE) #n=789
-rm(mapAus)
+# ### AWAITING GENOTYPE DATA
+# ##
+# # AFib Australia
+# ## new file downloaded from dbGaP 30OCT2017
+# Aus =read.table(paste(f.dir,'Fatkin_Australia_dbGaP_SubjectPhenotypesDS_v1.txt',sep="/"),
+#                 header=T,sep='\t',as.is=T,fill = TRUE) #n=120 & 17 variables
+# Aus$JWsource = "dbGaP"
+# mapAus <- map[map$study == "",] #n=
+# Aus2 <- merge(mapAus,Aus,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE) #n=789
+# rm(mapAus)
 
-# recode & check variable names & distributions
-table(Aus$diabetes,useNA='always')
-Aus$t2d = ifelse(is.na(Aus$diabetes),-9,Aus$diabetes)
-Aus$t2d[Aus$t2d == 'yes'] = 2
-Aus$t2d[Aus$t2d == 'no'] = 0
-with(Aus,table(diabetes,t2d,useNA='always')) #n=5 unknown T2D
-table(Aus$race,useNA='always')
-table(Aus$ethnicity,useNA='always')
-Aus$ancestry[Aus$race == 'white' & Aus$ethnicity == 'no'] = "EU"
-table(Aus$ancestry,useNA='always')
-table(Aus$sex,useNA='always')
-Aus$origsex = Aus$sex
-Aus$sex[Aus$sex == 'male'] = 'M'
-Aus$sex[Aus$sex == 'female'] = 'F'
-with(Aus,table(origsex,sex,useNA='always'))
-summary(Aus$age)
-Aus = subset(Aus, age >= 25) #drop 1 individuals
-Aus$last_exam_age = Aus$age
-summary(Aus$height)
-summary(Aus$weight)
-Aus$last_exam_bmi = ((703*Aus$weight)/(Aus$height*Aus$height))
-summary(Aus$last_exam_bmi) 
-Aus$last_exam_fg = NA
-Aus$last_exam_hba1c = NA
-Aus$last_exam_t2d_treatment = NA
-Aus$last_exam_visit = NA
-Aus$t2d_age = NA
-Aus$t2d_bmi = NA
-Aus$FamilyID = Aus$individual_id
-Aus$PaternalID = 0
-Aus$MaternalID = 0
-Aus$study_ancestry <- paste(Aus$study,Aus$ancestry, sep = "_")
+# # recode & check variable names & distributions
+# table(Aus$diabetes,useNA='always')
+# Aus$t2d = ifelse(is.na(Aus$diabetes),-9,Aus$diabetes)
+# Aus$t2d[Aus$t2d == 'yes'] = 2
+# Aus$t2d[Aus$t2d == 'no'] = 0
+# with(Aus,table(diabetes,t2d,useNA='always')) #n=5 unknown T2D
+# table(Aus$race,useNA='always')
+# table(Aus$ethnicity,useNA='always')
+# Aus$ancestry[Aus$race == 'white' & Aus$ethnicity == 'no'] = "EU"
+# table(Aus$ancestry,useNA='always')
+# table(Aus$sex,useNA='always')
+# Aus$origsex = Aus$sex
+# Aus$sex[Aus$sex == 'male'] = 'M'
+# Aus$sex[Aus$sex == 'female'] = 'F'
+# with(Aus,table(origsex,sex,useNA='always'))
+# summary(Aus$age)
+# Aus = subset(Aus, age >= 25) #drop 1 individuals
+# Aus$last_exam_age = Aus$age
+# summary(Aus$height)
+# summary(Aus$weight)
+# Aus$last_exam_bmi = ((703*Aus$weight)/(Aus$height*Aus$height))
+# summary(Aus$last_exam_bmi) 
+# Aus$last_exam_fg = NA
+# Aus$last_exam_hba1c = NA
+# Aus$last_exam_t2d_treatment = NA
+# Aus$last_exam_visit = NA
+# Aus$t2d_age = NA
+# Aus$t2d_bmi = NA
+# Aus$FamilyID = Aus$individual_id
+# Aus$PaternalID = 0
+# Aus$MaternalID = 0
+# Aus$study_ancestry <- paste(Aus$study,Aus$ancestry, sep = "_")
 
-Aus <- Aus[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
-              'sex','t2d','last_exam_age','last_exam_bmi','last_exam_fg',
-              'last_exam_hba1c','last_exam_t2d_treatment','t2d_age','t2d_bmi','study',
-              'study_topmedid','study_ancestry','JWsource','ancestry',
-              "sample.id", "unique_subject_key", "submitted_subject_id", "consent", 
-              "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
-              "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
-#n=65
-write.csv(Aus,row.names=F,quote=F,file='Harmonized.AFib.Aus.XXXX2017.T2D.csv')
-
-
-##
-# AFib UMass
-## new file downloaded from dbGaP 30OCT2017
-UMass =read.table('UMASS_dbGaP_SubjectPhenotypesDS_v1.txt',
-                  header=T,sep='\t',as.is=T,fill = TRUE) #n=65 & 17 variables
-UMass$JWsource = "dbGaP"
-mapUMass <- map[map$study == "",] #n=
-UMass2 <- merge(mapUMass,UMass,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE) #n=789
-rm(mapUMass)
-
-# recode & check variable names & distributions
-table(UMass$diabetes,useNA='always')
-UMass$t2d = ifelse(is.na(UMass$diabetes),-9,UMass$diabetes)
-UMass$t2d[UMass$t2d == 'yes'] = 2
-UMass$t2d[UMass$t2d == 'no'] = 0
-with(UMass,table(diabetes,t2d,useNA='always')) #n=5 unknown T2D
-table(UMass$race,useNA='always')
-table(UMass$ethnicity,useNA='always')
-UMass$ancestry[UMass$race == 'white' & UMass$ethnicity == 'no'] = "EU"
-table(UMass$ancestry,useNA='always')
-table(UMass$sex,useNA='always')
-UMass$origsex = UMass$sex
-UMass$sex[UMass$sex == 'male'] = 'M'
-UMass$sex[UMass$sex == 'female'] = 'F'
-with(UMass,table(origsex,sex,useNA='always'))
-summary(UMass$age)
-UMass$last_exam_age = UMass$age
-summary(UMass$height)
-summary(UMass$weight)
-UMass$last_exam_bmi = ((703*UMass$weight)/(UMass$height*UMass$height))
-summary(UMass$last_exam_bmi) 
-UMass$last_exam_fg = NA
-UMass$last_exam_hba1c = NA
-UMass$last_exam_t2d_treatment = NA
-UMass$last_exam_visit = NA
-UMass$t2d_age = NA
-UMass$t2d_bmi = NA
-UMass$FamilyID = UMass$individual_id
-UMass$PaternalID = 0
-UMass$MaternalID = 0
-UMass$study_ancestry <- paste(UMass$study,UMass$ancestry, sep = "_")
+# Aus <- Aus[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
+#               'sex','t2d','last_exam_age','last_exam_bmi','last_exam_fg',
+#               'last_exam_hba1c','last_exam_t2d_treatment','t2d_age','t2d_bmi','study',
+#               'study_topmedid','study_ancestry','JWsource','ancestry',
+#               "sample.id", "unique_subject_key", "submitted_subject_id", "consent", 
+#               "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
+#               "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
+# #n=65
+# write.csv(Aus,row.names=F,quote=F,file=paste(f.dir,'Harmonized.AFib.Aus.XXXX2017.T2D.csv',sep="/"))
 
 
-UMass <- UMass[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
-                  'sex','t2d','last_exam_age','last_exam_bmi','last_exam_fg',
-                  'last_exam_hba1c','last_exam_t2d_treatment','t2d_age','t2d_bmi','study',
-                  'study_topmedid','study_ancestry','JWsource','ancestry',
-                  "sample.id", "unique_subject_key", "submitted_subject_id", "consent", 
-                  "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
-                  "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
-#n=65
-write.csv(UMass,row.names=F,quote=F,file='Harmonized.AFib.UMass.XXXX2017.T2D.csv')
+# ##
+# # AFib UMass
+# ## new file downloaded from dbGaP 30OCT2017
+# UMass =read.table(paste(f.dir,'UMASS_dbGaP_SubjectPhenotypesDS_v1.txt',sep="/"),
+#                   header=T,sep='\t',as.is=T,fill = TRUE) #n=65 & 17 variables
+# UMass$JWsource = "dbGaP"
+# mapUMass <- map[map$study == "",] #n=
+# UMass2 <- merge(mapUMass,UMass,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE) #n=789
+# rm(mapUMass)
+
+# # recode & check variable names & distributions
+# table(UMass$diabetes,useNA='always')
+# UMass$t2d = ifelse(is.na(UMass$diabetes),-9,UMass$diabetes)
+# UMass$t2d[UMass$t2d == 'yes'] = 2
+# UMass$t2d[UMass$t2d == 'no'] = 0
+# with(UMass,table(diabetes,t2d,useNA='always')) #n=5 unknown T2D
+# table(UMass$race,useNA='always')
+# table(UMass$ethnicity,useNA='always')
+# UMass$ancestry[UMass$race == 'white' & UMass$ethnicity == 'no'] = "EU"
+# table(UMass$ancestry,useNA='always')
+# table(UMass$sex,useNA='always')
+# UMass$origsex = UMass$sex
+# UMass$sex[UMass$sex == 'male'] = 'M'
+# UMass$sex[UMass$sex == 'female'] = 'F'
+# with(UMass,table(origsex,sex,useNA='always'))
+# summary(UMass$age)
+# UMass$last_exam_age = UMass$age
+# summary(UMass$height)
+# summary(UMass$weight)
+# UMass$last_exam_bmi = ((703*UMass$weight)/(UMass$height*UMass$height))
+# summary(UMass$last_exam_bmi) 
+# UMass$last_exam_fg = NA
+# UMass$last_exam_hba1c = NA
+# UMass$last_exam_t2d_treatment = NA
+# UMass$last_exam_visit = NA
+# UMass$t2d_age = NA
+# UMass$t2d_bmi = NA
+# UMass$FamilyID = UMass$individual_id
+# UMass$PaternalID = 0
+# UMass$MaternalID = 0
+# UMass$study_ancestry <- paste(UMass$study,UMass$ancestry, sep = "_")
 
 
-## THRV download
-thrv = read.table('THRV_Chinese_KS_09142017_T2D.ped', header=T,sep='\t',as.is=T) #n=2346
-thrv$JWsource = "dbGaP_Ex"
-mapthrv <- map[map$study == "THRV",] #n=1144
-thrv <- merge(mapthrv,thrv,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE) #n=1144
-rm(mapthrv)
+# UMass <- UMass[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
+#                   'sex','t2d','last_exam_age','last_exam_bmi','last_exam_fg',
+#                   'last_exam_hba1c','last_exam_t2d_treatment','t2d_age','t2d_bmi','study',
+#                   'study_topmedid','study_ancestry','JWsource','ancestry',
+#                   "sample.id", "unique_subject_key", "submitted_subject_id", "consent", 
+#                   "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
+#                   "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
+# #n=65
+# write.csv(UMass,row.names=F,quote=F,file=paste(f.dir,'Harmonized.AFib.UMass.XXXX2017.T2D.csv',sep="/"))
 
-# recode & check variable names & distributions
-table(thrv$sequenced,useNA='always')
-table(thrv$T2D,useNA='always')
-thrv$t2d = ifelse(is.na(thrv$T2D),-9,thrv$T2D)
-with(thrv,table(T2D,t2d,useNA='always'))
-thrv$ancestry = 'AS'
-table(thrv$ancestry,useNA='always')
-table(thrv$sex,useNA='always')
-thrv$sex[thrv$sex == 1] = 'M'
-thrv$sex[thrv$sex == 2] = 'F'
-table(thrv$sex,useNA='always')
-summary(thrv$last_exam_age,useNA='always')
-summary(thrv$last_exam_BMI)
-summary(thrv$T2D_age)
-summary(thrv$T2D_BMI)
-summary(thrv$last_exam_HbA1c)
-thrv$t2d_age = thrv$T2D_AGE
-thrv$t2d_bmi = thrv$T2D_BMI
-thrv$last_exam_bmi = thrv$last_exam_BMI
-thrv$last_exam_fg = thrv$last_exam_FG
-thrv$last_exam_hba1c = thrv$last_exam_HbA1c
-thrv$last_exam_t2d_treatment = thrv$last_exam_T2D_treatment
-thrv$FamilyID = thrv$family_ID
-thrv$PaternalID = thrv$father_id
-thrv$MaternalID = thrv$mother_id
-thrv$study_ancestry <- paste(thrv$study,thrv$ancestry, sep = "_")
 
-thrv <- thrv[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
-                'sex','t2d','last_exam_age','last_exam_bmi','last_exam_fg',
-                'last_exam_hba1c','last_exam_t2d_treatment','t2d_age','t2d_bmi','study',
-                'study_topmedid','study_ancestry','JWsource','ancestry',
-                "sample.id", "unique_subject_key", "submitted_subject_id", "consent", 
-                "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
-                "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
-#n=
+# ## THRV download
+# thrv = read.table(paste(f.dir,'THRV_Chinese_KS_09142017_T2D.ped',sep="/"), header=T,sep='\t',as.is=T) #n=2346
+# thrv$JWsource = "dbGaP_Ex"
+# # mapthrv <- map[map$study == "THRV",] #n=1144
+# # thrv <- merge(mapthrv,thrv,by.x='individual_id',by.y='SUBJECT_ID',all.x=TRUE) #n=1144
+# thrv <- merge(thrv,map,by.x='subject_id',by.y='individual_id',all.x=TRUE) #n=1144
+# rm(mapthrv)
 
-##END OF RECODE
+# # recode & check variable names & distributions
+# table(thrv$sequenced,useNA='always')
+# table(thrv$T2D,useNA='always')
+# thrv$t2d = ifelse(is.na(thrv$T2D),-9,thrv$T2D)
+# with(thrv,table(T2D,t2d,useNA='always'))
+# thrv$ancestry = 'AS'
+# table(thrv$ancestry,useNA='always')
+# table(thrv$sex,useNA='always')
+# thrv$sex[thrv$sex == 1] = 'M'
+# thrv$sex[thrv$sex == 2] = 'F'
+# table(thrv$sex,useNA='always')
+# summary(thrv$last_exam_age,useNA='always')
+# summary(thrv$last_exam_BMI)
+# summary(thrv$T2D_age)
+# summary(thrv$T2D_BMI)
+# summary(thrv$last_exam_HbA1c)
+# thrv$t2d_age = thrv$T2D_AGE
+# thrv$t2d_bmi = thrv$T2D_BMI
+# thrv$last_exam_bmi = thrv$last_exam_BMI
+# thrv$last_exam_fg = thrv$last_exam_FG
+# thrv$last_exam_hba1c = thrv$last_exam_HbA1c
+# thrv$last_exam_t2d_treatment = thrv$last_exam_T2D_treatment
+# thrv$FamilyID = thrv$family_ID
+# thrv$PaternalID = thrv$father_id
+# thrv$MaternalID = thrv$mother_id
+# thrv$study_ancestry <- paste(thrv$study,thrv$ancestry, sep = "_")
+
+# thrv <- thrv[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
+#                 'sex','t2d','last_exam_age','last_exam_bmi','last_exam_fg',
+#                 'last_exam_hba1c','last_exam_t2d_treatment','t2d_age','t2d_bmi','study',
+#                 'study_topmedid','study_ancestry','JWsource','ancestry',
+#                 "sample.id", "unique_subject_key", "submitted_subject_id", "consent", 
+#                 "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER", 
+#                 "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
+# #n=
+
+# ##END OF RECODE
 
 
 
@@ -1638,17 +1656,17 @@ thrv <- thrv[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
 # 
 # studies to add in future safs,thrv, goldn, hypergen
 pooled <- rbind(afccaf,afp,afvub,amish,aric,cfs,chs,copd,dhs,fhs,genestar,genoa,
-                gensalt,jhs,mesa,mesafam,raw.HVH,raw.MGH,raw.VUdaw,sas,whi)
+                gensalt,jhs,mesa,mesafam,raw.HVH,raw.MGH,raw.VUdaw,sas,whi,safs3)
 
 table(pooled$t2d,useNA='always') #-9 n=2834 NA n=1978
-#pooled$t2d[pooled$t2d == -9] = 'NA'
+pooled$t2d[pooled$t2d == -9] = NA
 table(pooled$t2d)
 table(pooled$sex,useNA='always') # 595 missing 1 XXY
-pooled2 <- pooled[is.na(pooled$t2d),] 
+pooled2 <- pooled[is.na(pooled$t2d),]
 pooled2 = subset(pooled, sex == 'XXY')
 table(pooled$CENTER,useNA='always')
-#  baylor    broad illumina macrogen     nygc       uw     <NA> 
-#  5308    29938      264     1283      851     7188        0 
+# baylor    broad illumina macrogen     nygc       uw     <NA> 
+#   5308    29938     1288     1283      851     7188        0  
 
 ##  !!  NEED TO CREATE THESE VARIABLES !!  ##
 ## t2d_ctrl t2d_superctrl
@@ -1656,17 +1674,17 @@ table(pooled$t2d,useNA='always')
 pooled$t2d_ctrl[pooled$t2d == 2] = 1
 pooled$t2d_ctrl[pooled$t2d == 1] = 0
 pooled$t2d_ctrl[pooled$t2d == 0] = 0
-pooled$t2d_ctrl[pooled$t2d == -9] = -9
+pooled$t2d_ctrl[is.na(pooled$t2d)] = NA
 with(pooled,table(t2d,t2d_ctrl,useNA='always'))
 
 table(pooled$t2d,useNA='always')
 pooled$t2d_nopre.ctrl[pooled$t2d == 2] = 1
-pooled$t2d_nopre.ctrl[pooled$t2d == 1] = -9
+pooled$t2d_nopre.ctrl[pooled$t2d == 1] = NA
 pooled$t2d_nopre.ctrl[pooled$t2d == 0] = 0
-pooled$t2d_nopre.ctrl[pooled$t2d == -9] = -9
+pooled$t2d_nopre.ctrl[is.na(pooled$t2d)] = NA
 with(pooled,table(t2d,t2d_nopre.ctrl,useNA='always'))
 
-write.csv(pooled,row.names=F,quote=F,file='Pooled_MIXED_WesselJ_18JAN2017_T2D.csv')
+# write.csv(pooled,row.names=F,quote=F,file=paste(f.dir,'Pooled_MIXED_WesselJ_18JAN2017_T2D.csv',sep="/"))
 
 
 #collapse AFib studies
@@ -1701,5 +1719,5 @@ pooled$study_ancestry_AFib[pooled$study_ancestry == "JHS_AF"] = "JHS_AF"
 pooled$study_ancestry_AFib[pooled$study_ancestry == "SAS_AS"] = "SAS_AS"
 with(pooled,table(study_ancestry,study_ancestry_AFib,useNA='always'))
 
-write.csv(pooled,row.names=F,quote=F,file='Pooled_MIXED_WesselJ_27AUG2017_T2D.csv')
-save(pooled, file = "Pooled_MIXED_WesselJ_27AUG2017_T2D.RData")
+write.csv(pooled,row.names=F,quote=F,file=paste(out.pref,'.csv',sep=""))
+# save(pooled, file = paste(f.dir,"Pooled_MIXED_WesselJ_27AUG2017_T2D.RData",sep="/"))
