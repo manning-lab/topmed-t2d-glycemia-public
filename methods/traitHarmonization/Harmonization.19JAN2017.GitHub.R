@@ -49,6 +49,8 @@ chs <- dat$chs
 genoa <- dat$genoa
 dhs <- dat$dhs
 dhsPed <- dat$dhsPed
+safs <- dat$safs
+safs.ids <- dat$safs.ids
 
 rm(dat)
 
@@ -1431,69 +1433,79 @@ dhs <- dhs[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
 # ## 9 SEP 2017 DOWNLOADED new dataset
 # # 7DEC2017 checked for new files - none
 # safs = read.csv(paste(f.dir,'SAFSCVD_HA_MAHANEY_20170807_T2D.ped.csv',sep="/"), header=T,sep=',',as.is=TRUE) #n=2457 (n=2 Sequenced=0)
-head(safs)
+
+# 1: Get rows of map file that correspond to NWD ids from the id file
+safs.map <- map[map$sample.id %in% safs.ids$`NWD ID`,] # 1509
+
+# 2: Get the unique deidentified subject IDs from the id file
+uniq.deident <- unique(safs.ids$`Deidentified Subject`) # 2624
+
+# 3: Check that we have the only deidentified subject ids in the map file
+length(unique(safs.map$submitted_subject_id)) # 1474, so we have 35 duplicated NWD ids
+
+# 4: Get the NWD ids for our unique deidentified subject ids that are in the map file
+safs.nwd <- safs.map[safs.map$submitted_subject_id %in% uniq.deident,] # 1502
+
+# 5: Subset the phenotype file by these nwd ids
+safs.ped <- safs[safs$Individual_ID %in% safs.nwd$sample.id,] # 1438
+
+head(safs.ped)
+safs.ped <- merge(safs.ped, map[colnames(map)[colnames(map) != "sex"]], by.x="Individual_ID", by.y="sample.id", all.x=T)
+safs.ped$topmedid <- safs.ped$Individual_ID
+safs.ped$individual_id <- safs.ped$unique_subject_key
 # safs$Individual_ID_pheno = safs$Individual_ID
-safs3$JWsource = "dbGaP_Ex"
-
-safsid = read.csv(paste(f.dir,"SAFSCVD_PERALTA_09262017_nwd_mappingtable.csv",sep="/"), header=T,sep=',',as.is=TRUE) #n=2713
-head(safsid)
-safs2 <- merge(safsid,safs,by.x='NWD.ID',by.y='Individual_ID',all.x=TRUE) #n=2715
-head(safs2)
-# write.csv(safs2,row.names=F,quote=F,file='SAFS.test2.17NOV2017.T2D.csv')
-
-mapSAFS <- map[which(map$study == "SAFS"),] #n=1509
-head(mapSAFS)
-safs3 <- merge(mapSAFS,safs2,by.x='sample.id',by.y='NWD.ID') #n=1509
-head(safs3)
-# rm(mapSAFS)
-# write.csv(safs3,row.names=F,quote=F,file=paste(f.dir,'SAFS.test.25JAN2018.T2D.csv',sep="/"))
+safs.ped$JWsource = "dbGaP_Ex"
 
 # # recode & check variable names & distributions
-table(safs3$Sequenced,useNA='always')
-table(safs3$T2D,useNA='always')
-safs3$t2d = ifelse(is.na(safs3$T2D),-9,safs3$T2D)
-with(safs3,table(T2D,t2d,useNA='always'))
-safs3$ancestry = 'HS'
-table(safs3$ancestry,useNA='always')
-table(safs3$Sex,useNA='always')
-safs3$sex[safs3$Sex == 1] = 'M'
-safs3$sex[safs3$Sex == 2] = 'F'
-with(safs3,table(Sex,sex,useNA='always'))
-summary(safs3$Last_Exam_Age,useNA='always')
+table(safs.ped$Sequenced,useNA='always')
+table(safs.ped$T2D,useNA='always')
+# safs.ped$t2d = ifelse(is.na(safs.ped$T2D),-9,safs.ped$T2D)
+safs.ped$t2d = ifelse(safs.ped$T2D==-9,NA,safs.ped$T2D)
+with(safs.ped,table(T2D,t2d,useNA='always'))
+safs.ped$ancestry = 'HS'
+table(safs.ped$ancestry,useNA='always')
+table(safs.ped$Sex,useNA='always')
+safs.ped$sex[safs.ped$Sex == 1] = 'M'
+safs.ped$sex[safs.ped$Sex == 2] = 'F'
+with(safs.ped,table(Sex,sex,useNA='always'))
+summary(safs.ped$last_exam_age,useNA='always')
 
 # remove those with NA sex
-safs3 <- safs3[!is.na(safs3$sex),]
+safs.ped <- safs.ped[!is.na(safs.ped$sex),]
 
-summary(safs3$last_exam_age,useNA='always')
+summary(safs.ped$last_exam_age,useNA='always')
 # safs = subset(safs, Last_Exam_Age >= 25) #n=1903, drop 552 individuals
-safs3 = subset(safs3, last_exam_age >= 25) #n=1903, drop 552 individuals
-summary(safs3$last_exam_BMI) # ! low BMI
+safs.ped = subset(safs.ped, last_exam_age >= 25) #n=1903, drop 552 individuals
+summary(safs.ped$last_exam_BMI) # ! low BMI
 # summary(safs$last_exam_BMI) # ! low BMI
 # # safs$last_exam_age = safs$Last_Exam_Age
 # safs$last_exam_age = safs$last_exam_age
 # # safs$last_exam_bmi = safs$Last_Exam_BMI
-safs3$last_exam_bmi = safs3$last_exam_BMI
-safs3$last_exam_fg = safs3$last_exam_FG
-safs3$last_exam_hba1c = NA
+safs.ped$last_exam_bmi = safs.ped$last_exam_BMI
+safs.ped$last_exam_fg = safs.ped$last_exam_FG
+safs.ped$last_exam_hba1c = NA
 # ## variables are missing contacted MM 26JUL2017
 # safs$last_exam_t2d_treatment = safs$last_exam_T2D_treatment
-safs3$last_exam_t2d_treatment = NA
-safs3$t2d_age = safs3$T2D_age
-safs3$t2d_bmi = safs3$T2D_BMI
-table(safs3$last_exam_visit,useNA = 'always')
-safs3$FamilyID = safs3$Family_ID
-safs3$PaternalID = safs3$Father_ID
-safs3$MaternalID = safs3$Mother_ID
-safs3$study_ancestry <- paste(safs3$study,safs3$ancestry, sep = "_")
+safs.ped$last_exam_t2d_treatment = NA
+safs.ped$t2d_age = safs.ped$T2D_age
+safs.ped$t2d_bmi = safs.ped$T2D_BMI
+table(safs.ped$last_exam_visit,useNA = 'always')
+safs.ped$FamilyID = safs.ped$Family_ID
+safs.ped$PaternalID = safs.ped$Father_ID
+safs.ped$MaternalID = safs.ped$Mother_ID
+safs.ped$study_ancestry <- paste(safs.ped$study,safs.ped$ancestry, sep = "_")
+safs.ped$study_topmedid <- paste(safs.ped$study,safs.ped$Individual_ID, sep="_")
+safs.ped$sample.id <- safs.ped$unique_subject_key
 
-safs3 <- safs3[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
+safs.ped <- safs.ped[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID',
                 'sex','t2d','last_exam_age','last_exam_bmi','last_exam_fg',
                 'last_exam_hba1c','last_exam_t2d_treatment','t2d_age','t2d_bmi','study',
                 'study_topmedid','study_ancestry','JWsource','ancestry',
                 "sample.id", "unique_subject_key", "submitted_subject_id", "consent",
                 "sexchr.kary",  "topmed_phs", "topmed_project", "CENTER",
                 "geno.cntl",  "TRIO.dups", "MZtwinID",  "keep", "unique.geno",  "unique.subj")]
-# #n=????
+
+# #n=1021
 
 # ### AWAITING GENOTYPE DATA
 # ##
@@ -1656,7 +1668,7 @@ safs3 <- safs3[,c('topmedid','individual_id','FamilyID','MaternalID','PaternalID
 # 
 # studies to add in future safs,thrv, goldn, hypergen
 pooled <- rbind(afccaf,afp,afvub,amish,aric,cfs,chs,copd,dhs,fhs,genestar,genoa,
-                gensalt,jhs,mesa,mesafam,raw.HVH,raw.MGH,raw.VUdaw,sas,whi,safs3)
+                gensalt,jhs,mesa,mesafam,raw.HVH,raw.MGH,raw.VUdaw,sas,whi,safs.ped)
 
 table(pooled$t2d,useNA='always') #-9 n=2834 NA n=1978
 pooled$t2d[pooled$t2d == -9] = NA
