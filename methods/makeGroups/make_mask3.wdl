@@ -1,6 +1,6 @@
 task getScript {
 	command {
-		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/master/methods/makeGroups/make_mask3.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/make_groups/methods/makeGroups/make_mask3.R"
 	}
 
 	runtime {
