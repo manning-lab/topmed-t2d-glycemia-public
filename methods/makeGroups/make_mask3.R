@@ -250,5 +250,5 @@ groups.final <- do.call(rbind,groups)
 ## save groups
 # save(groups, "groups", file="/Users/tmajaria/Documents/projects/topmed/code/varshney/freeze5b/mask3/mask3.RData")
 # fwrite(groups.final, file="/Users/tmajaria/Documents/projects/topmed/code/varshney/freeze5b/mask3/mask3.csv",sep=",")
-save(groups, "groups", file=paste(outpref,chr,'mask3.RData',sep='.'))
-fwrite(groups.final, file=paste(outpref,chr,'mask3.csv',sep='.'),sep=",")
+save(groups, "groups", file=paste(outpref,'mask3.RData',sep='.'))
+fwrite(groups.final, file=paste(outpref,'mask3.csv',sep='.'),sep=",")
