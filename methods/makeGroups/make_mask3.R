@@ -88,7 +88,7 @@ states.gr <- GRanges(seqnames=states.subset$V1,ranges=IRanges(start=states.subse
 
 ## load tfbs data
 tfbs.raw <- fread(tfbs.file, data.table=F)
-tfbs.raw$V1 <- sub("^","chr",tfbs.raw$V1)
+# tfbs.raw$V1 <- sub("^","chr",tfbs.raw$V1)
 tfbs.raw <- tfbs.raw[tfbs.raw$V1 == chr,]
 tfbs.gr <- GRanges(seqnames=tfbs.raw$V1,ranges=IRanges(start=tfbs.raw$V2,end=tfbs.raw$V3),tf=tfbs.raw$V4)
 
