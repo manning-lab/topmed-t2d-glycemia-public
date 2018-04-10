@@ -124,6 +124,9 @@ groups <- list()
 ## loop through genes
 for (gind in seq(1,NROW(genes.gr))){
   # for (gind in seq(1,5)){
+    ptv.flag <- F
+    prom.flag <- F
+    enh.flag <- F
   
   print(paste(gind,"/",length(genes.gr[,1]),sep=""))
   

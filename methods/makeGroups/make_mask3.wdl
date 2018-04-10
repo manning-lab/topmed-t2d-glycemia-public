@@ -42,8 +42,8 @@ task makeGroups {
     }
 
     output {
-    	File rdata = "${outpref}.${chr}.mask3.RData"
-    	File csv = "${outpref}.${chr}.mask3.csv"
+    	File rdata = "${outpref}.mask3.RData"
+    	File csv = "${outpref}.mask3.csv"
     }	
 
 }
@@ -67,7 +67,7 @@ workflow wf {
 	
 	scatter(cur_gds in these_gds) {
 		call makeGroups {
-				input: gds = cur_gds, expr = this_expr, tfbs = this_tfbs, states = this_states, ptv = this_ptv, genh = this_genh, outpref = this_outpref, disk = this_disk, mem = this_mem, script = getScript.script
+				input: gds = cur_gds, expr = this_expr, exon = this_exon, tfbs = this_tfbs, states = this_states, ptv = this_ptv, genh = this_genh, outpref = this_outpref, disk = this_disk, mem = this_mem, script = getScript.script
 		}
 	}
 }
