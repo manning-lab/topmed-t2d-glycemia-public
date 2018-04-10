@@ -1,6 +1,7 @@
 task getScript {
 	command {
 		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/make_groups/methods/makeGroups/make_mask3.R"
+		wget "https://raw.githubusercontent.com/manning-lab/topmed-t2d-glycemia-public/make_groups/methods/makeGroups/combineGroups.R"
 	}
 
 	runtime {
@@ -9,6 +10,7 @@ task getScript {
 
 	output {
 		File script = "make_mask3.R"
+		File comb_script = "combineGroups.R"
 	}
 }
 
@@ -48,6 +50,26 @@ task makeGroups {
 
 }
 
+task combineGroups {
+	Array[File] groups
+	String outpref
+	File script
+
+	command {
+		R --vanilla --args ${sep="," groups} < ${script}
+	}
+
+	runtime {
+    	   docker: "robbyjo/r-mkl-bioconductor@sha256:b88d8713824e82ed4ae2a0097778e7750d120f2e696a2ddffe57295d531ec8b2"
+		   disks: "local-disk 100 SSD"
+		   memory: "10G"
+    }
+
+    output {
+    	File all_groups = "${outpref}.all.groups.mask3.csv"
+    }	
+}
+
 workflow wf {
 	Array[File] these_gds
 	File this_expr
@@ -69,5 +91,9 @@ workflow wf {
 		call makeGroups {
 				input: gds = cur_gds, expr = this_expr, exon = this_exon, tfbs = this_tfbs, states = this_states, ptv = this_ptv, genh = this_genh, outpref = this_outpref, disk = this_disk, mem = this_mem, script = getScript.script
 		}
+	}
+
+	call combineGroups {
+		input: groups = makeGroups.csv, outpref = this_outpref, script = getScript.comb_script
 	}
 }
