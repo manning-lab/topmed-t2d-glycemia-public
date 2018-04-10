@@ -213,6 +213,10 @@ for (gind in seq(1,NROW(genes.gr))){
   gds.gr.ovp$ptv <- cur_trans.var_regions$ptv[subjectHits(gds.gr.ovp.id)]
   gds.gr.ovp$tfbs_state <- cur_trans.var_regions$tfbs_state[subjectHits(gds.gr.ovp.id)]
   
+if(length(gds.gr.ovp$variant.id) == 0){
+    next
+}
+
   gds.gr.df <- data.frame(variant.id = gds.gr.ovp$variant.id, position = gds.gr.ovp$position, chromosome = seqnames(gds.gr.ovp), ref = gds.gr.ovp$ref, allele = gds.gr.ovp$allele, nAlleles = gds.gr.ovp$nAllelles, allele.index = gds.gr.ovp$allele.index, maf = gds.gr.ovp$maf, ptv = gds.gr.ovp$ptv, tfbs_state = gds.gr.ovp$tfbs_state, group_id = cur_trans.trans_id)
   gds.gr.df <- gds.gr.df[!duplicated(gds.gr.df$variant.id),]
   # ptv.final.id <- merge(gds.gr.df[gds.gr.df$ptv != "NA",],cur_trans.ptv.df, by.x = c("chromosome","position","ref","allele"), by.y = c("chromosome","position","ref","alt"))$variant.id
