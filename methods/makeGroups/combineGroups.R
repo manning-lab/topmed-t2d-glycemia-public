@@ -11,4 +11,4 @@ for (i in seq(1,length(groups))){
 
 all_groups <- do.call(rbind,all_groups)
 
-fwrite(all_groups, paste(outpref,"all.groups.mask3.csv", sep = "."), sep = ",")
+fwrite(all_groups, paste(outpref,"all.groups.mask9.csv", sep = "."), sep = ",")
