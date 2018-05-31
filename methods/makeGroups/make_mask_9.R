@@ -140,6 +140,11 @@ for (gind in seq(1,nrow(all.regions))){
   ## subset the variants to those with maf<1% and maf > 0
   gds.df <- gds.df[gds.df$maf<minmaf,]
   gds.df <- gds.df[gds.df$maf>0.0,]
+
+  # check if we have no var again
+  if(nrow(gds.df)==0){
+    next
+  }
   
   # fix chromosome
   gds.df$chromosome <- sub("^","chr",gds.df$chromosome)
