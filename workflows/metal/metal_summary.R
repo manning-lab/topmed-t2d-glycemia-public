@@ -44,13 +44,13 @@ if (length(assoc.names) < length(assoc.files)){
 metal.data <- fread(metal.file,data.table=F)
 
 for (f in seq(1,length(assoc.files))) {
-  assoc.data <- fread(assoc.files[f],data.table=F)
+  assoc.data <- fread(assoc.files[f],data.table=F)[,c(marker.column, cols.tokeep, freq.column, pval.column, sample.column)]
   if (f == 1){
     assoc.data.all = assoc.data[,c(marker.column, cols.tokeep, freq.column, pval.column, sample.column)]
     colnames(assoc.data.all)[which(colnames(assoc.data.all) %in% c(freq.column, pval.column, sample.column))] <- paste(c(freq.column, pval.column, sample.column),assoc.names[f],sep=".")
   } else {
-
-  assoc.data.all <- merge(assoc.data.all, assoc.data, by=c(marker.column,cols.tokeep),suffixes = c("",paste(".",assoc.names[f],sep="")),all=T)
+    names(assoc.data)[names(assoc.data) %in% c(freq.column, pval.column, sample.column)] <- paste(names(assoc.data)[names(assoc.data) %in% c(freq.column, pval.column, sample.column)],".",assoc.names[f],sep = "")
+    assoc.data.all <- merge(assoc.data.all, assoc.data, by=c(marker.column,cols.tokeep),all=T)
   }
 }
 
@@ -63,7 +63,7 @@ metal.data = metal.data[order(metal.data[,"P-value"]),]
 # calculate full sample mac for each variant
 all_mac <- c()
 for (n in assoc.names){
-  all_mac <- cbind(all_mac, 2 * metal.data[,paste(n,"_",sample.column,sep="")] * metal.data[,paste(n,"_",freq.column,sep="")] )
+  all_mac <- cbind(all_mac, 2 * metal.data[,paste(sample.column,".",n,sep="")] * metal.data[,paste(freq.column,".",n,sep="")] )
 }
 metal.data$total_maf <- rowSums(all_mac)/(2*metal.data$Weight)
 
