@@ -6,6 +6,7 @@ gds.file <- args[1]
 library(SeqVarTools)
 library(dplyr)
 library(tidyr)
+library(data.table)
 
 .variantDF <- function(gds) {
   data.frame(variant.id=seqGetData(gds, "variant.id"),
