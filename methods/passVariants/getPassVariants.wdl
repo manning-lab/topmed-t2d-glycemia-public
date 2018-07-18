@@ -25,7 +25,8 @@ task getPass {
 	runtime {
 		docker: "manninglab/singlevariantassociation:latest"
 		disks: "local-disk 100 SSD"
-		memory: "10G"
+		memory: "20G"
+		bootDiskSizeGb: 20
 	}
 
 	output {
@@ -44,6 +45,7 @@ task combine {
 		docker: "manninglab/singlevariantassociation:latest"
 		disks: "local-disk 50 SSD"
 		memory: "5G"
+		bootDiskSizeGb: 20
 	}
 
 	output {
@@ -65,5 +67,9 @@ workflow passVar {
 
 	call combine {
 		input: ids = getPass.varlist
+	}
+
+	output {
+		File all_variants = combine.allvar
 	}
 }
