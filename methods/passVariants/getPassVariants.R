@@ -32,5 +32,5 @@ df <- df[df$filter == "PASS",]
 df$MarkerName <- paste("chr", df$chromosome, df$position, df$ref, df$alt, sep = "-")
 df <- df[,c("variant.id", "MarkerName")]
 
-fwrite(df, file = paste("freeze.5b.passing.variants.", chr, ".minDP10.csv"), sep = ",")
+fwrite(df, file = paste0("freeze.5b.passing.variants.", chr, ".minDP10.csv"), sep = ",", col.names = F, quote = F)
 
