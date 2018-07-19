@@ -9,9 +9,6 @@ library(data.table)
 res.data <- fread(res.file, data.table = F, stringsAsFactors = F)
 pass.data <- fread(pass.file, data.table = F, stringsAsFactors = F)
 
-# fix mistake
-pass.data$V2 <- sub("chr-","chr",pass.data$V2)
-
 # keep passing variants
 res.data <- res.data[res.data$MarkerName %in% pass.data$V2,]
 
