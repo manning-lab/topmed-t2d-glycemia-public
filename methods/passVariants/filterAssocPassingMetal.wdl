@@ -19,6 +19,8 @@ task filterPass {
 	File pass_file
 	File script
 
+	String out_file = basename(res_file)
+
 	command {
 		R --vanilla --args ${res_file} ${pass_file} < ${script}
 	}
@@ -31,7 +33,7 @@ task filterPass {
 	}
 
 	output {
-		File varlist = "${res_file}"
+		File varlist = "${out_file}"
 	}
 }
 
