@@ -28,7 +28,7 @@ task filterPass {
 	runtime {
 		docker: "manninglab/singlevariantassociation:latest"
 		disks: "local-disk 100 SSD"
-		memory: "15G"
+		memory: "60G"
 		bootDiskSizeGb: 20
 	}
 

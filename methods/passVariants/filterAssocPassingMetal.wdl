@@ -18,6 +18,7 @@ task filterPass {
 	File res_file
 	File pass_file
 	File script
+	Float memory
 
 	String out_file = basename(res_file)
 
@@ -28,7 +29,7 @@ task filterPass {
 	runtime {
 		docker: "manninglab/singlevariantassociation:latest"
 		disks: "local-disk 100 SSD"
-		memory: "15G"
+		memory: "${memory}G"
 		bootDiskSizeGb: 20
 	}
 
@@ -40,10 +41,11 @@ task filterPass {
 workflow filterVar {
 	File this_res_file
 	File this_pass_file
+	Float this_memory
 
 	call getScript
 	
 	call filterPass {
-		input: res_file = this_res_file, pass_file = this_pass_file, script = getScript.script
+		input: res_file = this_res_file, pass_file = this_pass_file, memory= this_memory, script = getScript.script
 	}
 }
