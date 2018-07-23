@@ -11,10 +11,6 @@ library(data.table)
 res.data <- fread(res.file, data.table = F, stringsAsFactors = F)
 pass.data <- fread(pass.file, data.table = F, stringsAsFactors = F, header = F)$V1
 
-# fix markers
-# chr10:112998590:C:T
-pass.data <- gsub("-",":",pass.data)
-
 # keep passing variants
 res.data <- res.data[res.data$MarkerName %in% pass.data,]
 
